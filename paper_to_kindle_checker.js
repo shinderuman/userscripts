@@ -30,13 +30,23 @@
     // 書籍データをS3から取得
     const fetchBooks = () => {
         return new Promise((resolve, reject) => {
+            // キャッシュバスターを追加してキャッシュを無効化
+            const cacheBuster = `?t=${Date.now()}&r=${Math.random()}`;
+            const urlWithCacheBuster = CONFIG.BOOKS_URL + cacheBuster;
+            
             GM_xmlhttpRequest({
                 method: "GET",
-                url: CONFIG.BOOKS_URL,
+                url: urlWithCacheBuster,
+                headers: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0'
+                },
                 onload: (response) => {
                     if (response.status === 200) {
                         try {
                             const books = JSON.parse(response.responseText);
+                            console.log(`📥 S3データ取得成功: books (${books.length}件)`);
                             resolve(books);
                         } catch (error) {
                             reject(new Error(`Failed to parse JSON: ${error.message}`));

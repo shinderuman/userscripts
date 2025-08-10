@@ -88,13 +88,23 @@
 
     const fetchJsonFromS3 = (url, dataType) => {
         return new Promise((resolve, reject) => {
+            // キャッシュバスターを追加してキャッシュを無効化
+            const cacheBuster = `?t=${Date.now()}&r=${Math.random()}`;
+            const urlWithCacheBuster = url + cacheBuster;
+
             GM_xmlhttpRequest({
                 method: "GET",
-                url: url,
+                url: urlWithCacheBuster,
+                headers: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0'
+                },
                 onload: (response) => {
                     if (response.status === 200) {
                         try {
                             const data = JSON.parse(response.responseText);
+                            console.log(`📥 S3データ取得成功: ${dataType} (${data.length || Object.keys(data).length}件)`);
                             resolve(data);
                         } catch (error) {
                             reject(new Error(`Failed to parse ${dataType} JSON: ${error.message}`));
@@ -233,10 +243,10 @@
             const { title, bookUrl } = basicInfo;
             const asin = extractAsinFromUrl(bookUrl);
 
-            // 紙書籍チェック
-            if (checkIsPhysicalBook(asin)) {
-                continue;
-            }
+            // // 紙書籍チェック
+            // if (checkIsPhysicalBook(asin)) {
+            //     continue;
+            // }
 
             // 通知済みチェック
             if (checkAlreadyNotified(asin)) {
@@ -303,15 +313,6 @@
     const extractAsinFromUrl = (url) => {
         const match = url.match(/\/dp\/([A-Z0-9]{10})/);
         return match ? match[1] : null;
-    };
-
-    const checkIsPhysicalBook = (asin) => {
-        if (asin && isIsbn(asin)) {
-            console.log(`⏭️ スキップ: 紙書籍です (ASIN: ${asin})`);
-            return true;
-        }
-        console.log(`📖 ASIN: ${asin} (Kindle書籍)`);
-        return false;
     };
 
     const isIsbn = (asin) => {
