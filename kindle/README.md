@@ -43,6 +43,25 @@ checkPaperToKindle()
 - セール条件の判定（価格閾値、ポイント率など）
 - セール発見時の通知
 
+### 📘 Campaign Sorter (`campaign_sorter/`)
+期間限定キャンペーン対象のKindle本を抽出し価格順に表示するスクリプト。
+
+**機能:**
+- キャンペーン対象商品の自動検出
+- 複数ページの一括処理（最大20ページ）
+- 価格順ソート表示
+- 手動ボタントリガー
+- 結果の表示・非表示切り替え
+
+### 📖 Manga First Open Page (`manga_first_open_page/`)
+Kindle Cloud Readerで最初のページを開くスクリプト。
+
+**機能:**
+- キーボードショートカット（'0'キー）で最初のページに移動
+- 特定GETパラメータでの自動実行
+- リロード時の動作制御
+- MutationObserverによる要素監視
+
 **使用方法:**
 ```javascript
 // デベロッパーツールで実行
