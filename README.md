@@ -8,18 +8,25 @@
 userscripts/
 ├── README.md                    # このファイル
 ├── LICENSE                      # MITライセンス
-└── kindle/                      # Amazon Kindle関連スクリプト
-    ├── README.md               # Kindleスクリプトの詳細説明
+├── kindle/                      # Amazon Kindle関連スクリプト
+│   ├── README.md               # Kindleスクリプトの詳細説明
+│   ├── common.js               # 共通ライブラリ
+│   ├── new_release_checker/    # 新刊チェッカー
+│   ├── paper_to_kindle_checker/ # 紙書籍→Kindle版チェッカー
+│   └── sale_checker/           # セールチェッカー
+└── mastodon/                    # Mastodon関連スクリプト
+    ├── README.md               # Mastodonスクリプトの詳細説明
     ├── common.js               # 共通ライブラリ
-    ├── new_release_checker/    # 新刊チェッカー
-    ├── paper_to_kindle_checker/ # 紙書籍→Kindle版チェッカー
-    └── sale_checker/           # セールチェッカー
+    ├── column_splitter/        # カラム分割
+    ├── column_combiner/        # カラム結合
+    └── recent_post_editor/     # 投稿編集ショートカット
 ```
 
 ## 🎯 対応サービス
 
 ### 現在対応済み
 - **Amazon Kindle** (`kindle/`) - 書籍の新刊・セール・利用可能性チェック
+- **Mastodon** (`mastodon/`) - カラム管理・投稿編集・UI改善
 
 ### 今後追加予定
 - その他のECサイト
@@ -39,6 +46,12 @@ userscripts/
 - **新刊チェッカー**: 指定作者の新刊をチェックして通知
 - **紙書籍→Kindle版チェッカー**: 紙書籍とKindle版両方が利用可能な商品を発見
 - **セールチェッカー**: ウィッシュリストの書籍のセール情報をチェック
+
+### Mastodon (`mastodon/`)
+
+- **カラム分割**: 指定カラムを複数に分割してレイアウト改善
+- **カラム結合**: 複数カラムを縦方向に結合
+- **投稿編集ショートカット**: キーボードショートカットで投稿編集・リプライ
 
 詳細は各サービスディレクトリ内の`README.md`を参照してください。
 
