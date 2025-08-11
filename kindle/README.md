@@ -1,0 +1,181 @@
+# Kindle UserScripts
+
+Amazon Kindleストアでの書籍チェックを自動化するTampermonkeyスクリプト集です。
+
+## 📋 スクリプト一覧
+
+### 🆕 New Release Checker (`new_release_checker/`)
+指定した作者の新刊をチェックして通知するスクリプト。
+
+**機能:**
+- S3から作者リストを取得
+- Amazon検索結果から新刊を自動検出
+- 発売日ベースの新刊判定（デフォルト7日以内）
+- 除外キーワードによるフィルタリング
+- 重複通知の防止
+
+**使用方法:**
+```javascript
+// デベロッパーツールで実行
+checkNewReleases()
+```
+
+### 📖 Paper to Kindle Checker (`paper_to_kindle_checker/`)
+紙書籍とKindle版の両方が利用可能な商品を発見するスクリプト。
+
+**機能:**
+- S3から書籍ASINリストを取得
+- 各商品ページで紙書籍・Kindle版の利用可能性をチェック
+- 両方利用可能な商品を通知
+
+**使用方法:**
+```javascript
+// デベロッパーツールで実行
+checkPaperToKindle()
+```
+
+### 💰 Sale Checker (`sale_checker/`)
+ウィッシュリストの書籍のセール情報をチェックするスクリプト。
+
+**機能:**
+- S3から書籍ASINリストを取得
+- 価格・ポイント情報を取得
+- セール条件の判定（価格閾値、ポイント率など）
+- セール発見時の通知
+
+**使用方法:**
+```javascript
+// デベロッパーツールで実行
+checkWishlistSales()
+```
+
+## 🔧 共通ライブラリ (`common.js`)
+
+全スクリプトで共有される汎用機能を提供します。
+
+### 主要機能
+
+#### データ取得
+- `fetchJsonFromS3(url, dataType)`: S3からJSONデータを取得
+- `fetchPageInfo(url, extractorFunction)`: 個別ページ情報を取得
+
+#### 通知システム
+- `sendNotification(title, text, url, timeout)`: 基本通知
+- `sendCompletionNotification(scriptName, totalCount, resultCount)`: 完了通知
+- `sendErrorNotification(scriptName, errorMessage)`: エラー通知
+
+#### バッチ処理
+- `processBatch(items, processorFunction, config)`: 並行処理制御
+
+#### ストレージ管理
+- `getStorageItems(storageKey)`: localStorage読み込み
+- `saveStorageItem(storageKey, item)`: localStorage保存
+- `isAlreadyStored(storageKey, checkFunction)`: 重複チェック
+- `cleanupOldStorageItems(storageKey, cutoffDate)`: 古いデータ削除
+
+#### ユーティリティ
+- `extractAsinFromUrl(url)`: URLからASIN抽出
+- `getElementValue(doc, selector, regex)`: DOM要素値取得
+
+## 🚀 インストール方法
+
+### 1. Tampermonkeyの準備
+1. ブラウザにTampermonkey拡張機能をインストール
+2. Tampermonkey Dashboardを開く
+
+### 2. スクリプトのインストール
+各スクリプトの`wrapper.js`ファイルをTampermonkeyにインポート:
+
+1. **New Release Checker**: `new_release_checker/wrapper.js`
+2. **Paper to Kindle Checker**: `paper_to_kindle_checker/wrapper.js`
+3. **Sale Checker**: `sale_checker/wrapper.js`
+
+### 3. パスの設定
+`wrapper.js`ファイル内の`@require`パスを環境に合わせて調整:
+
+```javascript
+// @require file:///path/to/your/userscripts/kindle/common.js
+// @require file:///path/to/your/userscripts/kindle/[script_name]/main.js
+```
+
+## ⚙️ 設定
+
+### 設定項目
+各スクリプトの`main.js`内の`CONFIG`オブジェクトで設定を変更できます:
+
+```javascript
+const CONFIG = {
+    CONCURRENT_REQUESTS: 20,    // 同時リクエスト数
+    REQUEST_DELAY: 1000,        // リクエスト間隔（ミリ秒）
+    NEW_RELEASE_DAYS: 7,        // 新刊判定日数
+    MIN_PRICE: 221,             // 最低価格（円）
+    THRESHOLD: 151              // セール判定閾値
+};
+```
+
+### データソース
+スクリプトはS3から以下のJSONファイルを取得します:
+- `authors.json`: 作者リスト
+- `excluded_title_keywords.json`: 除外キーワード
+- `paper_books_asins.json`: 紙書籍ASINリスト
+- `unprocessed_asins.json`: 未処理ASINリスト
+
+## 🔍 使用方法
+
+### 基本的な流れ
+1. Amazon.co.jpにアクセス
+2. デベロッパーツール（F12）を開く
+3. コンソールで対応する関数を実行
+
+### 実行例
+```javascript
+// 新刊チェック
+checkNewReleases()
+
+// 紙書籍→Kindle版チェック
+checkPaperToKindle()
+
+// セールチェック
+checkWishlistSales()
+```
+
+## 📊 ログ出力
+
+各スクリプトは詳細なログを出力します:
+- 📥 データ取得状況
+- 📚 処理進捗
+- ✅ 成功通知
+- ❌ エラー情報
+- 🧹 クリーンアップ状況
+
+## 🛠️ 開発・カスタマイズ
+
+### アーキテクチャ
+- **共通ライブラリ**: 再利用可能な機能を`common.js`に集約
+- **スクリプト固有ロジック**: 各`main.js`に特化した処理を実装
+- **Tampermonkey統合**: `wrapper.js`でUserScriptヘッダーを管理
+
+### 新しいスクリプトの追加
+1. 新しいディレクトリを作成
+2. `main.js`でメインロジックを実装
+3. `wrapper.js`でTampermonkeyヘッダーを設定
+4. 共通ライブラリを活用
+
+## 🚨 注意事項
+
+- **レート制限**: Amazon APIの制限を考慮した並行処理制御
+- **エラーハンドリング**: ネットワークエラーや解析エラーに対応
+- **データ保護**: 個人情報を含まないよう注意
+- **利用規約**: Amazonの利用規約を遵守
+
+## 📝 更新履歴
+
+最新の変更については、Gitコミット履歴を参照してください。
+
+## 📄 ライセンス
+
+このプロジェクトはMITライセンスの下で公開されています。詳細は[LICENSE](../LICENSE)ファイルを参照してください。
+
+## 🤝 貢献
+
+改善提案やバグ報告は歓迎します。MITライセンスの下で自由に利用・改変できます。
