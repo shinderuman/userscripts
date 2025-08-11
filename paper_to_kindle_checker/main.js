@@ -1,19 +1,13 @@
-// ==UserScript==
-// @name         Paper to Kindle Checker
-// @namespace    http://tampermonkey.net/
-// @version      1.0
-// @description  紙書籍とKindle版の両方が利用可能な商品をチェックして通知する
-// @author       shinderuman
-// @match        https://www.amazon.co.jp/*
-// @grant        GM_xmlhttpRequest
-// @grant        GM_notification
-// @grant        GM_openInTab
-// @grant        unsafeWindow
-// @icon         https://www.amazon.co.jp/favicon.ico
-// ==/UserScript==
-
 (function () {
     "use strict";
+
+    // 共通ライブラリから関数を取得
+    const {
+        fetchJsonFromS3,
+        fetchPageInfo,
+        sendNotification,
+        sendCompletionNotification
+    } = unsafeWindow.KindleCommon;
 
     const CONFIG = {
         BOOKS_URL: "https://kindle-asins.s3.ap-northeast-1.amazonaws.com/paper_books_asins.json",
@@ -29,62 +23,16 @@
 
     // 書籍データをS3から取得
     const fetchBooks = () => {
-        return new Promise((resolve, reject) => {
-            // キャッシュバスターを追加してキャッシュを無効化
-            const cacheBuster = `?t=${Date.now()}&r=${Math.random()}`;
-            const urlWithCacheBuster = CONFIG.BOOKS_URL + cacheBuster;
-            
-            GM_xmlhttpRequest({
-                method: "GET",
-                url: urlWithCacheBuster,
-                headers: {
-                    'Cache-Control': 'no-cache, no-store, must-revalidate',
-                    'Pragma': 'no-cache',
-                    'Expires': '0'
-                },
-                onload: (response) => {
-                    if (response.status === 200) {
-                        try {
-                            const books = JSON.parse(response.responseText);
-                            console.log(`📥 S3データ取得成功: books (${books.length}件)`);
-                            resolve(books);
-                        } catch (error) {
-                            reject(new Error(`Failed to parse JSON: ${error.message}`));
-                        }
-                    } else {
-                        reject(new Error(`Failed to fetch books: ${response.status}`));
-                    }
-                },
-                onerror: (error) => reject(error)
-            });
-        });
+        return fetchJsonFromS3(CONFIG.BOOKS_URL, "books");
     };
 
     // 個別ページの情報を取得
-    const fetchPageInfo = (bookInfo) => {
-        return new Promise((resolve, reject) => {
-            const cleanUrl = bookInfo.URL.split('?')[0]; // アフィリエイトパラメータを除去
-
-            GM_xmlhttpRequest({
-                method: "GET",
-                url: cleanUrl,
-                onload: (response) => {
-                    if (response.status === 200) {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(response.responseText, 'text/html');
-                        const info = extractPageInfo(doc, bookInfo);
-                        resolve(info);
-                    } else {
-                        reject(new Error(`Failed to fetch page: ${response.status}`));
-                    }
-                },
-                onerror: (error) => reject(error)
-            });
-        });
+    const fetchBookPageInfo = (bookInfo) => {
+        return fetchPageInfo(bookInfo.URL, (doc, cleanUrl) => extractPageInfo(doc, bookInfo, cleanUrl));
     };
 
     // ページから利用可能性情報を抽出
-    const extractPageInfo = (doc, bookInfo) => {
+    const extractPageInfo = (doc, bookInfo, cleanUrl) => {
         const title = doc.querySelector(SELECTORS.title)?.innerText.trim() || bookInfo.Title;
         const paperBookAvailable = doc.querySelector(SELECTORS.paperBookAvailable);
         const kindleBookAvailable = doc.querySelector(SELECTORS.kindleBookAvailable);
@@ -94,7 +42,7 @@
             title,
             paperBookAvailable: !!paperBookAvailable,
             kindleBookAvailable: !!kindleBookAvailable,
-            cleanUrl: bookInfo.URL.split('?')[0]
+            cleanUrl
         };
     };
 
@@ -105,16 +53,11 @@
 
     // 通知を送信
     const sendAvailabilityNotification = (info) => {
-        GM_notification({
-            title: `📚 紙書籍・Kindle両方利用可能`,
-            text: `${info.title}`,
-            image: "https://www.google.com/s2/favicons?sz=64&domain=amazon.co.jp",
-            timeout: 0,
-            onclick: () => {
-                // 紙書籍のページを開く
-                GM_openInTab(info.cleanUrl, { active: true });
-            }
-        });
+        sendNotification(
+            `📚 紙書籍・Kindle両方利用可能`,
+            `${info.title}`,
+            info.cleanUrl
+        );
     };
 
     // 非同期でページをチェック（バッチ処理）
@@ -129,7 +72,7 @@
 
             const promises = batch.map(async (bookInfo) => {
                 try {
-                    const pageInfo = await fetchPageInfo(bookInfo);
+                    const pageInfo = await fetchBookPageInfo(bookInfo);
                     const isAvailable = checkAvailabilityConditions(pageInfo);
 
                     processedCount++;
@@ -160,12 +103,7 @@
         console.log(`✅ チェック完了: ${availableCount}件が両方利用可能でした`);
 
         // 完了通知
-        GM_notification({
-            title: "📚 利用可能性チェック完了",
-            text: `${books.length}冊中 ${availableCount}件が紙書籍・Kindle両方利用可能`,
-            image: "https://www.google.com/s2/favicons?sz=64&domain=amazon.co.jp",
-            timeout: 5000
-        });
+        sendCompletionNotification("利用可能性チェック", books.length, availableCount);
     };
 
     // メイン関数
@@ -189,14 +127,8 @@
     };
 
     // グローバル関数として公開（デベロッパーツールから呼び出し可能）
-    window.checkPaperToKindle = checkPaperToKindle;
-
-    // unsafeWindowも試す（Tampermonkey環境によっては必要）
-    if (typeof unsafeWindow !== 'undefined') {
-        unsafeWindow.checkPaperToKindle = checkPaperToKindle;
-    }
+    unsafeWindow.checkPaperToKindle = checkPaperToKindle;
 
     console.log("🚀 Paper to Kindle Checker が読み込まれました");
     console.log("💡 デベロッパーツールで checkPaperToKindle() を実行してください");
-
 })();

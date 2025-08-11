@@ -1,19 +1,17 @@
-// ==UserScript==
-// @name         New Release Checker
-// @namespace    http://tampermonkey.net/
-// @version      0.1
-// @description  作者の新しく発売されたKindle書籍をチェックして通知する
-// @author       shinderuman
-// @match        https://www.amazon.co.jp/*
-// @grant        GM_xmlhttpRequest
-// @grant        GM_notification
-// @grant        GM_openInTab
-// @grant        unsafeWindow
-// @icon         https://www.amazon.co.jp/favicon.ico
-// ==/UserScript==
-
 (function () {
     "use strict";
+
+    // 共通ライブラリから関数を取得
+    const {
+        fetchJsonFromS3,
+        sendErrorNotification,
+        sendCompletionNotification,
+        extractAsinFromUrl,
+        getStorageItems,
+        saveStorageItem,
+        isAlreadyStored,
+        cleanupOldStorageItems
+    } = unsafeWindow.KindleCommon;
 
     const CONFIG = {
         AUTHORS_URL: "https://kindle-asins.s3.ap-northeast-1.amazonaws.com/authors.json",
@@ -43,79 +41,18 @@
             await checkPagesInBatches(authors, excludedKeywords);
         } catch (error) {
             console.error("❌ エラーが発生しました:", error);
-            GM_notification({
-                title: "❌ エラー",
-                text: "新刊チェック中にエラーが発生しました",
-                image: "https://www.google.com/s2/favicons?sz=64&domain=amazon.co.jp",
-                timeout: 5000
-            });
+            sendErrorNotification("新刊チェック", error.message);
         }
     };
 
     const cleanupOldNotifications = () => {
-        try {
-            const notified = getNotifiedItems();
-            const cutoffDate = new Date();
-            cutoffDate.setDate(cutoffDate.getDate() - CONFIG.NEW_RELEASE_DAYS);
-
-            const validItems = notified.filter(item => {
-                const releaseDate = new Date(item.releaseDate);
-                return releaseDate >= cutoffDate;
-            });
-
-            const removedCount = notified.length - validItems.length;
-            if (removedCount > 0) {
-                localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(validItems));
-                console.log(`🧹 古い通知記録を${removedCount}件削除しました`);
-            }
-        } catch (error) {
-            console.error('❌ localStorage清理エラー:', error);
-        }
-    };
-
-    const getNotifiedItems = () => {
-        try {
-            return JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEY) || '[]');
-        } catch (error) {
-            console.error('❌ localStorage読み込みエラー:', error);
-            return [];
-        }
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - CONFIG.NEW_RELEASE_DAYS);
+        cleanupOldStorageItems(CONFIG.STORAGE_KEY, cutoffDate, 'releaseDate');
     };
 
     const fetchAuthors = () => {
         return fetchJsonFromS3(CONFIG.AUTHORS_URL, "authors");
-    };
-
-    const fetchJsonFromS3 = (url, dataType) => {
-        return new Promise((resolve, reject) => {
-            // キャッシュバスターを追加してキャッシュを無効化
-            const cacheBuster = `?t=${Date.now()}&r=${Math.random()}`;
-            const urlWithCacheBuster = url + cacheBuster;
-
-            GM_xmlhttpRequest({
-                method: "GET",
-                url: urlWithCacheBuster,
-                headers: {
-                    'Cache-Control': 'no-cache, no-store, must-revalidate',
-                    'Pragma': 'no-cache',
-                    'Expires': '0'
-                },
-                onload: (response) => {
-                    if (response.status === 200) {
-                        try {
-                            const data = JSON.parse(response.responseText);
-                            console.log(`📥 S3データ取得成功: ${dataType} (${data.length || Object.keys(data).length}件)`);
-                            resolve(data);
-                        } catch (error) {
-                            reject(new Error(`Failed to parse ${dataType} JSON: ${error.message}`));
-                        }
-                    } else {
-                        reject(new Error(`Failed to fetch ${dataType}: ${response.status}`));
-                    }
-                },
-                onerror: (error) => reject(error)
-            });
-        });
     };
 
     const fetchExcludedKeywords = () => {
@@ -169,12 +106,7 @@
         console.log(`✅ チェック完了: ${newReleaseCount}冊の新刊を発見しました`);
 
         // 完了通知
-        GM_notification({
-            title: "📚 新刊チェック完了",
-            text: `${authors.length}人中 ${newReleaseCount}冊の新刊を発見`,
-            image: "https://www.google.com/s2/favicons?sz=64&domain=amazon.co.jp",
-            timeout: 5000
-        });
+        sendCompletionNotification("新刊チェック", authors.length, newReleaseCount);
     };
 
     const fetchAuthorSearchInfo = async (authorInfo) => {
@@ -243,11 +175,6 @@
             const { title, bookUrl } = basicInfo;
             const asin = extractAsinFromUrl(bookUrl);
 
-            // // 紙書籍チェック
-            // if (checkIsPhysicalBook(asin)) {
-            //     continue;
-            // }
-
             // 通知済みチェック
             if (checkAlreadyNotified(asin)) {
                 continue;
@@ -310,29 +237,12 @@
         return { title, bookUrl, isValid: !!(title && bookUrl) };
     };
 
-    const extractAsinFromUrl = (url) => {
-        const match = url.match(/\/dp\/([A-Z0-9]{10})/);
-        return match ? match[1] : null;
-    };
-
-    const isIsbn = (asin) => {
-        if (!asin) return false;
-        // ISBNは通常10桁または13桁の数字で構成される
-        // Kindle書籍のASINは通常英数字の組み合わせ
-        return /^\d{10}$|^\d{13}$/.test(asin);
-    };
-
     const checkAlreadyNotified = (asin) => {
-        if (asin && isAlreadyNotified(asin)) {
+        if (asin && isAlreadyStored(CONFIG.STORAGE_KEY, item => item.asin === asin)) {
             console.log(`⏭️ スキップ: 既に通知済みです (ASIN: ${asin})`);
             return true;
         }
         return false;
-    };
-
-    const isAlreadyNotified = (asin) => {
-        const notified = getNotifiedItems();
-        return notified.some(item => item.asin === asin);
     };
 
     const checkExcludedKeywords = (title, excludedKeywords) => {
@@ -406,6 +316,7 @@
         }
     };
 
+    // Amazon固有の日本語日付解析関数（新刊チェッカー専用）
     const parseDateFromText = (dateText) => {
         if (!dateText) return null;
 
@@ -454,32 +365,19 @@
     };
 
     const saveNotifiedItem = (asin, releaseDate, title, author) => {
-        try {
-            const notified = getNotifiedItems();
-            const newItem = {
-                asin,
-                releaseDate,
-                title,
-                author,
-                notifiedAt: new Date().toISOString()
-            };
-            notified.push(newItem);
-            localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(notified));
-            console.log(`💾 通知済みアイテムを保存: ${asin} - ${title}`);
-        } catch (error) {
-            console.error('❌ localStorage保存エラー:', error);
-        }
+        const newItem = {
+            asin,
+            releaseDate,
+            title,
+            author,
+            notifiedAt: new Date().toISOString()
+        };
+        saveStorageItem(CONFIG.STORAGE_KEY, newItem);
     };
 
     // グローバル関数として公開（デベロッパーツールから呼び出し可能）
-    window.checkNewReleases = checkNewReleases;
-
-    // unsafeWindowも試す（Tampermonkey環境によっては必要）
-    if (typeof unsafeWindow !== 'undefined') {
-        unsafeWindow.checkNewReleases = checkNewReleases;
-    }
+    unsafeWindow.checkNewReleases = checkNewReleases;
 
     console.log("🚀 New Release Checker が読み込まれました");
     console.log("💡 デベロッパーツールで checkNewReleases() を実行してください");
-
 })();

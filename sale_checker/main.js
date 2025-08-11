@@ -1,19 +1,14 @@
-// ==UserScript==
-// @name         Wishlist Sale Checker
-// @namespace    http://tampermonkey.net/
-// @version      1.0
-// @description  指定されたMarkdownファイルからURLを取得し、セール情報をチェックして通知する
-// @author       shinderuman
-// @match        https://www.amazon.co.jp/*
-// @grant        GM_xmlhttpRequest
-// @grant        GM_notification
-// @grant        GM_openInTab
-// @grant        unsafeWindow
-// @icon         https://www.amazon.co.jp/favicon.ico
-// ==/UserScript==
-
 (function () {
     "use strict";
+
+    // 共通ライブラリから関数を取得
+    const {
+        fetchJsonFromS3,
+        fetchPageInfo,
+        sendNotification,
+        sendCompletionNotification,
+        getElementValue
+    } = unsafeWindow.KindleCommon;
 
     const CONFIG = {
         BOOKS_URL: "https://kindle-asins.s3.ap-northeast-1.amazonaws.com/unprocessed_asins.json",
@@ -33,73 +28,20 @@
 
     // 書籍データをS3から取得
     const fetchBooks = () => {
-        return new Promise((resolve, reject) => {
-            // キャッシュバスターを追加してキャッシュを無効化
-            const cacheBuster = `?t=${Date.now()}&r=${Math.random()}`;
-            const urlWithCacheBuster = CONFIG.BOOKS_URL + cacheBuster;
-            
-            GM_xmlhttpRequest({
-                method: "GET",
-                url: urlWithCacheBuster,
-                headers: {
-                    'Cache-Control': 'no-cache, no-store, must-revalidate',
-                    'Pragma': 'no-cache',
-                    'Expires': '0'
-                },
-                onload: (response) => {
-                    if (response.status === 200) {
-                        try {
-                            const books = JSON.parse(response.responseText);
-                            console.log(`📥 S3データ取得成功: books (${books.length}件)`);
-                            resolve(books);
-                        } catch (error) {
-                            reject(new Error(`Failed to parse JSON: ${error.message}`));
-                        }
-                    } else {
-                        reject(new Error(`Failed to fetch books: ${response.status}`));
-                    }
-                },
-                onerror: (error) => reject(error)
-            });
-        });
+        return fetchJsonFromS3(CONFIG.BOOKS_URL, "books");
     };
 
     // 個別ページの情報を取得
-    const fetchPageInfo = (bookInfo) => {
-        return new Promise((resolve, reject) => {
-            const cleanUrl = bookInfo.URL.split('?')[0]; // アフィリエイトパラメータを除去
-
-            GM_xmlhttpRequest({
-                method: "GET",
-                url: cleanUrl,
-                onload: (response) => {
-                    if (response.status === 200) {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(response.responseText, 'text/html');
-                        const info = extractPageInfo(doc, bookInfo);
-                        resolve(info);
-                    } else {
-                        reject(new Error(`Failed to fetch page: ${response.status}`));
-                    }
-                },
-                onerror: (error) => reject(error)
-            });
-        });
+    const fetchBookPageInfo = (bookInfo) => {
+        return fetchPageInfo(bookInfo.URL, (doc, cleanUrl) => extractPageInfo(doc, bookInfo, cleanUrl));
     };
 
     // ページから価格・ポイント情報を抽出
-    const extractPageInfo = (doc, bookInfo) => {
-        const getElementValue = (selector, regex) => {
-            const element = doc.querySelector(selector);
-            if (!element) return 0;
-            const match = element.innerText.match(regex);
-            return match ? parseInt(match[1].replace(/,/g, ""), 10) : 0;
-        };
-
+    const extractPageInfo = (doc, bookInfo, cleanUrl) => {
         const title = doc.querySelector(SELECTORS.title)?.innerText.trim() || bookInfo.Title;
-        const points = getElementValue(SELECTORS.points, /(\d+)pt/);
-        const kindlePrice = getElementValue(SELECTORS.kindlePrice, /([\d,]+)/);
-        const paperPrice = getElementValue(SELECTORS.paperPrice, /([\d,]+)/);
+        const points = getElementValue(doc, SELECTORS.points, /(\d+)pt/);
+        const kindlePrice = getElementValue(doc, SELECTORS.kindlePrice, /([\d,]+)/);
+        const paperPrice = getElementValue(doc, SELECTORS.paperPrice, /([\d,]+)/);
 
         return {
             ...bookInfo,
@@ -107,7 +49,7 @@
             points,
             kindlePrice,
             paperPrice,
-            cleanUrl: bookInfo.URL.split('?')[0]
+            cleanUrl
         };
     };
 
@@ -131,15 +73,11 @@
 
     // 通知を送信
     const sendSaleNotification = (info, conditions) => {
-        GM_notification({
-            title: `🎉 セール発見: ${info.title}`,
-            text: `条件達成: ${conditions}`,
-            image: "https://www.google.com/s2/favicons?sz=64&domain=amazon.co.jp",
-            timeout: 0,
-            onclick: () => {
-                GM_openInTab(info.cleanUrl, { active: true });
-            }
-        });
+        sendNotification(
+            `🎉 セール発見: ${info.title}`,
+            `条件達成: ${conditions}`,
+            info.cleanUrl
+        );
     };
 
     // 非同期でページをチェック（バッチ処理）
@@ -154,7 +92,7 @@
 
             const promises = batch.map(async (bookInfo) => {
                 try {
-                    const pageInfo = await fetchPageInfo(bookInfo);
+                    const pageInfo = await fetchBookPageInfo(bookInfo);
                     const conditions = checkSaleConditions(pageInfo);
 
                     processedCount++;
@@ -184,12 +122,7 @@
         console.log(`✅ チェック完了: ${saleCount}件のセールを発見しました`);
 
         // 完了通知
-        GM_notification({
-            title: "📚 セールチェック完了",
-            text: `${books.length}冊中 ${saleCount}件のセールを発見`,
-            image: "https://www.google.com/s2/favicons?sz=64&domain=amazon.co.jp",
-            timeout: 5000
-        });
+        sendCompletionNotification("セールチェック", books.length, saleCount);
     };
 
     // メイン関数
@@ -213,14 +146,8 @@
     };
 
     // グローバル関数として公開（デベロッパーツールから呼び出し可能）
-    window.checkWishlistSales = checkWishlistSales;
-
-    // unsafeWindowも試す（Tampermonkey環境によっては必要）
-    if (typeof unsafeWindow !== 'undefined') {
-        unsafeWindow.checkWishlistSales = checkWishlistSales;
-    }
+    unsafeWindow.checkWishlistSales = checkWishlistSales;
 
     console.log("🚀 Wishlist Sale Checker が読み込まれました");
     console.log("💡 デベロッパーツールで checkWishlistSales() を実行してください");
-
 })();
