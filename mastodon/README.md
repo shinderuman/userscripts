@@ -65,6 +65,32 @@ const CONFIG = {
 };
 ```
 
+### 🎭 AI Post Blur Toggle (`ai_post_blur_toggle/`)
+AI生成投稿のぼかし表示を切り替える機能。
+
+**機能:**
+- 特定の画像クリックでAI投稿のぼかし切り替え
+- 投稿全体にぼかし効果を適用/解除
+- 自動的な対象画像の検出
+- リアルタイムでの表示制御
+
+**対象サイト:**
+- `https://kenji.asmodeus.jp/deck/*`
+
+**使用方法:**
+1. 対象の画像をクリック
+2. AI投稿にぼかし効果が適用される
+3. 再度クリックでぼかし解除
+
+**設定項目:**
+```javascript
+const CONFIG = {
+    TARGET_IMAGE_SELECTOR: 'div.drawer__inner__mastodon > img',
+    AI_POSTS_SELECTOR: '.split-column article',
+    BLUR_FILTER: 'blur(10px)'
+};
+```
+
 ## 🔧 共通ライブラリ (`common.js`)
 
 全スクリプトで共有される汎用機能を提供します。
@@ -114,6 +140,7 @@ observer.observe(target, options);
 1. **Column Splitter**: `column_splitter/wrapper.js`
 2. **Column Combiner**: `column_combiner/wrapper.js`
 3. **Recent Post Editor**: `recent_post_editor/wrapper.js`
+4. **AI Post Blur Toggle**: `ai_post_blur_toggle/wrapper.js`
 
 ### 3. パスの設定
 `wrapper.js`ファイル内の`@require`パスを環境に合わせて調整:
@@ -149,6 +176,9 @@ initializeColumnCombiner()
 
 // Recent Post Editor
 initializeRecentPostEditor()
+
+// AI Post Blur Toggle
+initializeBlurSensitiveContents()
 ```
 
 ## 📊 ログ出力
