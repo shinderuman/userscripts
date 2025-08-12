@@ -6,27 +6,47 @@
 
 ```
 userscripts/
-├── README.md                    # このファイル
-├── LICENSE                      # MITライセンス
-├── kindle/                      # Amazon Kindle関連スクリプト
-│   ├── README.md               # Kindleスクリプトの詳細説明
-│   ├── common.js               # 共通ライブラリ
-│   ├── new_release_checker/    # 新刊チェッカー
-│   ├── paper_to_kindle_checker/ # 紙書籍→Kindle版チェッカー
-│   ├── sale_checker/           # セールチェッカー
-│   ├── campaign_sorter/        # キャンペーン商品抽出
-│   └── manga_first_open_page/  # マンガ最初のページ開く
-├── amazon/                      # Amazon関連スクリプト
-│   ├── README.md               # Amazonスクリプトの詳細説明
-│   ├── common.js               # 共通ライブラリ
-│   ├── highlight/              # ウィッシュリストハイライト
-│   └── affiliate_tag_adder/    # アフィリエイトタグ自動追加
-└── mastodon/                    # Mastodon関連スクリプト
-    ├── README.md               # Mastodonスクリプトの詳細説明
-    ├── common.js               # 共通ライブラリ
-    ├── column_splitter/        # カラム分割
-    ├── column_combiner/        # カラム結合
-    └── recent_post_editor/     # 投稿編集ショートカット
+├── README.md                           # このファイル
+├── LICENSE                             # MITライセンス
+├── kindle/                             # Amazon Kindle関連スクリプト
+│   ├── README.md                      # Kindleスクリプトの詳細説明
+│   ├── common.js                      # 共通ライブラリ
+│   ├── new_release_checker/           # 新刊チェッカー
+│   ├── paper_to_kindle_checker/       # 紙書籍→Kindle版チェッカー
+│   ├── sale_checker/                  # セールチェッカー
+│   ├── campaign_sorter/               # キャンペーン商品抽出
+│   └── manga_first_open_page/         # マンガ最初のページ開く
+├── amazon/                             # Amazon関連スクリプト
+│   ├── README.md                      # Amazonスクリプトの詳細説明
+│   ├── common.js                      # 共通ライブラリ
+│   ├── highlight/                     # ウィッシュリストハイライト
+│   └── affiliate_tag_adder/           # アフィリエイトタグ自動追加
+├── dmm/                               # DMM関連スクリプト
+│   ├── common.js                      # 共通ライブラリ
+│   └── video_tab_opener/              # 動画タブオープナー
+├── universal/                          # 汎用スクリプト
+│   ├── common.js                      # 共通ライブラリ
+│   ├── element_blur_toggle/           # 要素ぼかし切り替え
+│   └── multi_site_keybind_manager/    # マルチサイトキーバインド管理
+├── niconico/                          # ニコニコ動画関連スクリプト
+│   ├── common.js                      # 共通ライブラリ
+│   ├── vertical_to_horizontal_reader/ # 縦読み→横読み変換
+│   ├── video_series_navigation/       # シリーズナビゲーション
+│   └── auto_campaign_navigator/       # 自動キャンペーンナビゲーター
+├── twitter/                           # Twitter/X関連スクリプト
+│   ├── common.js                      # 共通ライブラリ
+│   ├── tweet_intent_clipboard/        # ツイートインテント クリップボード
+│   └── current_user_filter/           # 現在ユーザーフィルター
+├── youtube/                           # YouTube関連スクリプト
+│   ├── common.js                      # 共通ライブラリ
+│   └── subscription_layout_optimizer/ # 登録チャンネル レイアウト最適化
+└── mastodon/                          # Mastodon関連スクリプト
+    ├── README.md                      # Mastodonスクリプトの詳細説明
+    ├── common.js                      # 共通ライブラリ
+    ├── column_splitter/               # カラム分割
+    ├── column_combiner/               # カラム結合
+    ├── recent_post_editor/            # 投稿編集ショートカット
+    └── ai_post_blur_toggle/           # AI投稿ぼかし切り替え
 ```
 
 ## 🎯 対応サービス
@@ -34,12 +54,12 @@ userscripts/
 ### 現在対応済み
 - **Amazon Kindle** (`kindle/`) - 書籍の新刊・セール・利用可能性チェック
 - **Amazon** (`amazon/`) - ウィッシュリストハイライト・アフィリエイトタグ自動追加
-- **Mastodon** (`mastodon/`) - カラム管理・投稿編集・UI改善
-
-### 今後追加予定
-- その他のECサイト
-- 各種Webサービス
-- SNSプラットフォーム
+- **DMM** (`dmm/`) - 動画プレイヤーの新しいタブ表示
+- **Universal** (`universal/`) - 汎用的な機能（要素ぼかし・キーバインド管理）
+- **ニコニコ動画** (`niconico/`) - 漫画横読み変換・シリーズナビゲーション・キャンペーン自動処理
+- **Twitter/X** (`twitter/`) - インテントコピー・ユーザーフィルター
+- **YouTube** (`youtube/`) - 登録チャンネルレイアウト最適化
+- **Mastodon** (`mastodon/`) - カラム管理・投稿編集・AI投稿ぼかし・UI改善
 
 ## 🚀 使用方法
 
@@ -62,11 +82,36 @@ userscripts/
 - **ウィッシュリストハイライト**: 特定条件のアイテムをハイライト表示
 - **アフィリエイトタグ自動追加**: ペースト時にAmazonリンクにタグを自動追加
 
+### DMM (`dmm/`)
+
+- **動画タブオープナー**: DMM動画を新しいウィンドウではなく別タブで開く
+
+### Universal (`universal/`)
+
+- **要素ぼかし切り替え**: Option+Clickで任意の要素にモザイクをかける
+- **マルチサイトキーバインド管理**: 複数サイト対応のキーバインドシステム（URL コピー、ページ開く、通知機能付き）
+
+### ニコニコ動画 (`niconico/`)
+
+- **縦読み→横読み変換**: ニコニコ漫画の縦読みを右から左の横読み形式に変換
+- **シリーズナビゲーション**: シリーズ動画間のナビゲーションボタンを追加
+- **自動キャンペーンナビゲーター**: キャンペーンリンクを自動処理（遅延実行・クリックキャンセル機能付き）
+
+### Twitter/X (`twitter/`)
+
+- **ツイートインテント クリップボード**: X/Twitter インテントの内容をクリップボードにコピー（リンクを開かずに）
+- **現在ユーザーフィルター**: 現在のユーザーのツイートのみを表示するフィルター機能（ボタンで切り替え可能）
+
+### YouTube (`youtube/`)
+
+- **登録チャンネル レイアウト最適化**: 登録チャンネルのレイアウト最適化（配信済み動画非表示・列数調整）
+
 ### Mastodon (`mastodon/`)
 
 - **カラム分割**: 指定カラムを複数に分割してレイアウト改善
 - **カラム結合**: 複数カラムを縦方向に結合
 - **投稿編集ショートカット**: キーボードショートカットで投稿編集・リプライ
+- **AI投稿ぼかし切り替え**: AI生成投稿のぼかし表示を切り替える機能
 
 詳細は各サービスディレクトリ内の`README.md`を参照してください。
 
