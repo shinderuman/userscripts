@@ -48,6 +48,34 @@ checkPaperToKindle()
 
 **機能:**
 - キャンペーン対象商品の自動検出
+
+### 💎 Price and Point Highlighter (`price_and_point_highlighter/`)
+Kindle書籍の価格とポイント条件を満たす場合、視覚的に通知するスクリプト。
+
+**機能:**
+- 価格・ポイント条件の自動判定
+- ナビゲーションバーのハイライト表示
+- ファビコンへのバッジ追加
+- Slack・Mastodon連携通知
+- 通知クリック・ナビバークリック時の両プラットフォーム同時投稿
+- 外部設定ファイル対応（config.js）
+
+**設定:**
+`config.js`ファイルを作成してSlack・Mastodonの認証情報を設定:
+```javascript
+// 共通設定ファイル
+unsafeWindow.GlobalConfig = {
+    // コメントアウトしている場合は通知しない
+    // slack: {
+    //     token: "xoxb-your-slack-bot-token",
+    //     channelId: "C0123456789"
+    // },
+    mastodon: {
+        accessToken: "your-mastodon-access-token",
+        apiEndpoint: "https://your-instance.com/api/v1/statuses"
+    }
+};
+```
 - 複数ページの一括処理（最大20ページ）
 - 価格順ソート表示
 - 手動ボタントリガー

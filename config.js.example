@@ -1,0 +1,11 @@
+// 共通設定ファイルのテンプレート
+unsafeWindow.GlobalConfig = {
+    slack: {
+        token: "xoxb-your-slack-bot-token-here",
+        channelId: "C0123456789"
+    },
+    mastodon: {
+        accessToken: "your-mastodon-access-token-here",
+        apiEndpoint: "https://your-mastodon-instance.com/api/v1/statuses"
+    }
+};
