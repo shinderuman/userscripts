@@ -28,7 +28,7 @@
 
     // 個別ページの情報を取得
     const fetchBookPageInfo = (bookInfo) => {
-        return fetchPageInfo(bookInfo.URL, (doc, cleanUrl) => extractPageInfo(doc, bookInfo, cleanUrl));
+        return fetchPageInfo(`https://www.amazon.co.jp/dp/${bookInfo.ASIN}`, (doc, cleanUrl) => extractPageInfo(doc, bookInfo, cleanUrl));
     };
 
     // ページから利用可能性情報を抽出
