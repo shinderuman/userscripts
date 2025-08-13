@@ -36,8 +36,8 @@
 
     const getPageInfo = () => {
         const asin = document.querySelector("#ASIN, input[name='idx.asin'], input[name='ASIN.0'], input[name='titleID']")?.value;
-        const title = document.querySelector('#productTitle')?.textContent.trim() ?? 
-                     document.querySelector('#collection-masthead__title')?.textContent.trim();
+        const title = document.querySelector('#productTitle')?.textContent.trim() ??
+            document.querySelector('#collection-masthead__title')?.textContent.trim();
         return { asin, title };
     };
 
@@ -45,7 +45,7 @@
         const title = document.title;
         const url = cleanUrl(window.location.href);
         const content = `${title}\n${url}`;
-        
+
         const success = await copyToClipboard(content);
         if (success) {
             showNotification('Copied to Clipboard', `${title}\n${url}`, 3000);
@@ -59,13 +59,20 @@
         const unwantedPatterns = [...Array(10).keys()].map(String)
             .concat(CONFIG.UNDESIRABLE_CHARS)
             .concat(getFullWidthDigits());
-        
+
         const filteredTitle = unwantedPatterns.reduce(
             (title, pattern) => title.split(pattern)[0].trim(),
             title
         );
 
         openInTab(`${CONFIG.SEARCH_ENGINE}${encodeURIComponent(filteredTitle)}`, CONFIG.TAB_OPTIONS);
+    };
+
+    // ISBN判定関数
+    const isISBN = (asin) => {
+        if (!asin) return false;
+        const length = asin.length;
+        return (length >= 10 && length <= 13) && /^\d+$/.test(asin);
     };
 
     const copyProductInfo = async () => {
@@ -76,16 +83,19 @@
             document.querySelector("#rpi-attribute-book_details-publication_date > div.a-section.a-spacing-none.a-text-center.rpi-attribute-value > span")
                 ?.textContent.trim().replace(/\//g, '-')
         ).toISOString();
-        
+
         const currentPrice = Number(
             document.querySelector("#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span")
                 ?.textContent.replace(/[^\d]/g, '')
         ) || 0;
-        
+
         const maxPrice = Number(
             document.querySelector("[id^='tmm-grid-swatch']:not([id$='KINDLE']) > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span")
                 ?.textContent.replace(/[^\d]/g, '')
         ) || currentPrice;
+
+        // ISBNの場合はURLを空にする
+        const url = isISBN(asin) ? '' : `https://www.amazon.co.jp/dp/${asin}?tag=shinderuman03-22&linkCode=ogi&th=1&psc=1`;
 
         const productInfo = JSON.stringify({
             ASIN: asin,
@@ -93,7 +103,7 @@
             ReleaseDate: releaseDate,
             CurrentPrice: currentPrice,
             MaxPrice: maxPrice,
-            URL: `https://www.amazon.co.jp/dp/${asin}?tag=shinderuman03-22&linkCode=ogi&th=1&psc=1`,
+            URL: url,
         }, null, 4) + ",";
 
         const success = await copyToClipboard(productInfo);
@@ -129,7 +139,7 @@
             const dataObj = JSON.parse(rawData);
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = dataObj.inlineContent;
-            return Array.from(tempDiv.querySelectorAll('a')).map(a => 
+            return Array.from(tempDiv.querySelectorAll('a')).map(a =>
                 a.textContent.replace('(著)', '').replace(',', '').replace('Other', '').trim()
             );
         } else {
