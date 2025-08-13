@@ -79,8 +79,7 @@
     // グローバル関数として公開
     unsafeWindow.initializeRecentPostEditor = initializeRecentPostEditor;
 
-    console.log("🚀 Mastodon Recent Post Editor が読み込まれました");
-    console.log("💡 自動的に初期化されます");
+
 
     // 自動初期化
     initializeRecentPostEditor();

@@ -58,9 +58,6 @@ ${hashtags}
     // グローバル関数として公開
     unsafeWindow.initializeIntentCopier = initializeIntentCopier;
 
-    console.log("🚀 Twitter Intent Copier が読み込まれました");
-    console.log("💡 自動的に初期化されます");
-
     // 自動初期化
     initializeIntentCopier();
 })();

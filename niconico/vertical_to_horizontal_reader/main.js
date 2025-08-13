@@ -206,9 +206,6 @@
     // グローバル関数として公開
     unsafeWindow.initializeMangaReader = initializeMangaReader;
 
-    console.log("🚀 ニコニコ漫画横読み変換が読み込まれました");
-    console.log("💡 自動的に初期化されます");
-
     // イベントリスナー設定
     document.addEventListener('keydown', handleAbortKey);
     window.addEventListener('load', () => setTimeout(initializeMangaReader, 1000));

@@ -225,9 +225,6 @@
     // グローバル関数として公開
     unsafeWindow.initializeSeriesVideoNavigator = initializeSeriesVideoNavigator;
 
-    console.log("🚀 ニコニコ動画シリーズナビゲーターが読み込まれました");
-    console.log("💡 自動的に初期化されます");
-
     // 自動初期化
     initializeSeriesVideoNavigator();
 })();

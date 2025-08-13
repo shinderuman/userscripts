@@ -166,9 +166,6 @@
     // グローバル関数として公開
     unsafeWindow.initializeCampaignSorter = initializeCampaignSorter;
 
-    console.log("🚀 Kindle Campaign Sorter が読み込まれました");
-    console.log("💡 自動的に初期化されます");
-
     // 自動初期化
     initializeCampaignSorter();
 })();

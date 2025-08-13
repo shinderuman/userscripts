@@ -88,9 +88,6 @@
     // グローバル関数として公開
     unsafeWindow.initializeMangaFirstOpenPage = initializeMangaFirstOpenPage;
 
-    console.log("🚀 Kindle Manga First Open Page が読み込まれました");
-    console.log("💡 自動的に初期化されます");
-
     // 自動初期化
     initializeMangaFirstOpenPage();
 })();
