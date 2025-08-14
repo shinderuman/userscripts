@@ -10,20 +10,6 @@
         copyToClipboard
     } = unsafeWindow.TwitterCommon;
 
-    // ニコニコ動画専用のテキスト生成
-    const handleNicovideoShare = async () => {
-        const pageTitle = document.title || '';
-        const pageUrl = window.location.href;
-
-        // ニコニコ動画専用フォーマット
-        const fullText = `${pageTitle}${pageUrl}#ニコニコ動画\n\n`;
-
-        const success = await copyToClipboard(fullText);
-        if (success) {
-            showToast('X Intent Copier', fullText, pageUrl);
-        }
-    };
-
     const handleIntentClick = async (url) => {
         const { text, url: intentUrl, hashtags } = extractIntentParams(url);
 
@@ -57,19 +43,39 @@ ${hashtags}
         return false;
     };
 
-    // サイト固有の処理
-    const handleSiteSpecificShare = (event) => {
-        // ニコニコ動画の「ポストする」ボタン
-        if (window.location.hostname.includes('nicovideo.jp')) {
-            const nicoPostButton = event.target.closest('button');
-            if (nicoPostButton && nicoPostButton.textContent?.includes('ポストする')) {
-                event.preventDefault();
-                event.stopPropagation();
-                handleNicovideoShare();
-                return true;
-            }
+    // 汎用的なTwitterボタンの検出
+    const handleTwitterButton = (event) => {
+        const button = event.target.closest('button');
+        if (button && isLikelyTwitterButton(button)) {
+            // 即座にイベントを停止して独自処理を実行
+            event.preventDefault();
+            event.stopPropagation();
+
+            const pageTitle = document.title || '';
+            const pageUrl = window.location.href;
+            const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(pageTitle)}&url=${encodeURIComponent(pageUrl)}`;
+            handleIntentClick(intentUrl);
+
+            return true;
         }
+
         return false;
+    };
+
+    // buttonがTwitter関連かどうかを判定
+    const isLikelyTwitterButton = (button) => {
+        const text = button.textContent?.toLowerCase() || '';
+        const className = button.className.toLowerCase();
+        const ariaLabel = button.getAttribute('aria-label')?.toLowerCase() || '';
+
+        // Twitter関連のキーワードをチェック
+        const twitterKeywords = ['twitter', 'tweet', 'ツイート', 'post', 'ポスト', 'share', 'シェア'];
+
+        return twitterKeywords.some(keyword =>
+            text.includes(keyword) ||
+            className.includes(keyword) ||
+            ariaLabel.includes(keyword)
+        );
     };
 
     // シンプルなTwitterシェアボタンの検出
@@ -98,13 +104,13 @@ ${hashtags}
         document.addEventListener('click', (event) => {
             // 優先度順に処理
             if (handleDirectIntentLink(event)) return;
-            if (handleSiteSpecificShare(event)) return;
+            if (handleTwitterButton(event)) return;
             if (handleGenericTwitterShare(event)) return;
         }, true);
 
         // window.openのオーバーライド
         const originalOpen = window.open;
-        window.open = function (url, ...args) {
+        window.open = function(url, ...args) {
             if (url && isIntentUrl(url)) {
                 handleIntentClick(url);
                 return null;
