@@ -1,4 +1,4 @@
-(function() {
+(function () {
     'use strict';
 
     // 共通ライブラリから関数を取得
@@ -21,7 +21,7 @@
 
     // ページがリロードされたかどうかを確認
     const isPageReload = () => {
-        return performance.navigation.type === performance.navigation.TYPE_RELOAD;
+        return performance.getEntriesByType('navigation')[0].type === 'reload';
     };
 
     // 最初のページに移動
@@ -76,11 +76,11 @@
     // 初期化処理
     const initializeMangaFirstOpenPage = () => {
         if (isReferredWithParameter()) {
-            observeForMenuButton();
+            // observeForMenuButton();
         }
 
         document.addEventListener('keydown', handleKeydown);
-        
+
         console.log("📖 Kindle Manga First Open Page が初期化されました");
         console.log(`💡 '${CONFIG.TRIGGER_KEY}'キーで最初のページに移動できます`);
     };
