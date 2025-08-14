@@ -7,5 +7,8 @@ unsafeWindow.GlobalConfig = {
     mastodon: {
         accessToken: "your-mastodon-access-token-here",
         apiEndpoint: "https://your-mastodon-instance.com/api/v1/statuses"
+    },
+    s3CleanupApi: {
+        endpoint: "https://your-api-gateway-id.execute-api.ap-northeast-1.amazonaws.com/prod/cleanup"
     }
 };
