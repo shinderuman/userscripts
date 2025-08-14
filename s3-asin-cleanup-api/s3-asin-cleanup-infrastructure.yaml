@@ -1,0 +1,205 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'S3 ASIN Cleanup API - API Gateway and Lambda infrastructure'
+
+Parameters:
+  AllowedIPAddress:
+    Type: String
+    Description: 'IP address allowed to access the API'
+    Default: '0.0.0.0/32'
+    
+  S3BucketName:
+    Type: String
+    Description: 'S3 bucket containing the unprocessed_asins.json file'
+    Default: 'your-bucket-name'
+    
+  S3ObjectKey:
+    Type: String
+    Description: 'S3 object key for the JSON file'
+    Default: 'unprocessed_asins.json'
+
+Resources:
+  # IAM Role for Lambda function
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-lambda-execution-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: S3AccessPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                Resource: !Sub 'arn:aws:s3:::${S3BucketName}/${S3ObjectKey}'
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                Resource: !Sub 'arn:aws:s3:::${S3BucketName}'
+
+  # Lambda function (with empty code initially)
+  ASINCleanupLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-asin-cleanup'
+      Runtime: go1.x
+      Handler: main
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          package main
+          import (
+              "context"
+              "github.com/aws/aws-lambda-go/lambda"
+          )
+          type Event struct {
+              ASIN string `json:"asin"`
+          }
+          type Response struct {
+              StatusCode int    `json:"statusCode"`
+              Body       string `json:"body"`
+          }
+          func handler(ctx context.Context, event Event) (Response, error) {
+              return Response{
+                  StatusCode: 200,
+                  Body:       "{\"message\": \"Lambda function not yet deployed\"}",
+              }, nil
+          }
+          func main() {
+              lambda.Start(handler)
+          }
+      Environment:
+        Variables:
+          S3_BUCKET: !Ref S3BucketName
+          S3_OBJECT_KEY: !Ref S3ObjectKey
+      Timeout: 30
+      MemorySize: 128
+
+  # API Gateway REST API
+  ASINCleanupAPI:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub '${AWS::StackName}-asin-cleanup-api'
+      Description: 'API for cleaning up ASIN records from S3'
+      Policy:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action: execute-api:Invoke
+            Resource: '*'
+            Condition:
+              IpAddress:
+                aws:SourceIp: !Ref AllowedIPAddress
+
+  # API Gateway Resource for /cleanup
+  CleanupResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ASINCleanupAPI
+      ParentId: !GetAtt ASINCleanupAPI.RootResourceId
+      PathPart: cleanup
+
+  # DELETE method for /cleanup
+  CleanupDeleteMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref ASINCleanupAPI
+      ResourceId: !Ref CleanupResource
+      HttpMethod: DELETE
+      AuthorizationType: NONE
+      RequestValidatorId: !Ref RequestValidator
+      RequestModels:
+        application/json: !Ref ASINRequestModel
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ASINCleanupLambda.Arn}/invocations'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+        - StatusCode: 400
+          ResponseModels:
+            application/json: Empty
+        - StatusCode: 404
+          ResponseModels:
+            application/json: Empty
+        - StatusCode: 500
+          ResponseModels:
+            application/json: Empty
+
+  # Request validator
+  RequestValidator:
+    Type: AWS::ApiGateway::RequestValidator
+    Properties:
+      RestApiId: !Ref ASINCleanupAPI
+      Name: !Sub '${AWS::StackName}-request-validator'
+      ValidateRequestBody: true
+      ValidateRequestParameters: false
+
+  # Request model for ASIN
+  ASINRequestModel:
+    Type: AWS::ApiGateway::Model
+    Properties:
+      RestApiId: !Ref ASINCleanupAPI
+      Name: ASINRequest
+      ContentType: application/json
+      Schema:
+        $schema: 'http://json-schema.org/draft-04/schema#'
+        title: ASIN Request Schema
+        type: object
+        properties:
+          asin:
+            type: string
+            pattern: '^[A-Z0-9]{10}$'
+        required:
+          - asin
+
+  # Lambda permission for API Gateway
+  LambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ASINCleanupLambda
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ASINCleanupAPI}/*/*'
+
+  # API Gateway Deployment
+  APIDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - CleanupDeleteMethod
+    Properties:
+      RestApiId: !Ref ASINCleanupAPI
+      StageName: prod
+      StageDescription: 'Production stage for ASIN cleanup API'
+
+Outputs:
+  APIGatewayURL:
+    Description: 'API Gateway endpoint URL'
+    Value: !Sub 'https://${ASINCleanupAPI}.execute-api.${AWS::Region}.amazonaws.com/prod/cleanup'
+    Export:
+      Name: !Sub '${AWS::StackName}-api-url'
+      
+  LambdaFunctionName:
+    Description: 'Lambda function name for deployment scripts'
+    Value: !Ref ASINCleanupLambda
+    Export:
+      Name: !Sub '${AWS::StackName}-lambda-name'
+      
+  APIGatewayId:
+    Description: 'API Gateway ID for resource policy updates'
+    Value: !Ref ASINCleanupAPI
+    Export:
+      Name: !Sub '${AWS::StackName}-api-id'

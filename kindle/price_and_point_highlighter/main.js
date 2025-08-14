@@ -149,8 +149,15 @@ ${productUrl}
 
     const postToAllPlatforms = (title, detail) => {
         const message = createMessage(title, detail);
+        
+        // 通知送信
         postToSlack(message);
         postToMastodon(message);
+        
+        // S3からASINを削除（重複呼び出し防止のため1回だけ実行）
+        if (asin) {
+            removeASINFromS3(asin);
+        }
     };
 
     const postToSlack = (message) => {
@@ -200,6 +207,37 @@ ${productUrl}
             },
             onerror: (error) => {
                 console.error('リクエストエラー:', error);
+            }
+        });
+    };
+
+    const removeASINFromS3 = (targetASIN) => {
+        if (!globalConfig.s3CleanupApi?.endpoint) {
+            console.log('S3 Cleanup API endpoint not configured, skipping ASIN removal');
+            return;
+        }
+
+        GM_xmlhttpRequest({
+            method: 'DELETE',
+            url: globalConfig.s3CleanupApi.endpoint,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            data: JSON.stringify({
+                asin: targetASIN
+            }),
+            onload: (response) => {
+                if (response.status === 200) {
+                    console.log(`ASIN ${targetASIN} removed from S3 successfully:`, JSON.parse(response.responseText));
+                } else if (response.status === 404) {
+                    // 404は正常として処理（ASINが存在しない場合）
+                    console.log(`ASIN ${targetASIN} not found in S3 (already removed or never existed)`);
+                } else {
+                    console.error(`Failed to remove ASIN ${targetASIN} from S3:`, response);
+                }
+            },
+            onerror: (error) => {
+                console.error(`Error removing ASIN ${targetASIN} from S3:`, error);
             }
         });
     };
