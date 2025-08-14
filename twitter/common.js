@@ -5,15 +5,27 @@ unsafeWindow.TwitterCommon = (function () {
     // Intent URLパターン
     const INTENT_PATTERNS = [
         'twitter.com/intent/tweet',
+        'twitter.com/intent/post',
         'twitter.com/share',
         'x.com/intent/post',
         'x.com/intent/tweet',
         'x.com/share',
+        'twitter://intent/tweet',
+        'twitter://intent/post',
     ];
 
     // Intent URLかどうかを判定
     const isIntentUrl = (url) => {
-        return INTENT_PATTERNS.some(pattern => url.includes(pattern));
+        if (!url) return false;
+        
+        // 既存のパターンマッチング
+        if (INTENT_PATTERNS.some(pattern => url.includes(pattern))) {
+            return true;
+        }
+        
+        // 正規表現による柔軟なマッチング
+        const intentRegex = /(twitter|x)\.com\/(intent\/(tweet|post)|share)|twitter:\/\/intent\/(tweet|post)/i;
+        return intentRegex.test(url);
     };
 
     // Intent URLからパラメータを抽出
