@@ -30,7 +30,7 @@ ${hashtags}
         }
     };
 
-    // 基本のintent URLリンク検出
+    // 1. 基本のintent URLリンク検出（最優先）
     const handleDirectIntentLink = (event) => {
         const selector = INTENT_PATTERNS.map(pattern => `a[href*="${pattern}"]`).join(', ');
         const target = event.target.closest(selector);
@@ -43,7 +43,26 @@ ${hashtags}
         return false;
     };
 
-    // 汎用的なTwitterボタンの検出
+    // 2. AddToAnyのXボタンの検出
+    const handleAddToAnyXButton = (event) => {
+        const link = event.target.closest('a.a2a_button_x');
+        if (link && link.href.includes('addtoany.com/add_to/x')) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const url = new URL(link.href);
+            const linkUrl = decodeURIComponent(url.searchParams.get('linkurl') || '');
+            const linkName = decodeURIComponent(url.searchParams.get('linkname') || '');
+
+            // intent URL形式に変換
+            const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(linkName)}&url=${encodeURIComponent(linkUrl)}`;
+            handleIntentClick(intentUrl);
+            return true;
+        }
+        return false;
+    };
+
+    // 3. 汎用的なTwitterボタンの検出
     const handleTwitterButton = (event) => {
         const button = event.target.closest('button');
         if (button && isLikelyTwitterButton(button)) {
@@ -84,26 +103,7 @@ ${hashtags}
         );
     };
 
-    // AddToAnyのXボタンの検出
-    const handleAddToAnyXButton = (event) => {
-        const link = event.target.closest('a.a2a_button_x');
-        if (link && link.href.includes('addtoany.com/add_to/x')) {
-            event.preventDefault();
-            event.stopPropagation();
-
-            const url = new URL(link.href);
-            const linkUrl = decodeURIComponent(url.searchParams.get('linkurl') || '');
-            const linkName = decodeURIComponent(url.searchParams.get('linkname') || '');
-
-            // intent URL形式に変換
-            const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(linkName)}&url=${encodeURIComponent(linkUrl)}`;
-            handleIntentClick(intentUrl);
-            return true;
-        }
-        return false;
-    };
-
-    // シンプルなTwitterシェアボタンの検出
+    // 4. シンプルなTwitterシェアボタンの検出（最低優先）
     const handleGenericTwitterShare = (event) => {
         const shareElement = event.target.closest('.twitter, [onclick*="twitter"]');
         if (shareElement &&
