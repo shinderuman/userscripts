@@ -1,6 +1,6 @@
 // ニコニコ動画共通ライブラリ
 unsafeWindow.NiconicoCommon = (function () {
-    "use strict";
+    'use strict';
 
     // 通知表示
     const showNotification = (title, text, timeout = 3000) => {

@@ -1,5 +1,5 @@
 (function () {
-    "use strict";
+    'use strict';
 
     // 共通ライブラリから関数を取得
     const {
@@ -15,25 +15,25 @@
         AVERAGE_PRICE_THRESHOLD: 350,
         BADGE_EXPIRATION: 5 * 60 * 1000,
         LOCAL_STORAGE_KEYS: {
-            LAST_CLEAR_DATE: "lastClearDate",
-            NOTIFIED: "notifiedASINs",
-            MARKED: "markedASINs"
+            LAST_CLEAR_DATE: 'lastClearDate',
+            NOTIFIED: 'notifiedASINs',
+            MARKED: 'markedASINs'
         },
-        AFFILIATE_PARAMS: '?tag=shinderuman03-22&linkCode=ogi&th=1&psc=1',
+        AFFILIATE_PARAMS: '?tag=shinderuman03-22&linkCode=ogi&th=1&psc=1'
     };
 
     const SELECTORS = {
-        favicon: "link[rel*='icon'], link[rel='shortcut icon']",
-        navbar: "#nav-belt",
-        title: "#productTitle",
-        seriesTitle: "#collection-masthead__title",
-        asin: "#ASIN, input[name='idx.asin'], input[name='ASIN.0'], input[name='titleID']",
-        kindlePrice: "#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span",
-        paperPrice: "[id^='tmm-grid-swatch']:not([id$='KINDLE']) > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span",
-        points: "#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span, #tmm-grid-swatch-OTHER > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span",
-        ownershipVolume: "#hulk_buy_ownership_volume > span",
-        kindleBookAvailable: "#tmm-grid-swatch-KINDLE",
-        paperBookAvailable: "[id^='tmm-grid-swatch']:not([id$='KINDLE'])"
+        favicon: 'link[rel*=\'icon\'], link[rel=\'shortcut icon\']',
+        navbar: '#nav-belt',
+        title: '#productTitle',
+        seriesTitle: '#collection-masthead__title',
+        asin: '#ASIN, input[name=\'idx.asin\'], input[name=\'ASIN.0\'], input[name=\'titleID\']',
+        kindlePrice: '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span',
+        paperPrice: '[id^=\'tmm-grid-swatch\']:not([id$=\'KINDLE\']) > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span',
+        points: '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span, #tmm-grid-swatch-OTHER > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span',
+        ownershipVolume: '#hulk_buy_ownership_volume > span',
+        kindleBookAvailable: '#tmm-grid-swatch-KINDLE',
+        paperBookAvailable: '[id^=\'tmm-grid-swatch\']:not([id$=\'KINDLE\'])'
     };
 
     let asin = null;
@@ -53,11 +53,6 @@
     const isBadgeExpired = (timestamp) => {
         if (!timestamp) return false;
         return Date.now() - Number(timestamp) >= CONFIG.BADGE_EXPIRATION;
-    };
-
-    const extractNumber = (text, regex) => {
-        const match = text.match(regex);
-        return match ? parseInt(match[1].replace(/,/g, ""), 10) : 0;
     };
 
     const createMessage = (title, detail) => {
@@ -80,11 +75,11 @@ ${productUrl}
     };
 
     const isNotified = () => {
-        return JSON.parse(localStorage.getItem(CONFIG.LOCAL_STORAGE_KEYS.NOTIFIED) || "[]").includes(asin);
+        return JSON.parse(localStorage.getItem(CONFIG.LOCAL_STORAGE_KEYS.NOTIFIED) || '[]').includes(asin);
     };
 
     const markAsNotified = () => {
-        const notifiedASINs = JSON.parse(localStorage.getItem(CONFIG.LOCAL_STORAGE_KEYS.NOTIFIED) || "[]");
+        const notifiedASINs = JSON.parse(localStorage.getItem(CONFIG.LOCAL_STORAGE_KEYS.NOTIFIED) || '[]');
         if (!notifiedASINs.includes(asin)) {
             notifiedASINs.push(asin);
             localStorage.setItem(CONFIG.LOCAL_STORAGE_KEYS.NOTIFIED, JSON.stringify(notifiedASINs));
@@ -93,7 +88,7 @@ ${productUrl}
 
     const clearNotifiedASINsDaily = () => {
         const lastClearDate = localStorage.getItem(CONFIG.LOCAL_STORAGE_KEYS.LAST_CLEAR_DATE);
-        const today = new Date().toISOString().split("T")[0];
+        const today = new Date().toISOString().split('T')[0];
 
         if (lastClearDate !== today) {
             localStorage.removeItem(CONFIG.LOCAL_STORAGE_KEYS.NOTIFIED);
@@ -104,19 +99,19 @@ ${productUrl}
     const highlightNavbar = () => {
         const navbar = document.querySelector(SELECTORS.navbar);
         if (navbar) {
-            navbar.style.backgroundColor = "#ff0000";
-            navbar.style.color = "white";
+            navbar.style.backgroundColor = '#ff0000';
+            navbar.style.color = 'white';
         }
     };
 
     const addBadgeToFavicon = (color) => {
-        const canvas = document.createElement("canvas");
+        const canvas = document.createElement('canvas');
         canvas.width = 32;
         canvas.height = 32;
-        const ctx = canvas.getContext("2d");
+        const ctx = canvas.getContext('2d');
 
         const img = new Image();
-        img.src = document.querySelector(SELECTORS.favicon)?.href || "https://www.amazon.co.jp/favicon.ico";
+        img.src = document.querySelector(SELECTORS.favicon)?.href || 'https://www.amazon.co.jp/favicon.ico';
         img.onload = () => {
             ctx.drawImage(img, 0, 0, 32, 32);
             ctx.fillStyle = color;
@@ -124,7 +119,7 @@ ${productUrl}
             ctx.arc(24, 8, 8, 0, 2 * Math.PI);
             ctx.fill();
 
-            const newFavicon = canvas.toDataURL("image/png");
+            const newFavicon = canvas.toDataURL('image/png');
             changeFavicon(newFavicon);
         };
     };
@@ -134,9 +129,9 @@ ${productUrl}
         if (link) {
             link.href = url;
         } else {
-            link = document.createElement("link");
-            link.type = "image/x-icon";
-            link.rel = "shortcut icon";
+            link = document.createElement('link');
+            link.type = 'image/x-icon';
+            link.rel = 'shortcut icon';
             link.href = url;
             document.head.appendChild(link);
         }
@@ -146,7 +141,7 @@ ${productUrl}
         GM_notification({
             title: title,
             text: body,
-            image: "https://www.google.com/s2/favicons?sz=64&domain=amazon.co.jp",
+            image: 'https://www.google.com/s2/favicons?sz=64&domain=amazon.co.jp',
             timeout: 0,
             onclick: () => {
                 window.focus();
@@ -164,11 +159,11 @@ ${productUrl}
     const postToSlack = (message) => {
         if (!globalConfig.slack?.token) return;
         GM_xmlhttpRequest({
-            method: "POST",
-            url: "https://slack.com/api/chat.postMessage",
+            method: 'POST',
+            url: 'https://slack.com/api/chat.postMessage',
             headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${globalConfig.slack.token}`
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${globalConfig.slack.token}`
             },
             data: JSON.stringify({
                 channel: globalConfig.slack.channelId,
@@ -177,12 +172,12 @@ ${productUrl}
             onload: (response) => {
                 const result = JSON.parse(response.responseText);
                 if (result.ok) {
-                    console.log("メッセージ送信成功:", result);
+                    console.log('メッセージ送信成功:', result);
                 } else {
-                    console.error("メッセージ送信失敗:", result);
+                    console.error('メッセージ送信失敗:', result);
                 }
             },
-            onerror: (error) => console.error("リクエストエラー:", error)
+            onerror: (error) => console.error('リクエストエラー:', error)
         });
     };
 
@@ -193,11 +188,11 @@ ${productUrl}
             url: globalConfig.mastodon.apiEndpoint,
             headers: {
                 'Authorization': `Bearer ${globalConfig.mastodon.accessToken}`,
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json'
             },
             data: JSON.stringify({
                 status: status,
-                visibility: 'public',
+                visibility: 'public'
             }),
             onload: (response) => {
                 if (response.status === 200 || response.status === 202) {
@@ -208,7 +203,7 @@ ${productUrl}
             },
             onerror: (error) => {
                 console.error('リクエストエラー:', error);
-            },
+            }
         });
     };
 
@@ -217,7 +212,7 @@ ${productUrl}
         const kindlePrice = getElementValue(document, SELECTORS.kindlePrice, /([\d,]+)/);
         const paperPrice = getElementValue(document, SELECTORS.paperPrice, /([\d,]+)/);
 
-        let conditions = [];
+        const conditions = [];
         if (points >= CONFIG.THRESHOLD) {
             conditions.push(`✅ポイント ${points}pt`);
         }
@@ -280,7 +275,7 @@ ${productUrl}
     const addNavbarClickHandler = (title, detail) => {
         const navbar = document.querySelector(SELECTORS.navbar);
         if (navbar) {
-            navbar.addEventListener("click", (e) => {
+            navbar.addEventListener('click', (e) => {
                 e.preventDefault();
                 postToAllPlatforms(title, detail);
             });
@@ -288,12 +283,12 @@ ${productUrl}
     };
 
     const checkConditions = () => {
-        const title = document.querySelector(SELECTORS.title)?.innerText.trim() || document.querySelector(SELECTORS.seriesTitle)?.innerText.trim() || "商品タイトル不明";
+        const title = document.querySelector(SELECTORS.title)?.innerText.trim() || document.querySelector(SELECTORS.seriesTitle)?.innerText.trim() || '商品タイトル不明';
         const detail = evaluateConditions();
 
         if (detail) {
             highlightNavbar();
-            addBadgeToFavicon("red");
+            addBadgeToFavicon('red');
             addNavbarClickHandler(title, detail);
             if (!isNotified()) {
                 sendNotification(title, detail);
@@ -302,7 +297,7 @@ ${productUrl}
             return true;
         } else if (checkSeriesConditions()) {
             highlightNavbar();
-            addBadgeToFavicon("red");
+            addBadgeToFavicon('red');
             return true;
         }
         return false;
@@ -318,7 +313,7 @@ ${productUrl}
         }
 
         if (paperBookAvailable && kindleBookAvailable) {
-            addBadgeToFavicon("aqua");
+            addBadgeToFavicon('aqua');
             saveMarkedASINs(Date.now().toString());
         }
     };
@@ -330,12 +325,12 @@ ${productUrl}
         clearNotifiedASINsDaily();
         checkConditions() || checkAndApplyBadgeForKindleAvailability();
 
-        console.log("🚀 Kindle Price and Point Highlighter が初期化されました");
+        console.log('🚀 Kindle Price and Point Highlighter が初期化されました');
     };
 
     // グローバル関数として公開
     unsafeWindow.initializePriceAndPointHighlighter = initializePriceAndPointHighlighter;
 
     // 自動初期化
-    window.addEventListener("load", initializePriceAndPointHighlighter);
+    window.addEventListener('load', initializePriceAndPointHighlighter);
 })();

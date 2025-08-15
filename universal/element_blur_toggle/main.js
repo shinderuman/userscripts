@@ -22,8 +22,8 @@
 
     const initializeBlurOnClick = () => {
         document.addEventListener('click', handleClick, true);
-        console.log("🚀 Blur on Click が初期化されました");
-        console.log("💡 Option+Clickで要素にモザイクをかけることができます");
+        console.log('🚀 Blur on Click が初期化されました');
+        console.log('💡 Option+Clickで要素にモザイクをかけることができます');
     };
 
     // グローバル関数として公開

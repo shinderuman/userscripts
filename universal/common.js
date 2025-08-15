@@ -1,6 +1,6 @@
 // Universal共通ライブラリ
 unsafeWindow.UniversalCommon = (function () {
-    "use strict";
+    'use strict';
 
     // 通知表示ユーティリティ
     const showNotification = (title, text, timeout = 3000, onclick = null) => {

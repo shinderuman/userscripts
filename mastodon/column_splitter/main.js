@@ -15,13 +15,13 @@
         KENJI_API_ENDPOINT: 'https://kenji.asmodeus.jp/proxy/api/v1/image/info/',
         KENJI_IMAGE_BASE_URL: 'https://kenji.asmodeus.jp/proxy_image/post/t/',
         OURT_IMAGE_BASE_URL: 'https://img.ourt-ai.work/post/t/',
-        EXPIRATION_TIME: 24 * 60 * 60 * 1000 * 7,
+        EXPIRATION_TIME: 24 * 60 * 60 * 1000 * 7
     };
 
     const rules = [{
         'removeContent': {
             'accounts': [
-                '@pose@mstdn.jp',
+                '@pose@mstdn.jp'
             ],
             'func': (article) => {
                 article.querySelector('div.status__content.status__content--with-action')?.remove();
@@ -30,7 +30,7 @@
         'removeArticle': {
             'accounts': [
                 '@clartes@misskey.io',
-                '@poeeeeeeen44672@misskey.io',
+                '@poeeeeeeen44672@misskey.io'
             ],
             'func': (article) => {
                 if (!article.querySelector('div.media-gallery')) {
@@ -84,7 +84,7 @@
         }
 
         sourceColumn.parentElement.appendChild(sourceColumn);
-    }
+    };
 
     const fetchOurtAI = async (id) => {
         const imageCache = new ImageCache();
@@ -102,7 +102,7 @@
             console.error('Error fetching or parsing:', error);
             return null;
         }
-    }
+    };
 
     const appendMediaGallery = async (articleElement, imageDetails) => {
         const imageCache = new ImageCache();
@@ -132,7 +132,7 @@
 
         articleElement.querySelector('div.status__content.status__content--with-action')?.insertAdjacentElement('afterend', mediaGallery);
         articleElement.querySelector('a.status-card')?.remove();
-    }
+    };
 
     const createMediaGalleryItem = (blobImage, ourtImageUrl) => {
         const mediaGalleryItem = document.createElement('div');
@@ -160,7 +160,7 @@
         mediaGalleryItem.appendChild(thumbnailLink);
 
         return mediaGalleryItem;
-    }
+    };
 
     const initializeColumnSplitter = () => {
         const mainMutationObserver = new MutationObserver(() => {

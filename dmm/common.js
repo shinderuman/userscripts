@@ -1,6 +1,6 @@
 // DMM共通ライブラリ
 unsafeWindow.DMMCommon = (function () {
-    "use strict";
+    'use strict';
 
     // DOM監視
     const observeDOM = (callback, options = { childList: true, subtree: true }) => {

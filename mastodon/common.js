@@ -1,6 +1,6 @@
 // Mastodon共通ライブラリ
 unsafeWindow.MastodonCommon = (function () {
-    "use strict";
+    'use strict';
 
     // IndexedDBを使用した画像キャッシュクラス
     class ImageCache {
@@ -83,7 +83,7 @@ unsafeWindow.MastodonCommon = (function () {
         constructor(callback) {
             this.observer = new MutationObserver((mutations) => {
                 if (this.isTabActive) {
-                    callback(mutations)
+                    callback(mutations);
                 } else {
                     this.deferredMutations.push(...mutations);
                 }

@@ -33,8 +33,8 @@
 
     const initializePlayerOpenTab = () => {
         observeDOM(processLinks);
-        console.log("🚀 DMM Player Open Tab が初期化されました");
-        console.log("💡 DMM動画を新しいタブで開くように変更します");
+        console.log('🚀 DMM Player Open Tab が初期化されました');
+        console.log('💡 DMM動画を新しいタブで開くように変更します');
     };
 
     // グローバル関数として公開

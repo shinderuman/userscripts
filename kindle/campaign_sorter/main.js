@@ -3,9 +3,6 @@
 
     // 共通ライブラリから関数を取得
     const {
-        fetchJsonFromS3,
-        sendErrorNotification,
-        sendCompletionNotification
     } = unsafeWindow.KindleCommon;
 
     const CONFIG = {
@@ -160,7 +157,7 @@
 
     const initializeCampaignSorter = () => {
         createTriggerButton();
-        console.log("📘 Kindle Campaign Sorter が初期化されました");
+        console.log('📘 Kindle Campaign Sorter が初期化されました');
     };
 
     // グローバル関数として公開

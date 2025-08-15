@@ -46,7 +46,7 @@
         observer.observe(document.body, { childList: true, subtree: true });
 
         createToggleButton();
-        console.log("🚀 Twitter Show Yourself が初期化されました");
+        console.log('🚀 Twitter Show Yourself が初期化されました');
     };
 
     // グローバル関数として公開

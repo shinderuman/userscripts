@@ -2,8 +2,8 @@
     'use strict';
 
     // 共通ライブラリから関数を取得
+    // 共通ライブラリから関数を取得
     const {
-        getCurrentUsername
     } = unsafeWindow.MastodonCommon;
 
     const CONFIG = {
@@ -71,15 +71,13 @@
 
     const initializeRecentPostEditor = () => {
         document.addEventListener('keydown', handleKeyboardShortcuts);
-        console.log("⌨️ キーボードショートカットが有効になりました:");
-        console.log("  Command+↑: 最新の投稿を編集");
-        console.log("  Command+Shift+↑: 最新の投稿にリプライ");
+        console.log('⌨️ キーボードショートカットが有効になりました:');
+        console.log('  Command+↑: 最新の投稿を編集');
+        console.log('  Command+Shift+↑: 最新の投稿にリプライ');
     };
 
     // グローバル関数として公開
     unsafeWindow.initializeRecentPostEditor = initializeRecentPostEditor;
-
-
 
     // 自動初期化
     initializeRecentPostEditor();

@@ -4,7 +4,6 @@
     // 共通ライブラリから関数を取得
     const {
         showNotification,
-        wait,
         scrollToElement,
         createCanvas,
         applyStyles
@@ -200,7 +199,7 @@
         initializeDisplay(canvas, nav);
         enablePageTurn(canvas, pageGroups);
 
-        console.log("📖 ニコニコ漫画横読み変換が初期化されました");
+        console.log('📖 ニコニコ漫画横読み変換が初期化されました');
     };
 
     // グローバル関数として公開

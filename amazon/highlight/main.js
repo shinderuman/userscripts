@@ -11,16 +11,16 @@
         HIGHLIGHT_CONFIGS: [
             {
                 title: 'てさぐれ',
-                priceThreshold: 4000,
+                priceThreshold: 4000
             },
             {
                 title: '世話やき',
-                priceThreshold: 5000,
+                priceThreshold: 5000
             },
             {
                 title: '魔法少女',
-                priceThreshold: 10000,
-            },
+                priceThreshold: 10000
+            }
         ],
         STYLES: {
             highlightedItem: {
@@ -32,12 +32,12 @@
                 padding: '5px',
                 borderRadius: '10px',
                 boxShadow: '0 0 10px red',
-                textTransform: 'uppercase',
+                textTransform: 'uppercase'
             },
             navbar: {
                 backgroundColor: '#900090',
-                color: 'white',
-            },
+                color: 'white'
+            }
         },
         SELECTORS: {
             items: 'li.g-item-sortable',
@@ -85,10 +85,10 @@
         if (hasHighlightedItems) {
             highlightNavbar();
             addBadgeToFavicon(CONFIG.BADGE_COLOR);
-            console.log("🎯 アイテムがハイライトされました");
+            console.log('🎯 アイテムがハイライトされました');
         }
-
-        console.log("🚀 Amazon Highlight が初期化されました");
+        
+        console.log('🚀 Amazon Highlight が初期化されました');
     };
 
     // グローバル関数として公開

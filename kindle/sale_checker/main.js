@@ -1,5 +1,5 @@
 (function () {
-    "use strict";
+    'use strict';
 
     // 共通ライブラリから関数を取得
     const {
@@ -11,24 +11,24 @@
     } = unsafeWindow.KindleCommon;
 
     const CONFIG = {
-        BOOKS_URL: "https://kindle-asins.s3.ap-northeast-1.amazonaws.com/unprocessed_asins.json",
+        BOOKS_URL: 'https://kindle-asins.s3.ap-northeast-1.amazonaws.com/unprocessed_asins.json',
         THRESHOLD: 151,
         POINTS_RATE_THRESHOLD: 20,
         AVERAGE_PRICE_THRESHOLD: 350,
         CONCURRENT_REQUESTS: 20, // 同時リクエスト数
-        REQUEST_DELAY: 1000, // リクエスト間隔（ミリ秒）
+        REQUEST_DELAY: 1000 // リクエスト間隔（ミリ秒）
     };
 
     const SELECTORS = {
-        title: "#productTitle",
-        kindlePrice: "#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span",
-        paperPrice: "[id^='tmm-grid-swatch']:not([id$='KINDLE']) > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span",
-        points: "#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span, #tmm-grid-swatch-OTHER > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span",
+        title: '#productTitle',
+        kindlePrice: '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span',
+        paperPrice: '[id^=\'tmm-grid-swatch\']:not([id$=\'KINDLE\']) > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span',
+        points: '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span, #tmm-grid-swatch-OTHER > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span'
     };
 
     // 書籍データをS3から取得
     const fetchBooks = () => {
-        return fetchJsonFromS3(CONFIG.BOOKS_URL, "books");
+        return fetchJsonFromS3(CONFIG.BOOKS_URL, 'books');
     };
 
     // 個別ページの情報を取得
@@ -56,7 +56,7 @@
     // セール条件をチェック
     const checkSaleConditions = (info) => {
         const { points, kindlePrice, paperPrice } = info;
-        let conditions = [];
+        const conditions = [];
 
         if (points >= CONFIG.THRESHOLD) {
             conditions.push(`✅ポイント ${points}pt`);
@@ -122,24 +122,24 @@
         console.log(`✅ チェック完了: ${saleCount}件のセールを発見しました`);
 
         // 完了通知
-        sendCompletionNotification("セールチェック", books.length, saleCount);
+        sendCompletionNotification('セールチェック', books.length, saleCount);
     };
 
     // メイン関数
     const checkWishlistSales = async () => {
         try {
-            console.log("📖 書籍データを取得中...");
+            console.log('📖 書籍データを取得中...');
             const books = await fetchBooks();
             console.log(`📚 ${books.length}冊をチェックします`);
 
-            console.log("📖 セール情報をチェック中...");
+            console.log('📖 セール情報をチェック中...');
             await checkPagesInBatches(books);
         } catch (error) {
-            console.error("❌ エラーが発生しました:", error);
+            console.error('❌ エラーが発生しました:', error);
             GM_notification({
-                title: "❌ エラー",
-                text: "セールチェック中にエラーが発生しました",
-                image: "https://www.google.com/s2/favicons?sz=64&domain=amazon.co.jp",
+                title: '❌ エラー',
+                text: 'セールチェック中にエラーが発生しました',
+                image: 'https://www.google.com/s2/favicons?sz=64&domain=amazon.co.jp',
                 timeout: 5000
             });
         }
@@ -148,6 +148,6 @@
     // グローバル関数として公開（デベロッパーツールから呼び出し可能）
     unsafeWindow.checkWishlistSales = checkWishlistSales;
 
-    console.log("🚀 Wishlist Sale Checker が読み込まれました");
-    console.log("💡 デベロッパーツールで checkWishlistSales() を実行してください");
+    console.log('🚀 Wishlist Sale Checker が読み込まれました');
+    console.log('💡 デベロッパーツールで checkWishlistSales() を実行してください');
 })();

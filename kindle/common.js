@@ -1,6 +1,6 @@
 // 共通ライブラリ
 unsafeWindow.KindleCommon = (function () {
-    "use strict";
+    'use strict';
 
     // S3からJSONデータを取得する共通関数
     const fetchJsonFromS3 = (url, dataType) => {
@@ -10,7 +10,7 @@ unsafeWindow.KindleCommon = (function () {
             const urlWithCacheBuster = url + cacheBuster;
 
             GM_xmlhttpRequest({
-                method: "GET",
+                method: 'GET',
                 url: urlWithCacheBuster,
                 headers: {
                     'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -41,7 +41,7 @@ unsafeWindow.KindleCommon = (function () {
             const cleanUrl = url.split('?')[0]; // アフィリエイトパラメータを除去
 
             GM_xmlhttpRequest({
-                method: "GET",
+                method: 'GET',
                 url: cleanUrl,
                 onload: (response) => {
                     if (response.status === 200) {
@@ -102,7 +102,7 @@ unsafeWindow.KindleCommon = (function () {
         GM_notification({
             title,
             text,
-            image: "https://www.google.com/s2/favicons?sz=64&domain=amazon.co.jp",
+            image: 'https://www.google.com/s2/favicons?sz=64&domain=amazon.co.jp',
             timeout,
             onclick: () => {
                 if (url) {
@@ -125,7 +125,7 @@ unsafeWindow.KindleCommon = (function () {
     // エラー通知の共通関数
     const sendErrorNotification = (scriptName, errorMessage) => {
         sendNotification(
-            "❌ エラー",
+            '❌ エラー',
             `${scriptName}中にエラーが発生しました: ${errorMessage}`,
             null,
             5000
@@ -143,7 +143,7 @@ unsafeWindow.KindleCommon = (function () {
         const element = doc.querySelector(selector);
         if (!element) return 0;
         const match = element.innerText.match(regex);
-        return match ? parseInt(match[1].replace(/,/g, ""), 10) : 0;
+        return match ? parseInt(match[1].replace(/,/g, ''), 10) : 0;
     };
 
     // localStorage管理機能

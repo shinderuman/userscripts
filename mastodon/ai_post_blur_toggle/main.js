@@ -2,8 +2,8 @@
     'use strict';
 
     // 共通ライブラリから関数を取得
+    // 共通ライブラリから関数を取得
     const {
-        observeElement
     } = unsafeWindow.MastodonCommon;
 
     const CONFIG = {
@@ -28,7 +28,7 @@
         });
 
         observer.observe(document.body, { childList: true, subtree: true });
-        console.log("🚀 Mastodon Blur Sensitive Contents が初期化されました");
+        console.log('🚀 Mastodon Blur Sensitive Contents が初期化されました');
     };
 
     // グローバル関数として公開

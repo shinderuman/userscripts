@@ -1,6 +1,6 @@
 // YouTube共通ライブラリ
 unsafeWindow.YouTubeCommon = (function () {
-    "use strict";
+    'use strict';
 
     // DOM監視
     const observeDOM = (callback, options = { childList: true, subtree: true }) => {

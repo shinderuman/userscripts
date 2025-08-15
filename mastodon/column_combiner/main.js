@@ -2,19 +2,19 @@
     'use strict';
 
     // 共通ライブラリから関数を取得
+    // 共通ライブラリから関数を取得
     const {
-        waitForElements
     } = unsafeWindow.MastodonCommon;
 
     const COLUMN_PAIRS = [
         {
             topColumnName: '投稿の新規作成',
-            bottomColumnName: '通知',
+            bottomColumnName: '通知'
         },
         {
             topColumnName: '#gochisou_photo',
-            bottomColumnName: '#文鳥',
-        },
+            bottomColumnName: '#文鳥'
+        }
     ];
 
     const combineColumns = (topColumn, bottomColumn) => {

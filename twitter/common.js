@@ -1,6 +1,6 @@
 // Twitter/X共通ライブラリ
 unsafeWindow.TwitterCommon = (function () {
-    "use strict";
+    'use strict';
 
     // Intent URLパターン
     const INTENT_PATTERNS = [
@@ -11,7 +11,7 @@ unsafeWindow.TwitterCommon = (function () {
         'x.com/intent/tweet',
         'x.com/share',
         'twitter://intent/tweet',
-        'twitter://intent/post',
+        'twitter://intent/post'
     ];
 
     // Intent URLかどうかを判定

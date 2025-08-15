@@ -1,5 +1,5 @@
 (function () {
-    "use strict";
+    'use strict';
 
     // 共通ライブラリから関数を取得
     const {
@@ -7,20 +7,19 @@
         sendErrorNotification,
         sendCompletionNotification,
         extractAsinFromUrl,
-        getStorageItems,
         saveStorageItem,
         isAlreadyStored,
         cleanupOldStorageItems
     } = unsafeWindow.KindleCommon;
 
     const CONFIG = {
-        AUTHORS_URL: "https://kindle-asins.s3.ap-northeast-1.amazonaws.com/authors.json",
-        EXCLUDED_KEYWORDS_URL: "https://kindle-asins.s3.ap-northeast-1.amazonaws.com/excluded_title_keywords.json",
+        AUTHORS_URL: 'https://kindle-asins.s3.ap-northeast-1.amazonaws.com/authors.json',
+        EXCLUDED_KEYWORDS_URL: 'https://kindle-asins.s3.ap-northeast-1.amazonaws.com/excluded_title_keywords.json',
         CONCURRENT_REQUESTS: 20, // 同時リクエスト数
         REQUEST_DELAY: 1000, // リクエスト間隔（ミリ秒）
         NEW_RELEASE_DAYS: 7, // 何日以内を新刊とするか
         MIN_PRICE: 221, // 最低価格（円）
-        STORAGE_KEY: 'newReleaseNotifications', // localStorage キー
+        STORAGE_KEY: 'newReleaseNotifications' // localStorage キー
     };
 
     // ISBN判定関数
@@ -35,33 +34,33 @@
     // メイン関数
     const checkNewReleases = async (isbnMode = 0) => {
         try {
-            console.log("🧹 古い通知記録をクリーンアップ中...");
+            console.log('🧹 古い通知記録をクリーンアップ中...');
             cleanupOldNotifications();
 
             console.log(`📖 ISBN処理モード: ${getISBNModeDescription(isbnMode)}`);
 
-            console.log("📖 作者データを取得中...");
+            console.log('📖 作者データを取得中...');
             const authors = await fetchAuthors();
             console.log(`📚 ${authors.length}人をチェックします`);
 
-            console.log("📖 除外キーワードを取得中...");
+            console.log('📖 除外キーワードを取得中...');
             const excludedKeywords = await fetchExcludedKeywords();
             console.log(`🚫 除外キーワード: ${excludedKeywords.join(', ')}`);
 
-            console.log("📖 作者の新刊をチェック中...");
+            console.log('📖 作者の新刊をチェック中...');
             await checkPagesInBatches(authors, excludedKeywords, isbnMode);
         } catch (error) {
-            console.error("❌ エラーが発生しました:", error);
-            sendErrorNotification("新刊チェック", error.message);
+            console.error('❌ エラーが発生しました:', error);
+            sendErrorNotification('新刊チェック', error.message);
         }
     };
 
     const getISBNModeDescription = (mode) => {
         switch (mode) {
-            case 0: return "0 (ISBNをスキップ)";
-            case 1: return "1 (ISBNのみ表示)";
-            case 2: return "2 (どちらも表示)";
-            default: return `${mode} (不明なモード、ISBNをスキップとして処理)`;
+        case 0: return '0 (ISBNをスキップ)';
+        case 1: return '1 (ISBNのみ表示)';
+        case 2: return '2 (どちらも表示)';
+        default: return `${mode} (不明なモード、ISBNをスキップとして処理)`;
         }
     };
 
@@ -72,11 +71,11 @@
     };
 
     const fetchAuthors = () => {
-        return fetchJsonFromS3(CONFIG.AUTHORS_URL, "authors");
+        return fetchJsonFromS3(CONFIG.AUTHORS_URL, 'authors');
     };
 
     const fetchExcludedKeywords = () => {
-        return fetchJsonFromS3(CONFIG.EXCLUDED_KEYWORDS_URL, "excluded keywords");
+        return fetchJsonFromS3(CONFIG.EXCLUDED_KEYWORDS_URL, 'excluded keywords');
     };
 
     const checkPagesInBatches = async (authors, excludedKeywords, isbnMode) => {
@@ -127,7 +126,7 @@
         console.log(`✅ チェック完了: ${newReleaseCount}冊の新刊を発見しました`);
 
         // 完了通知
-        sendCompletionNotification("新刊チェック", authors.length, newReleaseCount);
+        sendCompletionNotification('新刊チェック', authors.length, newReleaseCount);
     };
 
     const fetchAuthorSearchInfo = async (authorInfo) => {
@@ -139,7 +138,7 @@
             console.log(`📄 検索URL: ${searchUrl}`);
 
             GM_xmlhttpRequest({
-                method: "GET",
+                method: 'GET',
                 url: searchUrl,
                 onload: async (response) => {
                     if (response.status === 200) {
@@ -184,7 +183,7 @@
             // 基本情報チェック
             const basicInfo = checkBookBasicInfo(item);
             if (!basicInfo.isValid) {
-                console.log(`⏭️ スキップ: タイトルまたはURLが見つかりません`);
+                console.log('⏭️ スキップ: タイトルまたはURLが見つかりません');
                 // デバッグ用：利用可能な要素を表示
                 const allH2 = item.querySelectorAll('h2, h2 span, h2 a, h2 a span');
                 console.log(`🔍 利用可能なh2要素: ${allH2.length}個`);
@@ -235,9 +234,9 @@
                     asin: asin
                 };
                 newReleases.push(bookData);
-                console.log(`✅ 新刊として追加しました`);
+                console.log('✅ 新刊として追加しました');
             } else if (!dateInfo.releaseDate) {
-                console.log(`❌ 発売日を解析できませんでした`);
+                console.log('❌ 発売日を解析できませんでした');
             }
         }
 
@@ -270,27 +269,27 @@
         console.log(`📚 ASIN: ${asin}, ISBN判定: ${isBookISBN}, モード: ${isbnMode}`);
 
         switch (isbnMode) {
-            case 0: // ISBNをスキップ
-                if (isBookISBN) {
-                    console.log(`⏭️ スキップ: ISBN（紙書籍）のためスキップします (ASIN: ${asin})`);
-                    return true;
-                }
-                break;
-            case 1: // ISBNのみ表示
-                if (!isBookISBN) {
-                    console.log(`⏭️ スキップ: ISBNではないためスキップします (ASIN: ${asin})`);
-                    return true;
-                }
-                break;
-            case 2: // どちらも表示
-                // フィルタリングしない
-                break;
-            default: // 不明なモードの場合はISBNをスキップ
-                if (isBookISBN) {
-                    console.log(`⏭️ スキップ: 不明なモード、ISBN（紙書籍）のためスキップします (ASIN: ${asin})`);
-                    return true;
-                }
-                break;
+        case 0: // ISBNをスキップ
+            if (isBookISBN) {
+                console.log(`⏭️ スキップ: ISBN（紙書籍）のためスキップします (ASIN: ${asin})`);
+                return true;
+            }
+            break;
+        case 1: // ISBNのみ表示
+            if (!isBookISBN) {
+                console.log(`⏭️ スキップ: ISBNではないためスキップします (ASIN: ${asin})`);
+                return true;
+            }
+            break;
+        case 2: // どちらも表示
+            // フィルタリングしない
+            break;
+        default: // 不明なモードの場合はISBNをスキップ
+            if (isBookISBN) {
+                console.log(`⏭️ スキップ: 不明なモード、ISBN（紙書籍）のためスキップします (ASIN: ${asin})`);
+                return true;
+            }
+            break;
         }
 
         return false;
@@ -333,7 +332,7 @@
                 console.log(`💰 価格: テキスト解析失敗 "${priceText}"`);
             }
         } else {
-            console.log(`💰 価格: 取得できませんでした（継続）`);
+            console.log('💰 価格: 取得できませんでした（継続）');
         }
 
         return { price, shouldSkip: false };
@@ -348,7 +347,7 @@
         console.log(`✅ 作者マッチ: ${isAuthorMatch}`);
 
         if (!isAuthorMatch) {
-            console.log(`⏭️ スキップ: 作者が一致しません`);
+            console.log('⏭️ スキップ: 作者が一致しません');
             return false;
         }
         return true;
@@ -370,7 +369,7 @@
 
             return { releaseDate, isNewRelease };
         } else {
-            console.log(`❌ 発売日を解析できませんでした`);
+            console.log('❌ 発売日を解析できませんでした');
             return { releaseDate: null, isNewRelease: false };
         }
     };
@@ -395,7 +394,7 @@
             console.log(`📅 解析結果: ${releaseDate?.toISOString()}`);
             return releaseDate;
         }
-        console.log(`❌ 日付パターンが見つかりません`);
+        console.log('❌ 日付パターンが見つかりません');
         return null;
     };
 
@@ -409,7 +408,7 @@
             GM_notification({
                 title: `📚 ${info.Name}の新刊発見`,
                 text: `${book.title}`,
-                image: "https://www.google.com/s2/favicons?sz=64&domain=amazon.co.jp",
+                image: 'https://www.google.com/s2/favicons?sz=64&domain=amazon.co.jp',
                 timeout: 0,
                 onclick: () => {
                     GM_openInTab(book.url, { active: true });
@@ -437,7 +436,7 @@
     // グローバル関数として公開（デベロッパーツールから呼び出し可能）
     unsafeWindow.checkNewReleases = checkNewReleases;
 
-    console.log("🚀 New Release Checker が読み込まれました");
-    console.log("💡 デベロッパーツールで checkNewReleases(isbnMode) を実行してください");
-    console.log("💡 isbnMode: 0=ISBNスキップ(デフォルト), 1=ISBNのみ, 2=どちらも表示");
+    console.log('🚀 New Release Checker が読み込まれました');
+    console.log('💡 デベロッパーツールで checkNewReleases(isbnMode) を実行してください');
+    console.log('💡 isbnMode: 0=ISBNスキップ(デフォルト), 1=ISBNのみ, 2=どちらも表示');
 })();

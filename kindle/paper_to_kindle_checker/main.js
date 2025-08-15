@@ -1,5 +1,5 @@
 (function () {
-    "use strict";
+    'use strict';
 
     // 共通ライブラリから関数を取得
     const {
@@ -10,20 +10,20 @@
     } = unsafeWindow.KindleCommon;
 
     const CONFIG = {
-        BOOKS_URL: "https://kindle-asins.s3.ap-northeast-1.amazonaws.com/paper_books_asins.json",
+        BOOKS_URL: 'https://kindle-asins.s3.ap-northeast-1.amazonaws.com/paper_books_asins.json',
         CONCURRENT_REQUESTS: 20, // 同時リクエスト数
-        REQUEST_DELAY: 1000, // リクエスト間隔（ミリ秒）
+        REQUEST_DELAY: 1000 // リクエスト間隔（ミリ秒）
     };
 
     const SELECTORS = {
-        title: "#productTitle",
-        paperBookAvailable: "[id^='tmm-grid-swatch']:not([id$='KINDLE'])",
-        kindleBookAvailable: "#tmm-grid-swatch-KINDLE",
+        title: '#productTitle',
+        paperBookAvailable: '[id^=\'tmm-grid-swatch\']:not([id$=\'KINDLE\'])',
+        kindleBookAvailable: '#tmm-grid-swatch-KINDLE'
     };
 
     // 書籍データをS3から取得
     const fetchBooks = () => {
-        return fetchJsonFromS3(CONFIG.BOOKS_URL, "books");
+        return fetchJsonFromS3(CONFIG.BOOKS_URL, 'books');
     };
 
     // 個別ページの情報を取得
@@ -54,7 +54,7 @@
     // 通知を送信
     const sendAvailabilityNotification = (info) => {
         sendNotification(
-            `📚 紙書籍・Kindle両方利用可能`,
+            '📚 紙書籍・Kindle両方利用可能',
             `${info.title}`,
             info.cleanUrl
         );
@@ -103,24 +103,24 @@
         console.log(`✅ チェック完了: ${availableCount}件が両方利用可能でした`);
 
         // 完了通知
-        sendCompletionNotification("利用可能性チェック", books.length, availableCount);
+        sendCompletionNotification('利用可能性チェック', books.length, availableCount);
     };
 
     // メイン関数
     const checkPaperToKindle = async () => {
         try {
-            console.log("📖 書籍データを取得中...");
+            console.log('📖 書籍データを取得中...');
             const books = await fetchBooks();
             console.log(`📚 ${books.length}冊をチェックします`);
 
-            console.log("📖 紙書籍とKindle版の利用可能性をチェック中...");
+            console.log('📖 紙書籍とKindle版の利用可能性をチェック中...');
             await checkPagesInBatches(books);
         } catch (error) {
-            console.error("❌ エラーが発生しました:", error);
+            console.error('❌ エラーが発生しました:', error);
             GM_notification({
-                title: "❌ エラー",
-                text: "利用可能性チェック中にエラーが発生しました",
-                image: "https://www.google.com/s2/favicons?sz=64&domain=amazon.co.jp",
+                title: '❌ エラー',
+                text: '利用可能性チェック中にエラーが発生しました',
+                image: 'https://www.google.com/s2/favicons?sz=64&domain=amazon.co.jp',
                 timeout: 5000
             });
         }
@@ -129,6 +129,6 @@
     // グローバル関数として公開（デベロッパーツールから呼び出し可能）
     unsafeWindow.checkPaperToKindle = checkPaperToKindle;
 
-    console.log("🚀 Paper to Kindle Checker が読み込まれました");
-    console.log("💡 デベロッパーツールで checkPaperToKindle() を実行してください");
+    console.log('🚀 Paper to Kindle Checker が読み込まれました');
+    console.log('💡 デベロッパーツールで checkPaperToKindle() を実行してください');
 })();

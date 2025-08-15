@@ -13,7 +13,7 @@
             PREVIOUS: 'M12 4l-8 8 8 8V4zm10 0v16h-2V4h2z',
             NEXT: 'M12 4l8 8-8 8V4zm-8 0h2v16H4V4z',
             FORWARD: 'M19.6 6.95a9.11 9.11 0 1 0-1.12 11.46.96.96 0 0 1 1.36 0l.69.68c.37.37.37.97 0 1.35a12 12 0 1 1 1.53-14.96l.49-.3a.96.96 0 0 1 1.45.83v4.37a.96.96 0 0 1-1.42.85l-3.48-1.9-.34-.19a.96.96 0 0 1-.04-1.66z',
-            REWIND: 'M4.4 6.95a9.11 9.11 0 1 1 1.12 11.46.96.96 0 0 0-1.36 0l-.69.68a.96.96 0 0 0 0 1.35A12 12 0 1 0 1.93 5.48l-.49-.3A.96.96 0 0 0 0 6.02v4.37a.96.96 0 0 0 1.42.85l3.82-2.09a.96.96 0 0 0 .04-1.66z',
+            REWIND: 'M4.4 6.95a9.11 9.11 0 1 1 1.12 11.46.96.96 0 0 0-1.36 0l-.69.68a.96.96 0 0 0 0 1.35A12 12 0 1 0 1.93 5.48l-.49-.3A.96.96 0 0 0 0 6.02v4.37a.96.96 0 0 0 1.42.85l3.82-2.09a.96.96 0 0 0 .04-1.66z'
         },
         TIME_OFFSETS: [-60, 60],
         SELECTORS: {
@@ -130,7 +130,7 @@
         return {
             first: previousVideoId === previousAnchorId && nextVideoId === nextAnchorId ? firstLink : null,
             previous: currentVideoIndex > 0 ? videoLinks[currentVideoIndex - 1] : null,
-            next: currentVideoIndex < videoLinks.length - 1 ? videoLinks[currentVideoIndex + 1] : null,
+            next: currentVideoIndex < videoLinks.length - 1 ? videoLinks[currentVideoIndex + 1] : null
         };
     };
 
@@ -201,7 +201,7 @@
                         childList: true,
                         subtree: true,
                         attributes: true,
-                        characterData: true,
+                        characterData: true
                     });
                 }
                 debouncedProcessButtons();
@@ -219,7 +219,7 @@
 
     const initializeSeriesVideoNavigator = () => {
         monitorSeriesSection();
-        console.log("🚀 ニコニコ動画シリーズナビゲーターが初期化されました");
+        console.log('🚀 ニコニコ動画シリーズナビゲーターが初期化されました');
     };
 
     // グローバル関数として公開

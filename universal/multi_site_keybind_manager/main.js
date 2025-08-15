@@ -17,7 +17,7 @@
             'twitter.com/share',
             'x.com/intent/post',
             'x.com/intent/tweet',
-            'x.com/share',
+            'x.com/share'
         ],
         NAVIGATION_URLS: {
             ArrowLeft: 'https://abema.tv/timetable',
@@ -35,7 +35,7 @@
     };
 
     const getPageInfo = () => {
-        const asin = document.querySelector("#ASIN, input[name='idx.asin'], input[name='ASIN.0'], input[name='titleID']")?.value;
+        const asin = document.querySelector('#ASIN, input[name=\'idx.asin\'], input[name=\'ASIN.0\'], input[name=\'titleID\']')?.value;
         const title = document.querySelector('#productTitle')?.textContent.trim() ??
             document.querySelector('#collection-masthead__title')?.textContent.trim();
         return { asin, title };
@@ -80,17 +80,17 @@
         if (!asin || !title) return;
 
         const releaseDate = new Date(
-            document.querySelector("#rpi-attribute-book_details-publication_date > div.a-section.a-spacing-none.a-text-center.rpi-attribute-value > span")
+            document.querySelector('#rpi-attribute-book_details-publication_date > div.a-section.a-spacing-none.a-text-center.rpi-attribute-value > span')
                 ?.textContent.trim().replace(/\//g, '-')
         ).toISOString();
 
         const currentPrice = Number(
-            document.querySelector("#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span")
+            document.querySelector('#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span')
                 ?.textContent.replace(/[^\d]/g, '')
         ) || 0;
 
         const maxPrice = Number(
-            document.querySelector("[id^='tmm-grid-swatch']:not([id$='KINDLE']) > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span")
+            document.querySelector('[id^=\'tmm-grid-swatch\']:not([id$=\'KINDLE\']) > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span')
                 ?.textContent.replace(/[^\d]/g, '')
         ) || currentPrice;
 
@@ -103,8 +103,8 @@
             ReleaseDate: releaseDate,
             CurrentPrice: currentPrice,
             MaxPrice: maxPrice,
-            URL: url,
-        }, null, 4) + ",";
+            URL: url
+        }, null, 4) + ',';
 
         const success = await copyToClipboard(productInfo);
         if (success) {
@@ -119,12 +119,12 @@
         const asin = match[1];
         const authors = getAuthors();
 
-        let lines = ["{"];
+        const lines = ['{'];
         for (const name of authors) {
             lines.push(`"Name": "${name}",`);
         }
         lines.push(`"URL": "https://www.amazon.co.jp/dp/${asin}"`);
-        lines.push("},\n");
+        lines.push('},\n');
 
         const success = await copyToClipboard(lines.join('\n'));
         if (success) {
@@ -144,7 +144,7 @@
             );
         } else {
             return [
-                document.querySelector("#collection-masthead__author > a")?.textContent.replace('(著)', '').trim()
+                document.querySelector('#collection-masthead__author > a')?.textContent.replace('(著)', '').trim()
             ];
         }
     };
@@ -168,48 +168,48 @@
         preventDefaultKeys(event, ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']);
 
         switch (event.key) {
-            case 'ArrowUp': {
-                const button = document.querySelector(
-                    CONFIG.INTENT_URL_PATTERNS.map(pattern => `a[href*="${pattern}"]`).join(', ')
-                );
-                if (event.shiftKey) {
-                    copyPageInfo();
-                } else if (button) {
-                    button.click();
-                } else if (window.location.href.startsWith('https://www.amazon.co.jp/')) {
-                    const { asin } = getPageInfo();
-                    if (asin) {
-                        copyProductInfo();
-                    } else {
-                        copyCollectionInfo();
-                    }
+        case 'ArrowUp': {
+            const button = document.querySelector(
+                CONFIG.INTENT_URL_PATTERNS.map(pattern => `a[href*="${pattern}"]`).join(', ')
+            );
+            if (event.shiftKey) {
+                copyPageInfo();
+            } else if (button) {
+                button.click();
+            } else if (window.location.href.startsWith('https://www.amazon.co.jp/')) {
+                const { asin } = getPageInfo();
+                if (asin) {
+                    copyProductInfo();
                 } else {
-                    copyPageInfo();
+                    copyCollectionInfo();
                 }
-                break;
+            } else {
+                copyPageInfo();
             }
-            case 'ArrowDown':
-                openInTab(CONFIG.NAVIGATION_URLS.ArrowDown, CONFIG.TAB_OPTIONS);
-                break;
-            case 'ArrowLeft':
-                openInTab(CONFIG.NAVIGATION_URLS.ArrowLeft, CONFIG.TAB_OPTIONS);
-                break;
-            case 'ArrowRight':
-                if (window.location.href.startsWith('https://www.amazon.co.jp/')) {
-                    handleAmazonSearch();
-                } else {
-                    window.open(CONFIG.NAVIGATION_URLS.ArrowRight, '_blank', 'width=800,height=1200,noopener,noreferrer');
-                }
-                break;
-            default:
-                break;
+            break;
+        }
+        case 'ArrowDown':
+            openInTab(CONFIG.NAVIGATION_URLS.ArrowDown, CONFIG.TAB_OPTIONS);
+            break;
+        case 'ArrowLeft':
+            openInTab(CONFIG.NAVIGATION_URLS.ArrowLeft, CONFIG.TAB_OPTIONS);
+            break;
+        case 'ArrowRight':
+            if (window.location.href.startsWith('https://www.amazon.co.jp/')) {
+                handleAmazonSearch();
+            } else {
+                window.open(CONFIG.NAVIGATION_URLS.ArrowRight, '_blank', 'width=800,height=1200,noopener,noreferrer');
+            }
+            break;
+        default:
+            break;
         }
     };
 
     const initializeCustomKeybindHandler = () => {
         document.addEventListener('keydown', handleKeyEvents);
-        console.log("🚀 Custom Keybind Handler が初期化されました");
-        console.log("💡 Alt+矢印キーで各種機能を使用できます");
+        console.log('🚀 Custom Keybind Handler が初期化されました');
+        console.log('💡 Alt+矢印キーで各種機能を使用できます');
     };
 
     // グローバル関数として公開

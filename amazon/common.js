@@ -1,6 +1,6 @@
 // Amazon共通ライブラリ
 unsafeWindow.AmazonCommon = (function () {
-    "use strict";
+    'use strict';
 
     // DOM要素の待機と取得
     const waitForElement = (selector, timeout = 10000) => {
@@ -98,7 +98,7 @@ unsafeWindow.AmazonCommon = (function () {
 
     // ファビコン操作
     const changeFavicon = (url) => {
-        let link = document.querySelector("link[rel*='icon'], link[rel='shortcut icon']");
+        let link = document.querySelector('link[rel*=\'icon\'], link[rel=\'shortcut icon\']');
         if (!link) {
             link = document.createElement('link');
             link.type = 'image/x-icon';
@@ -116,7 +116,7 @@ unsafeWindow.AmazonCommon = (function () {
         const ctx = canvas.getContext('2d');
 
         const img = new Image();
-        img.src = document.querySelector("link[rel*='icon'], link[rel='shortcut icon']")?.href || 'https://www.amazon.co.jp/favicon.ico';
+        img.src = document.querySelector('link[rel*=\'icon\'], link[rel=\'shortcut icon\']')?.href || 'https://www.amazon.co.jp/favicon.ico';
         img.onload = () => {
             ctx.drawImage(img, 0, 0, 32, 32);
             ctx.fillStyle = color;

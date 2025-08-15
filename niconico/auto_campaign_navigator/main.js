@@ -4,7 +4,6 @@
     // 共通ライブラリから関数を取得
     const {
         showNotification,
-        debounce,
         observeDOM
     } = unsafeWindow.NiconicoCommon;
 
@@ -22,7 +21,7 @@
             '「桃那のな」',
             '踊コレ動画を\n応援します！',
             '超会議応援！',
-            '推しﾀｸﾞ動画が',
+            '推しﾀｸﾞ動画が'
         ],
         LINK_OPEN_DELAY_MS: 1000
     };
@@ -75,7 +74,7 @@
     const initializeCampaignLinkHelper = () => {
         addClickCancelListener();
         observeDOMChanges();
-        console.log("🚀 ニコニコキャンペーンリンクヘルパーが初期化されました");
+        console.log('🚀 ニコニコキャンペーンリンクヘルパーが初期化されました');
     };
 
     // グローバル関数として公開

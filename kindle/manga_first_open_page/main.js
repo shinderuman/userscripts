@@ -3,12 +3,11 @@
 
     // 共通ライブラリから関数を取得
     const {
-        waitForElement
     } = unsafeWindow.KindleCommon;
 
     const CONFIG = {
-        MENU_BUTTON_SELECTOR: "button.kw-rd-chrome-dot-menu-btn",
-        FIRST_PAGE_SELECTOR: "#readerDotMenuCover",
+        MENU_BUTTON_SELECTOR: 'button.kw-rd-chrome-dot-menu-btn',
+        FIRST_PAGE_SELECTOR: '#readerDotMenuCover',
         REF_PARAMETER: 'kwrp_m_d_ea_nis_r',
         TRIGGER_KEY: '0'
     };
@@ -19,24 +18,12 @@
         return urlParams.has('ref_') && urlParams.get('ref_') === CONFIG.REF_PARAMETER;
     };
 
-    // ページがリロードされたかどうかを確認
-    const isPageReload = () => {
-        return performance.getEntriesByType('navigation')[0].type === 'reload';
-    };
-
     // 最初のページに移動
     const navigateToFirstPage = () => {
         const menuButton = document.querySelector(CONFIG.MENU_BUTTON_SELECTOR);
         if (menuButton) {
             menuButton.click();
             waitForFirstPageButton();
-        }
-    };
-
-    // メニューのボタンがレンダリングされるのを監視
-    const observeForMenuButton = () => {
-        if (!isPageReload()) {
-            observeElement(CONFIG.MENU_BUTTON_SELECTOR, navigateToFirstPage);
         }
     };
 
@@ -81,7 +68,7 @@
 
         document.addEventListener('keydown', handleKeydown);
 
-        console.log("📖 Kindle Manga First Open Page が初期化されました");
+        console.log('📖 Kindle Manga First Open Page が初期化されました');
         console.log(`💡 '${CONFIG.TRIGGER_KEY}'キーで最初のページに移動できます`);
     };
 

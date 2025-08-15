@@ -3,8 +3,6 @@
 
     // 共通ライブラリから関数を取得
     const {
-        addUrlParams,
-        isAmazonUrl
     } = unsafeWindow.AmazonCommon;
 
     const CONFIG = {
@@ -53,14 +51,14 @@
             const newPosition = (start || 0) + modifiedText.length;
             inputElement.setSelectionRange(newPosition, newPosition);
 
-            console.log("🔗 Amazonリンクにアフィリエイトタグを追加しました");
+            console.log('🔗 Amazonリンクにアフィリエイトタグを追加しました');
         }
     };
 
     const initializeAffiliateTagAdder = () => {
         document.addEventListener('paste', handlePaste);
-        console.log("🚀 Amazon Affiliate Tag Adder が初期化されました");
-        console.log("💡 Amazonリンクをペーストすると自動的にアフィリエイトタグが追加されます");
+        console.log('🚀 Amazon Affiliate Tag Adder が初期化されました');
+        console.log('💡 Amazonリンクをペーストすると自動的にアフィリエイトタグが追加されます');
     };
 
     // グローバル関数として公開

@@ -118,7 +118,7 @@ ${hashtags}
             return originalOpen.apply(this, [url, ...args]);
         };
 
-        console.log("🚀 Twitter Intent Copier が初期化されました");
+        console.log('🚀 Twitter Intent Copier が初期化されました');
     };
 
     // グローバル関数として公開
