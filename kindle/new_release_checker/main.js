@@ -169,7 +169,7 @@
         const cutoffDate = new Date(currentDate.getTime() - (CONFIG.NEW_RELEASE_DAYS * 24 * 60 * 60 * 1000));
         const isbnMode = authorInfo.isbnMode || 0;
 
-        console.log(`� 検索判結果: ${searchResults.length}件`);
+        console.log(`🔍 検索結果: ${searchResults.length}件`);
         console.log(`📅 新刊判定基準日: ${cutoffDate.toISOString()}`);
 
         // 最初の数冊のみチェック（検索結果は日付順でソートされている）
