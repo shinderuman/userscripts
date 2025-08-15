@@ -67,6 +67,12 @@ ${hashtags}
         const text = button.textContent?.toLowerCase() || '';
         const className = button.className.toLowerCase();
         const ariaLabel = button.getAttribute('aria-label')?.toLowerCase() || '';
+        const dataTestId = button.getAttribute('data-testid')?.toLowerCase() || '';
+
+        // data-testid="twitter"の場合は確実にTwitterボタン
+        if (dataTestId === 'twitter') {
+            return true;
+        }
 
         // Twitter関連のキーワードをチェック
         const twitterKeywords = ['twitter', 'tweet', 'ツイート', 'post', 'ポスト', 'share', 'シェア'];
