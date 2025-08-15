@@ -84,6 +84,25 @@ ${hashtags}
         );
     };
 
+    // AddToAnyのXボタンの検出
+    const handleAddToAnyXButton = (event) => {
+        const link = event.target.closest('a.a2a_button_x');
+        if (link && link.href.includes('addtoany.com/add_to/x')) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const url = new URL(link.href);
+            const linkUrl = decodeURIComponent(url.searchParams.get('linkurl') || '');
+            const linkName = decodeURIComponent(url.searchParams.get('linkname') || '');
+
+            // intent URL形式に変換
+            const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(linkName)}&url=${encodeURIComponent(linkUrl)}`;
+            handleIntentClick(intentUrl);
+            return true;
+        }
+        return false;
+    };
+
     // シンプルなTwitterシェアボタンの検出
     const handleGenericTwitterShare = (event) => {
         const shareElement = event.target.closest('.twitter, [onclick*="twitter"]');
@@ -110,13 +129,14 @@ ${hashtags}
         document.addEventListener('click', (event) => {
             // 優先度順に処理
             if (handleDirectIntentLink(event)) return;
+            if (handleAddToAnyXButton(event)) return;
             if (handleTwitterButton(event)) return;
             if (handleGenericTwitterShare(event)) return;
         }, true);
 
         // window.openのオーバーライド
         const originalOpen = window.open;
-        window.open = function(url, ...args) {
+        window.open = function (url, ...args) {
             if (url && isIntentUrl(url)) {
                 handleIntentClick(url);
                 return null;
