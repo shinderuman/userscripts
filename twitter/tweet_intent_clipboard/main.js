@@ -43,95 +43,10 @@ ${hashtags}
         return false;
     };
 
-    // 2. AddToAnyのXボタンの検出
-    const handleAddToAnyXButton = (event) => {
-        const link = event.target.closest('a.a2a_button_x');
-        if (link && link.href.includes('addtoany.com/add_to/x')) {
-            event.preventDefault();
-            event.stopPropagation();
-
-            const url = new URL(link.href);
-            const linkUrl = decodeURIComponent(url.searchParams.get('linkurl') || '');
-            const linkName = decodeURIComponent(url.searchParams.get('linkname') || '');
-
-            // intent URL形式に変換
-            const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(linkName)}&url=${encodeURIComponent(linkUrl)}`;
-            handleIntentClick(intentUrl);
-            return true;
-        }
-        return false;
-    };
-
-    // 3. 汎用的なTwitterボタンの検出
-    const handleTwitterButton = (event) => {
-        const button = event.target.closest('button');
-        if (button && isLikelyTwitterButton(button)) {
-            // 即座にイベントを停止して独自処理を実行
-            event.preventDefault();
-            event.stopPropagation();
-
-            const pageTitle = document.title || '';
-            const pageUrl = window.location.href;
-            const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(pageTitle)}&url=${encodeURIComponent(pageUrl)}`;
-            handleIntentClick(intentUrl);
-
-            return true;
-        }
-
-        return false;
-    };
-
-    // buttonがTwitter関連かどうかを判定
-    const isLikelyTwitterButton = (button) => {
-        const text = button.textContent?.toLowerCase() || '';
-        const className = button.className.toLowerCase();
-        const ariaLabel = button.getAttribute('aria-label')?.toLowerCase() || '';
-        const dataTestId = button.getAttribute('data-testid')?.toLowerCase() || '';
-
-        // data-testid="twitter"の場合は確実にTwitterボタン
-        if (dataTestId === 'twitter') {
-            return true;
-        }
-
-        // Twitter関連のキーワードをチェック
-        const twitterKeywords = ['twitter', 'tweet', 'ツイート', 'post', 'ポスト', 'share', 'シェア'];
-
-        return twitterKeywords.some(keyword =>
-            text.includes(keyword) ||
-            className.includes(keyword) ||
-            ariaLabel.includes(keyword)
-        );
-    };
-
-    // 4. シンプルなTwitterシェアボタンの検出（最低優先）
-    const handleGenericTwitterShare = (event) => {
-        const shareElement = event.target.closest('.twitter, [onclick*="twitter"]');
-        if (shareElement &&
-            (shareElement.className.includes('twitter') ||
-                shareElement.onclick?.toString().includes('twitter'))) {
-
-            event.preventDefault();
-            event.stopPropagation();
-
-            // ページ情報からintent URLを生成
-            const pageTitle = document.title || '';
-            const pageUrl = window.location.href;
-            const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(pageTitle)}&url=${encodeURIComponent(pageUrl)}`;
-
-            handleIntentClick(intentUrl);
-            return true;
-        }
-        return false;
-    };
-
     const initializeIntentCopier = () => {
         // クリックイベントリスナー
         document.addEventListener('click', (event) => {
-            // 優先度順に処理
-            if (handleDirectIntentLink(event)) return;
-            if (handleAddToAnyXButton(event)) return;
-            if (handleTwitterButton(event)) return;
-            if (handleGenericTwitterShare(event)) return;
+            handleDirectIntentLink(event);
         }, true);
 
         // window.openのオーバーライド
