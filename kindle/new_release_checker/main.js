@@ -319,9 +319,9 @@
         let price = null;
 
         if (priceText) {
-            const priceMatch = priceText.match(/￥(\d+)/);
+            const priceMatch = priceText.match(/￥([\d,]+)/);
             if (priceMatch) {
-                price = parseInt(priceMatch[1], 10);
+                price = parseInt(priceMatch[1].replace(/,/g, ''), 10);
                 console.log(`💰 価格: ${price}円`);
 
                 if (price <= CONFIG.MIN_PRICE) {
