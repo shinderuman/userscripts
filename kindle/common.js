@@ -2,6 +2,32 @@
 unsafeWindow.KindleCommon = (function () {
     'use strict';
 
+    // 共通設定
+    const COMMON_CONFIG = {
+        // S3 URLs
+        AUTHORS_URL: 'https://kindle-asins.s3.ap-northeast-1.amazonaws.com/authors.json',
+        EXCLUDED_KEYWORDS_URL: 'https://kindle-asins.s3.ap-northeast-1.amazonaws.com/excluded_title_keywords.json',
+        PAPER_BOOKS_URL: 'https://kindle-asins.s3.ap-northeast-1.amazonaws.com/paper_books_asins.json',
+        UNPROCESSED_BOOKS_URL: 'https://kindle-asins.s3.ap-northeast-1.amazonaws.com/unprocessed_asins.json',
+
+        // 共通閾値
+        POINT_THRESHOLD: 151,
+        POINTS_RATE_THRESHOLD: 20,
+        AVERAGE_PRICE_THRESHOLD: 350,
+        MIN_PRICE: 221,
+
+        // 新刊チェック設定
+        NEW_RELEASE_DAYS: 7,
+
+        // リクエスト制御
+        CONCURRENT_REQUESTS: 20,
+        REQUEST_DELAY: 1000,
+
+        // その他
+        AFFILIATE_PARAMS: '?tag=shinderuman03-22&linkCode=ogi&th=1&psc=1',
+        BADGE_EXPIRATION: 5 * 60 * 1000
+    };
+
     // S3からJSONデータを取得する共通関数
     const fetchJsonFromS3 = (url, dataType) => {
         return new Promise((resolve, reject) => {
@@ -192,6 +218,7 @@ unsafeWindow.KindleCommon = (function () {
 
     // 公開API
     return {
+        COMMON_CONFIG,
         fetchJsonFromS3,
         fetchPageInfo,
         processBatch,

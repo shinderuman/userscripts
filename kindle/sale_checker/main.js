@@ -3,6 +3,7 @@
 
     // 共通ライブラリから関数を取得
     const {
+        COMMON_CONFIG,
         fetchJsonFromS3,
         fetchPageInfo,
         sendNotification,
@@ -11,12 +12,7 @@
     } = unsafeWindow.KindleCommon;
 
     const CONFIG = {
-        BOOKS_URL: 'https://kindle-asins.s3.ap-northeast-1.amazonaws.com/unprocessed_asins.json',
-        THRESHOLD: 151,
-        POINTS_RATE_THRESHOLD: 20,
-        AVERAGE_PRICE_THRESHOLD: 350,
-        CONCURRENT_REQUESTS: 20, // 同時リクエスト数
-        REQUEST_DELAY: 1000 // リクエスト間隔（ミリ秒）
+        ...COMMON_CONFIG
     };
 
     const SELECTORS = {
@@ -28,7 +24,7 @@
 
     // 書籍データをS3から取得
     const fetchBooks = () => {
-        return fetchJsonFromS3(CONFIG.BOOKS_URL, 'books');
+        return fetchJsonFromS3(CONFIG.UNPROCESSED_BOOKS_URL, 'books');
     };
 
     // 個別ページの情報を取得
@@ -58,13 +54,13 @@
         const { points, kindlePrice, paperPrice } = info;
         const conditions = [];
 
-        if (points >= CONFIG.THRESHOLD) {
+        if (points >= CONFIG.POINT_THRESHOLD) {
             conditions.push(`✅ポイント ${points}pt`);
         }
         if (kindlePrice && (points / kindlePrice) * 100 >= CONFIG.POINTS_RATE_THRESHOLD) {
             conditions.push(`✅ポイント還元 ${(points / kindlePrice * 100).toFixed(2)}%`);
         }
-        if (paperPrice && kindlePrice > 0 && paperPrice - kindlePrice >= CONFIG.THRESHOLD) {
+        if (paperPrice && kindlePrice > 0 && paperPrice - kindlePrice >= CONFIG.POINT_THRESHOLD) {
             conditions.push(`✅価格差 ${paperPrice - kindlePrice}円`);
         }
 

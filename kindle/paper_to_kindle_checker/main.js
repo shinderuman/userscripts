@@ -3,6 +3,7 @@
 
     // 共通ライブラリから関数を取得
     const {
+        COMMON_CONFIG,
         fetchJsonFromS3,
         fetchPageInfo,
         sendNotification,
@@ -10,9 +11,7 @@
     } = unsafeWindow.KindleCommon;
 
     const CONFIG = {
-        BOOKS_URL: 'https://kindle-asins.s3.ap-northeast-1.amazonaws.com/paper_books_asins.json',
-        CONCURRENT_REQUESTS: 20, // 同時リクエスト数
-        REQUEST_DELAY: 1000 // リクエスト間隔（ミリ秒）
+        ...COMMON_CONFIG
     };
 
     const SELECTORS = {
@@ -23,7 +22,7 @@
 
     // 書籍データをS3から取得
     const fetchBooks = () => {
-        return fetchJsonFromS3(CONFIG.BOOKS_URL, 'books');
+        return fetchJsonFromS3(CONFIG.PAPER_BOOKS_URL, 'books');
     };
 
     // 個別ページの情報を取得

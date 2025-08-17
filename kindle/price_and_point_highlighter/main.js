@@ -3,6 +3,7 @@
 
     // 共通ライブラリから関数を取得
     const {
+        COMMON_CONFIG,
         getElementValue
     } = unsafeWindow.KindleCommon;
 
@@ -10,16 +11,12 @@
     const globalConfig = unsafeWindow.GlobalConfig || {};
 
     const CONFIG = {
-        THRESHOLD: 151,
-        POINTS_RATE_THRESHOLD: 20,
-        AVERAGE_PRICE_THRESHOLD: 350,
-        BADGE_EXPIRATION: 5 * 60 * 1000,
+        ...COMMON_CONFIG,
         LOCAL_STORAGE_KEYS: {
             LAST_CLEAR_DATE: 'lastClearDate',
             NOTIFIED: 'notifiedASINs',
             MARKED: 'markedASINs'
-        },
-        AFFILIATE_PARAMS: '?tag=shinderuman03-22&linkCode=ogi&th=1&psc=1'
+        }
     };
 
     const SELECTORS = {
@@ -213,13 +210,13 @@ ${productUrl}
         const paperPrice = getElementValue(document, SELECTORS.paperPrice, /([\d,]+)/);
 
         const conditions = [];
-        if (points >= CONFIG.THRESHOLD) {
+        if (points >= CONFIG.POINT_THRESHOLD) {
             conditions.push(`✅ポイント ${points}pt`);
         }
         if (kindlePrice && (points / kindlePrice) * 100 >= CONFIG.POINTS_RATE_THRESHOLD) {
             conditions.push(`✅ポイント還元 ${(points / kindlePrice * 100).toFixed(2)}%`);
         }
-        if (paperPrice && kindlePrice > 0 && paperPrice - kindlePrice >= CONFIG.THRESHOLD) {
+        if (paperPrice && kindlePrice > 0 && paperPrice - kindlePrice >= CONFIG.POINT_THRESHOLD) {
             conditions.push(`✅価格差 ${paperPrice - kindlePrice}円`);
         }
         return conditions.join(' ');
@@ -239,7 +236,7 @@ ${productUrl}
                 `#hulk_buy_points_COMPLETE_SERIES_VOLUME_volume_${i} > div.a-column.a-span6.a-text-right.a-span-last > div > div > span.a-size-small.a-text-bold`,
                 /(\d+)pt/
             );
-            if (seriesPoints >= CONFIG.THRESHOLD) {
+            if (seriesPoints >= CONFIG.POINT_THRESHOLD) {
                 return `シリーズのポイントが ${seriesPoints}pt です。`;
             }
 

@@ -3,6 +3,7 @@
 
     // 共通ライブラリから関数を取得
     const {
+        COMMON_CONFIG,
         fetchJsonFromS3,
         sendErrorNotification,
         sendCompletionNotification,
@@ -13,13 +14,10 @@
     } = unsafeWindow.KindleCommon;
 
     const CONFIG = {
-        AUTHORS_URL: 'https://kindle-asins.s3.ap-northeast-1.amazonaws.com/authors.json',
-        EXCLUDED_KEYWORDS_URL: 'https://kindle-asins.s3.ap-northeast-1.amazonaws.com/excluded_title_keywords.json',
-        CONCURRENT_REQUESTS: 20, // 同時リクエスト数
-        REQUEST_DELAY: 1000, // リクエスト間隔（ミリ秒）
-        NEW_RELEASE_DAYS: 7, // 何日以内を新刊とするか
-        MIN_PRICE: 221, // 最低価格（円）
-        STORAGE_KEY: 'newReleaseNotifications' // localStorage キー
+        ...COMMON_CONFIG,
+        LOCAL_STORAGE_KEYS: {
+            NOTIFICATIONS: 'newReleaseNotifications'
+        }
     };
 
     // ISBN判定関数
@@ -67,7 +65,7 @@
     const cleanupOldNotifications = () => {
         const cutoffDate = new Date();
         cutoffDate.setDate(cutoffDate.getDate() - CONFIG.NEW_RELEASE_DAYS);
-        cleanupOldStorageItems(CONFIG.STORAGE_KEY, cutoffDate, 'releaseDate');
+        cleanupOldStorageItems(CONFIG.LOCAL_STORAGE_KEYS.NOTIFICATIONS, cutoffDate, 'releaseDate');
     };
 
     const fetchAuthors = () => {
@@ -296,7 +294,7 @@
     };
 
     const checkAlreadyNotified = (asin) => {
-        if (asin && isAlreadyStored(CONFIG.STORAGE_KEY, item => item.asin === asin)) {
+        if (asin && isAlreadyStored(CONFIG.LOCAL_STORAGE_KEYS.NOTIFICATIONS, item => item.asin === asin)) {
             console.log(`⏭️ スキップ: 既に通知済みです (ASIN: ${asin})`);
             return true;
         }
@@ -430,7 +428,7 @@
             author,
             notifiedAt: new Date().toISOString()
         };
-        saveStorageItem(CONFIG.STORAGE_KEY, newItem);
+        saveStorageItem(CONFIG.LOCAL_STORAGE_KEYS.NOTIFICATIONS, newItem);
     };
 
     // グローバル関数として公開（デベロッパーツールから呼び出し可能）
