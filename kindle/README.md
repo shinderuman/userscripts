@@ -90,6 +90,27 @@ Kindle Cloud Readerで最初のページを開くスクリプト。
 - リロード時の動作制御
 - MutationObserverによる要素監視
 
+### 🗑️ Deleted Item Checker (`deleted_item_checker/`)
+購入履歴から削除された商品があるページを検出するスクリプト。
+
+**機能:**
+- 購入履歴ページを指定範囲で自動スキャン（デフォルト：0〜100ページ）
+- 「本商品は現在カタログにありません。」メッセージの検出
+- 削除商品が含まれるページのURL一覧表示
+- 削除商品の前後の商品名を抽出し、Amazon注文履歴検索リンクを生成
+- 複数削除商品がある場合の個別検出
+- 前の削除ページとの差分ページ数表示
+- 開始ページ・終了ページの画面上設定
+- 手動ボタントリガー
+- 結果の表示・非表示切り替え
+
+**使用方法:**
+1. https://www.amazon.co.jp/gp/yourstore/iyr/?ie=UTF8&ref_=sv_ys_3 にアクセス
+2. 必要に応じて開始ページ・終了ページを設定（デフォルト：0〜100）
+3. 「🗑️ 削除商品をチェック」ボタンをクリック
+4. 結果の商品名リンクをクリックしてAmazon注文履歴で検索
+5. 前後の商品から削除された商品を特定
+
 **使用方法:**
 ```javascript
 // デベロッパーツールで実行
@@ -136,6 +157,7 @@ checkWishlistSales()
 1. **New Release Checker**: `new_release_checker/wrapper.js`
 2. **Paper to Kindle Checker**: `paper_to_kindle_checker/wrapper.js`
 3. **Sale Checker**: `sale_checker/wrapper.js`
+4. **Deleted Item Checker**: `deleted_item_checker/wrapper.js`
 
 ### 3. パスの設定
 `wrapper.js`ファイル内の`@require`パスを環境に合わせて調整:
