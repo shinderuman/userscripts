@@ -15,6 +15,7 @@ userscripts/
 │   ├── paper_to_kindle_checker/       # 紙書籍→Kindle版チェッカー
 │   ├── sale_checker/                  # セールチェッカー
 │   ├── campaign_sorter/               # キャンペーン商品抽出
+│   ├── deleted_item_checker/          # 削除商品チェッカー
 │   └── manga_first_open_page/         # マンガ最初のページ開く
 ├── amazon/                             # Amazon関連スクリプト
 │   ├── README.md                      # Amazonスクリプトの詳細説明
@@ -75,6 +76,7 @@ userscripts/
 - **紙書籍→Kindle版チェッカー**: 紙書籍とKindle版両方が利用可能な商品を発見
 - **セールチェッカー**: ウィッシュリストの書籍のセール情報をチェック
 - **キャンペーン商品抽出**: 期間限定キャンペーン対象商品を価格順で表示
+- **削除商品チェッカー**: 購入履歴から削除された商品があるページを検出し、前後の商品から特定を支援
 - **価格・ポイントハイライター**: 条件達成時の視覚的通知とSlack・Mastodon連携
 - **マンガ最初のページ開く**: Kindle Cloud Readerで最初のページを開く
 
