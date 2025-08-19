@@ -13,11 +13,14 @@
     const CONFIG = {
         SEARCH_ENGINE: 'https://www.google.com/search?q=',
         INTENT_URL_PATTERNS: [
+            'twitter.com/intent/post',
             'twitter.com/intent/tweet',
             'twitter.com/share',
             'x.com/intent/post',
             'x.com/intent/tweet',
-            'x.com/share'
+            'x.com/share',
+            'twitter://intent/tweet',
+            'twitter://intent/post'
         ],
         NAVIGATION_URLS: {
             ArrowLeft: 'https://abema.tv/timetable',
