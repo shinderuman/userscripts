@@ -41,13 +41,17 @@ userscripts/
 ├── youtube/                           # YouTube関連スクリプト
 │   ├── common.js                      # 共通ライブラリ
 │   └── subscription_layout_optimizer/ # 登録チャンネル レイアウト最適化
-└── mastodon/                          # Mastodon関連スクリプト
-    ├── README.md                      # Mastodonスクリプトの詳細説明
+├── mastodon/                          # Mastodon関連スクリプト
+│   ├── README.md                      # Mastodonスクリプトの詳細説明
+│   ├── common.js                      # 共通ライブラリ
+│   ├── column_splitter/               # カラム分割
+│   ├── column_combiner/               # カラム結合
+│   ├── recent_post_editor/            # 投稿編集ショートカット
+│   └── ai_post_blur_toggle/           # AI投稿ぼかし切り替え
+└── github/                            # GitHub関連スクリプト
+    ├── README.md                      # GitHubスクリプトの詳細説明
     ├── common.js                      # 共通ライブラリ
-    ├── column_splitter/               # カラム分割
-    ├── column_combiner/               # カラム結合
-    ├── recent_post_editor/            # 投稿編集ショートカット
-    └── ai_post_blur_toggle/           # AI投稿ぼかし切り替え
+    └── gist_link_opener/              # Gistリンクオープナー
 ```
 
 ## 🎯 対応サービス
@@ -61,6 +65,7 @@ userscripts/
 - **Twitter/X** (`twitter/`) - インテントコピー・ユーザーフィルター
 - **YouTube** (`youtube/`) - 登録チャンネルレイアウト最適化
 - **Mastodon** (`mastodon/`) - カラム管理・投稿編集・AI投稿ぼかし・UI改善
+- **GitHub** (`github/`) - Gistページでの日付フィルタリング機能付きリンク一括開き
 
 ## 🚀 使用方法
 
@@ -115,6 +120,10 @@ userscripts/
 - **カラム結合**: 複数カラムを縦方向に結合
 - **投稿編集ショートカット**: キーボードショートカットで投稿編集・リプライ
 - **AI投稿ぼかし切り替え**: AI生成投稿のぼかし表示を切り替える機能
+
+### GitHub (`github/`)
+
+- **Gistリンクオープナー**: GitHub Gistページで日付フィルタリング機能付きのリンク一括開きボタンを表示
 
 詳細は各サービスディレクトリ内の`README.md`を参照してください。
 
