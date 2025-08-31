@@ -17,9 +17,23 @@
 
     const SELECTORS = {
         title: '#productTitle',
-        kindlePrice: '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span',
-        paperPrice: '[id^=\'tmm-grid-swatch\']:not([id$=\'KINDLE\']) > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span',
-        points: '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span, #tmm-grid-swatch-OTHER > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span'
+        kindlePrice: [
+            '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span',
+            '#tmm-grid-swatch-OTHER > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span',
+            '#kindle-price',
+            '#a-autoid-2-announce > span.slot-price > span',
+            '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-extraMessage .kindleExtraMessage .a-color-price'
+        ].join(', '),
+        paperPrice: [
+            // 紙書籍価格（KINDLE以外）
+            '[id^=\'tmm-grid-swatch\']:not([id$=\'KINDLE\']) > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span'
+        ].join(', '),
+        points: [
+            // Kindleポイント
+            '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span',
+            // OTHERポイント
+            '#tmm-grid-swatch-OTHER > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span'
+        ].join(', ')
     };
 
     // 書籍データをS3から取得
@@ -38,6 +52,20 @@
         const points = getElementValue(doc, SELECTORS.points, /(\d+)pt/);
         const kindlePrice = getElementValue(doc, SELECTORS.kindlePrice, /([\d,]+)/);
         const paperPrice = getElementValue(doc, SELECTORS.paperPrice, /([\d,]+)/);
+
+        // 取得できなかった値についてログを出力
+        if (points === 0) {
+            console.warn(`⚠️ ポイント情報を取得できませんでした - ${title} (${cleanUrl})`);
+            console.warn('セレクタ:', SELECTORS.points);
+        }
+        if (kindlePrice === 0) {
+            console.warn(`⚠️ Kindle価格情報を取得できませんでした - ${title} (${cleanUrl})`);
+            console.warn('セレクタ:', SELECTORS.kindlePrice);
+        }
+        if (paperPrice === 0) {
+            console.log(`📖 紙書籍価格情報を取得できませんでした - ${title} (${cleanUrl})`);
+            console.log('セレクタ:', SELECTORS.paperPrice);
+        }
 
         return {
             ...bookInfo,

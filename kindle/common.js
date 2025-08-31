@@ -166,10 +166,21 @@ unsafeWindow.KindleCommon = (function () {
 
     // 共通のDOM要素値取得関数
     const getElementValue = (doc, selector, regex) => {
-        const element = doc.querySelector(selector);
-        if (!element) return 0;
-        const match = element.innerText.match(regex);
-        return match ? parseInt(match[1].replace(/,/g, ''), 10) : 0;
+        // 複数のセレクターがカンマ区切りで渡された場合、順番に試す
+        const selectors = selector.split(',').map(s => s.trim());
+
+        for (const sel of selectors) {
+            const element = doc.querySelector(sel);
+            if (element) {
+                const match = element.innerText.match(regex);
+                const value = match ? parseInt(match[1].replace(/,/g, ''), 10) : 0;
+                if (value > 0) {
+                    return value;
+                }
+            }
+        }
+
+        return 0;
     };
 
     // localStorage管理機能
