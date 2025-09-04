@@ -2,53 +2,36 @@
 (function () {
     'use strict';
 
+    const selectors = {
+        next: [
+            '.kr-chevron-container-right',
+            '.chevron-container.right',
+            '[class*="chevron"][class*="right"]',
+            '[class*="next"]',
+            '[aria-label*="次"]',
+            '[aria-label*="Next"]'
+        ],
+        prev: [
+            '.kr-chevron-container-left',
+            '.chevron-container.left',
+            '[class*="chevron"][class*="left"]',
+            '[class*="prev"]',
+            '[aria-label*="前"]',
+            '[aria-label*="Previous"]'
+        ]
+    };
+
     // Chevron要素を直接クリックしてページ送りを行う
     const clickChevron = (direction) => {
         try {
-            console.log(`Looking for ${direction} chevron...`);
-
-            const selectors = {
-                next: [
-                    '.kr-chevron-container-right',
-                    '.chevron-container.right',
-                    '[class*="chevron"][class*="right"]',
-                    '[class*="next"]',
-                    '[aria-label*="次"]',
-                    '[aria-label*="Next"]'
-                ],
-                prev: [
-                    '.kr-chevron-container-left',
-                    '.chevron-container.left',
-                    '[class*="chevron"][class*="left"]',
-                    '[class*="prev"]',
-                    '[aria-label*="前"]',
-                    '[aria-label*="Previous"]'
-                ]
-            };
-
-            const targetSelectors = selectors[direction];
-
-            for (const selector of targetSelectors) {
+            for (const selector of selectors[direction]) {
                 const element = document.querySelector(selector);
                 if (element) {
-                    console.log(`Found ${direction} element:`, element);
-
                     // 複数の方法でクリックを試す
-                    const clickMethods = [
-                        () => element.click(),
-                        () => element.dispatchEvent(new MouseEvent('click', { bubbles: true })),
-                        () => element.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })),
-                        () => element.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
-                    ];
-
-                    clickMethods.forEach((method, i) => {
-                        try {
-                            method();
-                            console.log(`📖 ${direction === 'next' ? '次' : '前'}のページに移動 (method ${i + 1})`);
-                        } catch (error) {
-                            console.error(`Click method ${i + 1} failed:`, error);
-                        }
-                    });
+                    element.click();
+                    element.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+                    element.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+                    element.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
 
                     return true;
                 }
