@@ -16,7 +16,8 @@ userscripts/
 │   ├── sale_checker/                  # セールチェッカー
 │   ├── campaign_sorter/               # キャンペーン商品抽出
 │   ├── deleted_item_checker/          # 削除商品チェッカー
-│   └── manga_first_open_page/         # マンガ最初のページ開く
+│   ├── manga_first_open_page/         # マンガ最初のページ開く
+│   └── reader_key_remap/              # Amazon Readerキーリマップ
 ├── amazon/                             # Amazon関連スクリプト
 │   ├── README.md                      # Amazonスクリプトの詳細説明
 │   ├── common.js                      # 共通ライブラリ
@@ -84,6 +85,7 @@ userscripts/
 - **削除商品チェッカー**: 購入履歴から削除された商品があるページを検出し、前後の商品から特定を支援
 - **価格・ポイントハイライター**: 条件達成時の視覚的通知とSlack・Mastodon連携
 - **マンガ最初のページ開く**: Kindle Cloud Readerで最初のページを開く
+- **Amazon Readerキーリマップ**: Amazon Kindle Readerでのキーボードショートカット（左Ctrl→前ページ、左Alt→次ページ）
 
 ### Amazon (`amazon/`)
 

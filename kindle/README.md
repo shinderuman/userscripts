@@ -117,6 +117,23 @@ Kindle Cloud Readerで最初のページを開くスクリプト。
 4. 結果の商品名リンクをクリックしてAmazon注文履歴で検索
 5. 前後の商品から削除された商品を特定
 
+### ⌨️ Amazon Reader Key Remap (`reader_key_remap/`)
+Amazon Kindle Readerでのキーボードショートカットをリマップするスクリプト。
+
+**機能:**
+- 左Ctrl → 前のページに移動
+- 左Alt → 次のページに移動
+- Amazon Readerのchevron要素を直接クリック
+- Kindleマンガリーダー対応
+
+**対応サイト:**
+- `https://read.amazon.co.jp/manga/*` - Kindleマンガリーダー
+
+**使用方法:**
+1. Amazon Kindle Readerでマンガを開く
+2. 左Ctrlキーを押すと前のページに移動
+3. 左Altキーを押すと次のページに移動
+
 ## 🔧 共通ライブラリ (`common.js`)
 
 全スクリプトで共有される汎用機能を提供します。
@@ -158,6 +175,7 @@ Kindle Cloud Readerで最初のページを開くスクリプト。
 2. **Paper to Kindle Checker**: `paper_to_kindle_checker/wrapper.js`
 3. **Sale Checker**: `sale_checker/wrapper.js`
 4. **Deleted Item Checker**: `deleted_item_checker/wrapper.js`
+5. **Amazon Reader Key Remap**: `reader_key_remap/wrapper.js`
 
 ### 3. パスの設定
 `wrapper.js`ファイル内の`@require`パスを環境に合わせて調整:
