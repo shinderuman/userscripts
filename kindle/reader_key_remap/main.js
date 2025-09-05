@@ -2,6 +2,12 @@
 (function () {
     'use strict';
 
+    // キーバインド設定（変更可能）
+    const KEY_BINDINGS = {
+        PREV_PAGE: 'KeyZ',  // 前のページ
+        NEXT_PAGE: 'KeyX'   // 次のページ
+    };
+
     const selectors = {
         next: [
             '.kr-chevron-container-right',
@@ -49,16 +55,16 @@
     // キーボードイベントリスナーを設定
     const setupKeyRemapping = () => {
         document.addEventListener('keydown', (e) => {
-            // 左Ctrl 単独 → 前のページ
-            if (e.code === 'ControlLeft' && !e.shiftKey && !e.altKey && !e.metaKey) {
+            // 前のページキー 単独
+            if (e.code === KEY_BINDINGS.PREV_PAGE && !e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey) {
                 e.preventDefault();
                 e.stopPropagation();
                 e.stopImmediatePropagation();
                 clickChevron('prev');
             }
 
-            // 左Option (Alt) 単独 → 次のページ
-            if (e.code === 'AltLeft' && !e.ctrlKey && !e.shiftKey && !e.metaKey) {
+            // 次のページキー 単独
+            if (e.code === KEY_BINDINGS.NEXT_PAGE && !e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey) {
                 e.preventDefault();
                 e.stopPropagation();
                 e.stopImmediatePropagation();
@@ -71,7 +77,7 @@
     const initializeKeyRemap = () => {
         setupKeyRemapping();
         console.log('🚀 Amazon Reader Key Remap が読み込まれました');
-        console.log('💡 左Ctrl → 前のページ、左Alt → 次のページ');
+        console.log(`💡 ${KEY_BINDINGS.PREV_PAGE.replace('Key', '')}キー → 前のページ、${KEY_BINDINGS.NEXT_PAGE.replace('Key', '')}キー → 次のページ`);
     };
 
     // グローバル関数として公開（デベロッパーツールから呼び出し可能）

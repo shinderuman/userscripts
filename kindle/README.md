@@ -121,18 +121,36 @@ Kindle Cloud Readerで最初のページを開くスクリプト。
 Amazon Kindle Readerでのキーボードショートカットをリマップするスクリプト。
 
 **機能:**
-- 左Ctrl → 前のページに移動
-- 左Alt → 次のページに移動
+- カスタマイズ可能なキーバインドでページ送り（デフォルト：Z/X）
 - Amazon Readerのchevron要素を直接クリック
 - Kindleマンガリーダー対応
+- 簡単なキーバインドカスタマイズ
 
 **対応サイト:**
 - `https://read.amazon.co.jp/manga/*` - Kindleマンガリーダー
 
 **使用方法:**
 1. Amazon Kindle Readerでマンガを開く
-2. 左Ctrlキーを押すと前のページに移動
-3. 左Altキーを押すと次のページに移動
+2. 設定されたキー（デフォルト：Z/X）でページ送り操作
+3. デベロッパーツールのコンソールで現在のキーバインドを確認可能
+
+**カスタマイズ:**
+`main.js`の`KEY_BINDINGS`オブジェクトでキーを変更可能：
+
+```javascript
+const KEY_BINDINGS = {
+    PREV_PAGE: 'KeyZ',  // 前のページ（デフォルト：Z）
+    NEXT_PAGE: 'KeyX'   // 次のページ（デフォルト：X）
+};
+```
+
+例：AキーとSキーに変更する場合
+```javascript
+const KEY_BINDINGS = {
+    PREV_PAGE: 'KeyA',  // Aキー → 前のページ
+    NEXT_PAGE: 'KeyS'   // Sキー → 次のページ
+};
+```
 
 ## 🔧 共通ライブラリ (`common.js`)
 

@@ -85,7 +85,7 @@ userscripts/
 - **削除商品チェッカー**: 購入履歴から削除された商品があるページを検出し、前後の商品から特定を支援
 - **価格・ポイントハイライター**: 条件達成時の視覚的通知とSlack・Mastodon連携
 - **マンガ最初のページ開く**: Kindle Cloud Readerで最初のページを開く
-- **Amazon Readerキーリマップ**: Amazon Kindle Readerでのキーボードショートカット（左Ctrl→前ページ、左Alt→次ページ）
+- **Amazon Readerキーリマップ**: Amazon Kindle Readerでのカスタマイズ可能なキーボードショートカット（デフォルト：Z/X）
 
 ### Amazon (`amazon/`)
 

@@ -2,7 +2,7 @@
 // @name         Amazon Reader Key Remap Wrapper
 // @namespace    http://tampermonkey.net/
 // @version      1.0
-// @description  Remap Left Control → Previous Page, Left Option → Next Page on Amazon Reader
+// @description  Customizable keyboard shortcuts for Amazon Reader page navigation
 // @author       shinderuman
 // @match        https://read.amazon.co.jp/manga/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=amazon.co.jp
