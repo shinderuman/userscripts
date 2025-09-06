@@ -236,7 +236,18 @@
     // キーボードイベントリスナーを設定
     const setupKeyRemapping = () => {
         document.addEventListener('keydown', (e) => {
-            // 前のページキー 単独 → 10秒戻る
+            // テキスト入力中は無効化
+            const activeElement = document.activeElement;
+            if (activeElement && (
+                activeElement.tagName === 'INPUT' ||
+                activeElement.tagName === 'TEXTAREA' ||
+                activeElement.contentEditable === 'true' ||
+                activeElement.isContentEditable
+            )) {
+                return;
+            }
+
+            // キーバインド処理
             if (CONFIG.KEY_BINDINGS[e.code] && !e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey) {
                 e.preventDefault();
                 e.stopPropagation();
