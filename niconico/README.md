@@ -42,17 +42,22 @@ const CONFIG = {
 ```
 
 ### 🎬 Video Series Navigation (`video_series_navigation/`)
-シリーズ動画間のナビゲーションボタンを追加するスクリプト。
+シリーズ動画間のナビゲーションボタンとキーボードショートカットを追加するスクリプト。
 
 **機能:**
 - シリーズ動画の前後移動ボタン
 - 最初のエピソードへのジャンプ
 - 時間制御ボタン（±60秒）
-- 一時停止ボタンの再配置
+- キーボードショートカット（Z/X/C）
 - 自動的なボタン配置最適化
 
 **対象サイト:**
 - `https://www.nicovideo.jp/watch/*`
+
+**キーボードショートカット:**
+- **Zキー**: 10秒戻る
+- **Xキー**: 一時停止/再生
+- **Cキー**: 10秒送る
 
 **ボタン配置:**
 - **First**: シリーズ最初の動画
@@ -67,6 +72,11 @@ const CONFIG = {
 ```javascript
 const CONFIG = {
     TIME_OFFSETS: [-60, 60],  // 時間制御のオフセット（秒）
+    KEY_BINDINGS: {
+        'KeyZ': '#tooltip\\:«ra»\\:trigger',  // 10秒戻る
+        'KeyX': '#tooltip\\:«r6»\\:trigger',  // 一時停止
+        'KeyC': '#tooltip\\:«r9»\\:trigger'   // 10秒送る
+    },
     SELECTORS: {
         PLAYER_CONTAINER: 'div.pos_relative.asp_auto.w_100\\%.ov_hidden.bdr_m',
         SERIES_SECTION: 'div.grid-area_\\[bottom\\].d_flex.flex-d_column.gap_x2'
@@ -186,6 +196,7 @@ const videoId = extractVideoId(linkElement);
 2. プレイヤーに追加ボタンが表示される
 3. ボタンクリックで前後の動画に移動
 4. 時間制御ボタンで±60秒移動
+5. Z/X/Cキーで動画操作（10秒戻る/一時停止/10秒送る）
 
 ### Auto Campaign Navigator
 1. ニコニコキャンペーンページを開く

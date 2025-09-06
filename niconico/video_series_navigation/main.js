@@ -21,18 +21,34 @@
             SERIES_SECTION: 'div.grid-area_\\[bottom\\].d_flex.flex-d_column.gap_x2',
             SERIES_LINKS: 'div.grid-area_\\[sidebar\\] > div.d_flex.flex-d_column.gap_x2 > section > div > div > div > div > div > a',
             BUTTON_PAUSE: '#tooltip\\:«r6»\\:trigger',
-            BUTTON_FORWARD: '#tooltip\\:«r9»\\:trigger',
-            BUTTON_REWIND: '#tooltip\\:«ra»\\:trigger',
+            BUTTON_REWIND: '#tooltip\\:«r9»\\:trigger',
+            BUTTON_FORWARD: '#tooltip\\:«ra»\\:trigger',
             ANCHORS: {
                 FIRST: 'a[data-anchor-detail="first"]',
                 PREVIOUS: 'a[data-anchor-detail="prev"]',
                 NEXT: 'a[data-anchor-detail="next"]'
             }
+        },
+        KEY_BINDINGS: {
+            'KeyZ': '#tooltip\\:«r9»\\:trigger',  // 10秒戻る
+            'KeyX': '#tooltip\\:«r6»\\:trigger',  // 一時停止
+            'KeyC': '#tooltip\\:«ra»\\:trigger'   // 10秒送る
         }
     };
 
     let isProcessing = false;
     let debounceTimeout = null;
+
+    // キーイベントを送信する関数
+    const performAction = (keyCode) => {
+        const selector = CONFIG.KEY_BINDINGS[keyCode];
+        if (selector) {
+            const button = document.querySelector(selector);
+            if (button) {
+                button.click();
+            }
+        }
+    };
 
     const createButton = (pathData, link = null, timeOffset = 0) => {
         const { button, svg } = createSVGButton(pathData);
@@ -73,8 +89,8 @@
     const createNavigationButtons = (playerContainer, navigationLinks) => {
         removeNavigationButtons();
 
-        const buttonRewind = document.querySelector(CONFIG.SELECTORS.BUTTON_FORWARD);
-        const buttonForward = document.querySelector(CONFIG.SELECTORS.BUTTON_REWIND);
+        const buttonRewind = document.querySelector(CONFIG.SELECTORS.BUTTON_REWIND);
+        const buttonForward = document.querySelector(CONFIG.SELECTORS.BUTTON_FORWARD);
 
         if (navigationLinks.first) {
             buttonRewind.parentNode.insertBefore(createButton(CONFIG.SVG_PATHS.FIRST, navigationLinks.first), buttonRewind);
@@ -217,8 +233,22 @@
         });
     };
 
+    // キーボードイベントリスナーを設定
+    const setupKeyRemapping = () => {
+        document.addEventListener('keydown', (e) => {
+            // 前のページキー 単独 → 10秒戻る
+            if (CONFIG.KEY_BINDINGS[e.code] && !e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                performAction(e.code);
+            }
+        }, true); // useCapture = true で早期キャッチ
+    };
+
     const initializeSeriesVideoNavigator = () => {
         monitorSeriesSection();
+        setupKeyRemapping();
         console.log('🚀 ニコニコ動画シリーズナビゲーターが初期化されました');
     };
 
