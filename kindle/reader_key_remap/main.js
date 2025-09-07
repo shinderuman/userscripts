@@ -5,7 +5,8 @@
     // キーバインド設定（変更可能）
     const KEY_BINDINGS = {
         PREV_PAGE: 'KeyZ',  // 前のページ
-        NEXT_PAGE: 'KeyX'   // 次のページ
+        NEXT_PAGE: 'KeyX',  // 次のページ
+        NEXT_VOLUME: 'KeyA' // 次の巻
     };
 
     const selectors = {
@@ -52,6 +53,37 @@
         }
     };
 
+    // 次の巻を開く
+    const openNextVolume = () => {
+        // 「さらに読む」ボタンをクリック
+        const moreButton = document.querySelector('#readerChromeTitleBar > div > button');
+        if (!moreButton) return false;
+
+        moreButton.click();
+
+        // 100ms間隔で最大50回（5秒間）チェック
+        let attempts = 0;
+        const maxAttempts = 50;
+        const intervalId = setInterval(() => {
+            attempts++;
+            if (checkForReadButton() || attempts >= maxAttempts) {
+                clearInterval(intervalId);
+            }
+        }, 100);
+
+        return true;
+    };
+
+    // 定期的に「今すぐ読む」ボタンをチェック
+    const checkForReadButton = () => {
+        const readButton = document.querySelector('button[data-testid=read-button]');
+        if (readButton) {
+            readButton.click();
+            return true;
+        }
+        return false;
+    };
+
     // グローバルなイベントリスナー参照
     let keydownListener = null;
 
@@ -64,20 +96,31 @@
 
         // 新しいリスナーを作成
         keydownListener = (e) => {
-            // 前のページキー 単独
-            if (e.code === KEY_BINDINGS.PREV_PAGE && !e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey) {
+            // 修飾キーが押されている場合は何もしない
+            if (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) return;
+
+            // 前のページキー
+            if (e.code === KEY_BINDINGS.PREV_PAGE) {
                 e.preventDefault();
                 e.stopPropagation();
                 e.stopImmediatePropagation();
                 clickChevron('prev');
             }
 
-            // 次のページキー 単独
-            if (e.code === KEY_BINDINGS.NEXT_PAGE && !e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey) {
+            // 次のページキー
+            if (e.code === KEY_BINDINGS.NEXT_PAGE) {
                 e.preventDefault();
                 e.stopPropagation();
                 e.stopImmediatePropagation();
                 clickChevron('next');
+            }
+
+            // 次の巻キー
+            if (e.code === KEY_BINDINGS.NEXT_VOLUME) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                openNextVolume();
             }
         };
 
@@ -112,7 +155,7 @@
         setupKeyRemapping();
         monitorUrlChanges();
         console.log('🚀 Amazon Reader Key Remap が読み込まれました');
-        console.log(`💡 ${KEY_BINDINGS.PREV_PAGE.replace('Key', '')}キー → 前のページ、${KEY_BINDINGS.NEXT_PAGE.replace('Key', '')}キー → 次のページ`);
+        console.log(`💡 ${KEY_BINDINGS.PREV_PAGE.replace('Key', '')}キー → 前のページ、${KEY_BINDINGS.NEXT_PAGE.replace('Key', '')}キー → 次のページ、${KEY_BINDINGS.NEXT_VOLUME.replace('Key', '')}キー → 次の巻`);
     };
 
     // グローバル関数として公開（デベロッパーツールから呼び出し可能）

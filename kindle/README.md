@@ -122,33 +122,46 @@ Amazon Kindle Readerでのキーボードショートカットをリマップす
 
 **機能:**
 - カスタマイズ可能なキーバインドでページ送り（デフォルト：Z/X）
+- 次の巻を開く機能（デフォルト：A）
 - Amazon Readerのchevron要素を直接クリック
 - Kindleマンガリーダー対応
 - 簡単なキーバインドカスタマイズ
+- URL変更監視による自動再初期化
 
 **対応サイト:**
 - `https://read.amazon.co.jp/manga/*` - Kindleマンガリーダー
 
 **使用方法:**
 1. Amazon Kindle Readerでマンガを開く
-2. 設定されたキー（デフォルト：Z/X）でページ送り操作
+2. 設定されたキーでページ送り・次巻操作
+   - **Zキー**: 前のページ
+   - **Xキー**: 次のページ
+   - **Aキー**: 次の巻を開く（続巻がある場合）
 3. デベロッパーツールのコンソールで現在のキーバインドを確認可能
+
+**次の巻を開く機能:**
+Aキーを押すと以下の処理が自動実行されます：
+1. 「さらに読む」ボタンをクリック
+2. 「今すぐ読む」ボタンが出現するまで監視
+3. 出現後に自動クリックして次の巻を開く
 
 **カスタマイズ:**
 `main.js`の`KEY_BINDINGS`オブジェクトでキーを変更可能：
 
 ```javascript
 const KEY_BINDINGS = {
-    PREV_PAGE: 'KeyZ',  // 前のページ（デフォルト：Z）
-    NEXT_PAGE: 'KeyX'   // 次のページ（デフォルト：X）
+    PREV_PAGE: 'KeyZ',    // 前のページ（デフォルト：Z）
+    NEXT_PAGE: 'KeyX',    // 次のページ（デフォルト：X）
+    NEXT_VOLUME: 'KeyA'   // 次の巻（デフォルト：A）
 };
 ```
 
-例：AキーとSキーに変更する場合
+例：異なるキーに変更する場合
 ```javascript
 const KEY_BINDINGS = {
-    PREV_PAGE: 'KeyA',  // Aキー → 前のページ
-    NEXT_PAGE: 'KeyS'   // Sキー → 次のページ
+    PREV_PAGE: 'KeyQ',    // Qキー → 前のページ
+    NEXT_PAGE: 'KeyW',    // Wキー → 次のページ
+    NEXT_VOLUME: 'KeyE'   // Eキー → 次の巻
 };
 ```
 
