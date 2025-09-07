@@ -4,22 +4,32 @@
 
     // キーバインド設定（変更可能）
     const KEY_BINDINGS = {
-        PREV_PAGE: 'KeyZ',  // 前のページ
-        NEXT_PAGE: 'KeyX',  // 次のページ
-        NEXT_VOLUME: 'KeyA' // 次の巻
+        PREV_PAGE: 'KeyZ',    // 前のページ
+        NEXT_PAGE: 'KeyX',    // 次のページ
+        NEXT_VOLUME: 'KeyA',  // 次の巻
+        FIRST_PAGE: 'Digit0'  // 最初のページ
     };
 
-    const selectors = {
-        next: '.kr-chevron-container-right',
-        prev: '.kr-chevron-container-left'
+    const SELECTORS = {
+        CHEVRON_NEXT: '.kr-chevron-container-right',
+        CHEVRON_PREV: '.kr-chevron-container-left',
+        MENU_BUTTON: 'button.kw-rd-chrome-dot-menu-btn',
+        FIRST_PAGE_BUTTON: '#readerDotMenuCover',
+        MORE_BUTTON: '#readerChromeTitleBar > div > button',
+        READ_BUTTON: 'button[data-testid=read-button]',
+        READER_CONTAINER: '#reader'
     };
+
+    // グローバルなイベントリスナー参照
+    let keydownListener = null;
 
     // Chevron要素を直接クリックしてページ送りを行う
     const clickChevron = (direction) => {
         try {
-            const container = document.querySelector('#reader');
+            const container = document.querySelector(SELECTORS.READER_CONTAINER);
             const activeContainer = container && container.offsetWidth > 0 && container.offsetHeight > 0 ? container : document;
-            const elements = activeContainer.querySelectorAll(selectors[direction]);
+            const selector = direction === 'next' ? SELECTORS.CHEVRON_NEXT : SELECTORS.CHEVRON_PREV;
+            const elements = activeContainer.querySelectorAll(selector);
 
             if (elements.length > 0) {
                 // 表示されている要素をフィルタリング
@@ -56,7 +66,7 @@
     // 次の巻を開く
     const openNextVolume = () => {
         // 「さらに読む」ボタンをクリック
-        const moreButton = document.querySelector('#readerChromeTitleBar > div > button');
+        const moreButton = document.querySelector(SELECTORS.MORE_BUTTON);
         if (!moreButton) return false;
 
         moreButton.click();
@@ -76,7 +86,7 @@
 
     // 定期的に「今すぐ読む」ボタンをチェック
     const checkForReadButton = () => {
-        const readButton = document.querySelector('button[data-testid=read-button]');
+        const readButton = document.querySelector(SELECTORS.READ_BUTTON);
         if (readButton) {
             readButton.click();
             return true;
@@ -84,8 +94,29 @@
         return false;
     };
 
-    // グローバルなイベントリスナー参照
-    let keydownListener = null;
+    // 最初のページに移動
+    const navigateToFirstPage = () => {
+        const menuButton = document.querySelector(SELECTORS.MENU_BUTTON);
+        if (!menuButton) return false;
+
+        menuButton.click();
+
+        // MutationObserverで最初のページボタンの出現を監視
+        const observer = new MutationObserver((mutations, obs) => {
+            const firstPageButton = document.querySelector(SELECTORS.FIRST_PAGE_BUTTON);
+            if (firstPageButton) {
+                firstPageButton.click();
+                obs.disconnect();
+            }
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+
+        return true;
+    };
 
     // キーボードイベントリスナーを設定
     const setupKeyRemapping = () => {
@@ -122,6 +153,14 @@
                 e.stopImmediatePropagation();
                 openNextVolume();
             }
+
+            // 最初のページキー
+            if (e.code === KEY_BINDINGS.FIRST_PAGE) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                navigateToFirstPage();
+            }
         };
 
         // 新しいリスナーを追加
@@ -151,16 +190,16 @@
     };
 
     // 初期化
-    const initializeKeyRemap = () => {
+    const initializeKindleReader = () => {
         setupKeyRemapping();
         monitorUrlChanges();
-        console.log('🚀 Amazon Reader Key Remap が読み込まれました');
-        console.log(`💡 ${KEY_BINDINGS.PREV_PAGE.replace('Key', '')}キー → 前のページ、${KEY_BINDINGS.NEXT_PAGE.replace('Key', '')}キー → 次のページ、${KEY_BINDINGS.NEXT_VOLUME.replace('Key', '')}キー → 次の巻`);
+        console.log('🚀 Amazon Kindle Reader が読み込まれました');
+        console.log(`💡 ${KEY_BINDINGS.PREV_PAGE.replace('Key', '')}キー → 前のページ、${KEY_BINDINGS.NEXT_PAGE.replace('Key', '')}キー → 次のページ、${KEY_BINDINGS.NEXT_VOLUME.replace('Key', '')}キー → 次の巻、${KEY_BINDINGS.FIRST_PAGE.replace('Digit', '')}キー → 最初のページ`);
     };
 
     // グローバル関数として公開（デベロッパーツールから呼び出し可能）
-    unsafeWindow.initializeKeyRemap = initializeKeyRemap;
+    unsafeWindow.initializeKindleReader = initializeKindleReader;
 
     // 自動初期化
-    initializeKeyRemap();
+    initializeKindleReader();
 })();

@@ -16,8 +16,7 @@ userscripts/
 │   ├── sale_checker/                  # セールチェッカー
 │   ├── campaign_sorter/               # キャンペーン商品抽出
 │   ├── deleted_item_checker/          # 削除商品チェッカー
-│   ├── manga_first_open_page/         # マンガ最初のページ開く
-│   └── reader_key_remap/              # Amazon Readerキーリマップ
+│   └── reader_key_remap/              # Amazon Kindle Reader統合スクリプト
 ├── amazon/                             # Amazon関連スクリプト
 │   ├── README.md                      # Amazonスクリプトの詳細説明
 │   ├── common.js                      # 共通ライブラリ
@@ -84,8 +83,10 @@ userscripts/
 - **キャンペーン商品抽出**: 期間限定キャンペーン対象商品を価格順で表示
 - **削除商品チェッカー**: 購入履歴から削除された商品があるページを検出し、前後の商品から特定を支援
 - **価格・ポイントハイライター**: 条件達成時の視覚的通知とSlack・Mastodon連携
-- **マンガ最初のページ開く**: Kindle Cloud Readerで最初のページを開く
-- **Amazon Readerキーリマップ**: Amazon Kindle Readerでのカスタマイズ可能なキーボードショートカット（デフォルト：Z/X）
+- **Amazon Kindle Reader統合スクリプト**: Amazon Kindle Readerでの包括的なキーボードショートカット
+  - **Z/Xキー**: ページナビゲーション（前/次のページ）
+  - **Aキー**: 次の巻を開く（続巻がある場合）
+  - **0キー**: 最初のページに移動
 
 ### Amazon (`amazon/`)
 

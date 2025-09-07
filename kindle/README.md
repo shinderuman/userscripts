@@ -87,14 +87,7 @@ unsafeWindow.GlobalConfig = {
 - 手動ボタントリガー
 - 結果の表示・非表示切り替え
 
-### 📖 Manga First Open Page (`manga_first_open_page/`)
-Kindle Cloud Readerで最初のページを開くスクリプト。
 
-**機能:**
-- キーボードショートカット（'0'キー）で最初のページに移動
-- 特定GETパラメータでの自動実行
-- リロード時の動作制御
-- MutationObserverによる要素監視
 
 ### 🗑️ Deleted Item Checker (`deleted_item_checker/`)
 購入履歴から削除された商品があるページを検出するスクリプト。
@@ -117,27 +110,23 @@ Kindle Cloud Readerで最初のページを開くスクリプト。
 4. 結果の商品名リンクをクリックしてAmazon注文履歴で検索
 5. 前後の商品から削除された商品を特定
 
-### ⌨️ Amazon Reader Key Remap (`reader_key_remap/`)
-Amazon Kindle Readerでのキーボードショートカットをリマップするスクリプト。
+### ⌨️ Amazon Kindle Reader統合スクリプト (`reader_key_remap/`)
+Amazon Kindle Readerでの包括的なキーボードショートカット機能を提供する統合スクリプト。
 
-**機能:**
-- カスタマイズ可能なキーバインドでページ送り（デフォルト：Z/X）
-- 次の巻を開く機能（デフォルト：A）
-- Amazon Readerのchevron要素を直接クリック
-- Kindleマンガリーダー対応
-- 簡単なキーバインドカスタマイズ
-- URL変更監視による自動再初期化
+**統合機能:**
+- **ページナビゲーション**: カスタマイズ可能なキーバインドでページ送り
+- **次の巻を開く**: 続巻がある場合の自動巻切り替え
+- **最初のページ移動**: ワンキーで最初のページにジャンプ
+- **URL変更監視**: ページ遷移時の自動再初期化
 
 **対応サイト:**
 - `https://read.amazon.co.jp/manga/*` - Kindleマンガリーダー
 
-**使用方法:**
-1. Amazon Kindle Readerでマンガを開く
-2. 設定されたキーでページ送り・次巻操作
-   - **Zキー**: 前のページ
-   - **Xキー**: 次のページ
-   - **Aキー**: 次の巻を開く（続巻がある場合）
-3. デベロッパーツールのコンソールで現在のキーバインドを確認可能
+**キーボードショートカット:**
+- **Zキー**: 前のページ
+- **Xキー**: 次のページ  
+- **Aキー**: 次の巻を開く（続巻がある場合）
+- **0キー**: 最初のページに移動
 
 **次の巻を開く機能:**
 Aキーを押すと以下の処理が自動実行されます：
@@ -145,23 +134,31 @@ Aキーを押すと以下の処理が自動実行されます：
 2. 「今すぐ読む」ボタンが出現するまで監視
 3. 出現後に自動クリックして次の巻を開く
 
+**最初のページ移動機能:**
+0キーを押すと以下の処理が自動実行されます：
+1. メニューボタンをクリック
+2. 最初のページボタンが出現するまで監視
+3. 出現後に自動クリックして最初のページに移動
+
 **カスタマイズ:**
 `main.js`の`KEY_BINDINGS`オブジェクトでキーを変更可能：
 
 ```javascript
 const KEY_BINDINGS = {
-    PREV_PAGE: 'KeyZ',    // 前のページ（デフォルト：Z）
-    NEXT_PAGE: 'KeyX',    // 次のページ（デフォルト：X）
-    NEXT_VOLUME: 'KeyA'   // 次の巻（デフォルト：A）
+    PREV_PAGE: 'KeyZ',      // 前のページ（デフォルト：Z）
+    NEXT_PAGE: 'KeyX',      // 次のページ（デフォルト：X）
+    NEXT_VOLUME: 'KeyA',    // 次の巻（デフォルト：A）
+    FIRST_PAGE: 'Digit0'    // 最初のページ（デフォルト：0）
 };
 ```
 
 例：異なるキーに変更する場合
 ```javascript
 const KEY_BINDINGS = {
-    PREV_PAGE: 'KeyQ',    // Qキー → 前のページ
-    NEXT_PAGE: 'KeyW',    // Wキー → 次のページ
-    NEXT_VOLUME: 'KeyE'   // Eキー → 次の巻
+    PREV_PAGE: 'KeyQ',      // Qキー → 前のページ
+    NEXT_PAGE: 'KeyW',      // Wキー → 次のページ
+    NEXT_VOLUME: 'KeyE',    // Eキー → 次の巻
+    FIRST_PAGE: 'Digit9'    // 9キー → 最初のページ
 };
 ```
 
@@ -206,7 +203,7 @@ const KEY_BINDINGS = {
 2. **Paper to Kindle Checker**: `paper_to_kindle_checker/wrapper.js`
 3. **Sale Checker**: `sale_checker/wrapper.js`
 4. **Deleted Item Checker**: `deleted_item_checker/wrapper.js`
-5. **Amazon Reader Key Remap**: `reader_key_remap/wrapper.js`
+5. **Amazon Kindle Reader統合スクリプト**: `reader_key_remap/wrapper.js`
 
 ### 3. パスの設定
 `wrapper.js`ファイル内の`@require`パスを環境に合わせて調整:
