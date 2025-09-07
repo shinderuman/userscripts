@@ -8,14 +8,7 @@
     const CONFIG = {
         MENU_BUTTON_SELECTOR: 'button.kw-rd-chrome-dot-menu-btn',
         FIRST_PAGE_SELECTOR: '#readerDotMenuCover',
-        REF_PARAMETER: 'kwrp_m_d_ea_nis_r',
         TRIGGER_KEY: '0'
-    };
-
-    // GETパラメータに特定の値があるかどうかを確認
-    const isReferredWithParameter = () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.has('ref_') && urlParams.get('ref_') === CONFIG.REF_PARAMETER;
     };
 
     // 最初のページに移動
@@ -62,10 +55,6 @@
 
     // 初期化処理
     const initializeMangaFirstOpenPage = () => {
-        if (isReferredWithParameter()) {
-            // observeForMenuButton();
-        }
-
         document.addEventListener('keydown', handleKeydown);
 
         console.log('📖 Kindle Manga First Open Page が初期化されました');
