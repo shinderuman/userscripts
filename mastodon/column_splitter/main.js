@@ -28,14 +28,11 @@
             }
         },
         'removeArticle': {
-            'accounts': [
-                '@clartes@misskey.io',
-                '@poeeeeeeen44672@misskey.io'
-            ],
+            'accounts': [],
             'func': (article) => {
-                if (!article.querySelector('div.media-gallery')) {
-                    article.remove();
-                }
+                if (article.querySelector('div.media-gallery')) return;
+                if (article.querySelector('a[href^="https://ourt-ai.work/image/"]')) return;
+                article.remove();
             }
         },
         'fetchOurtAI': {
