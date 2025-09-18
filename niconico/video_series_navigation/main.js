@@ -91,17 +91,18 @@
 
         const buttonRewind = document.querySelector(CONFIG.SELECTORS.BUTTON_REWIND);
         const buttonForward = document.querySelector(CONFIG.SELECTORS.BUTTON_FORWARD);
+        if (navigationLinks.previous || navigationLinks.next) {
+            if (navigationLinks.first) {
+                buttonRewind.parentNode.insertBefore(createButton(CONFIG.SVG_PATHS.FIRST, navigationLinks.first), buttonRewind);
+            }
 
-        if (navigationLinks.first) {
-            buttonRewind.parentNode.insertBefore(createButton(CONFIG.SVG_PATHS.FIRST, navigationLinks.first), buttonRewind);
-        }
+            if (navigationLinks.previous) {
+                buttonRewind.parentNode.insertBefore(createButton(CONFIG.SVG_PATHS.PREVIOUS, navigationLinks.previous), buttonRewind);
+            }
 
-        if (navigationLinks.previous) {
-            buttonRewind.parentNode.insertBefore(createButton(CONFIG.SVG_PATHS.PREVIOUS, navigationLinks.previous), buttonRewind);
-        }
-
-        if (navigationLinks.next) {
-            buttonForward.parentNode.insertBefore(createButton(CONFIG.SVG_PATHS.NEXT, navigationLinks.next), buttonForward.nextSibling);
+            if (navigationLinks.next) {
+                buttonForward.parentNode.insertBefore(createButton(CONFIG.SVG_PATHS.NEXT, navigationLinks.next), buttonForward.nextSibling);
+            }
         }
 
         const sortedOffsets = [
@@ -158,10 +159,7 @@
             const playerContainer = document.querySelector(CONFIG.SELECTORS.PLAYER_CONTAINER);
             if (playerContainer) {
                 if (document.querySelector(`${CONFIG.SELECTORS.SERIES_SECTION} > div.bdr_m.ov_hidden, ${CONFIG.SELECTORS.SERIES_LINKS}`)) {
-                    const navigationLinks = fetchSeriesLinks();
-                    if (navigationLinks.previous || navigationLinks.next) {
-                        createNavigationButtons(playerContainer, navigationLinks);
-                    }
+                    createNavigationButtons(playerContainer, fetchSeriesLinks());
                 }
             } else {
                 removeNavigationButtons();
