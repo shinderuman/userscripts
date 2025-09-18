@@ -110,6 +110,31 @@ unsafeWindow.GlobalConfig = {
 4. 結果の商品名リンクをクリックしてAmazon注文履歴で検索
 5. 前後の商品から削除された商品を特定
 
+### 📚 本棚巻数フィルター (`library_volume_filter/`)
+Kindle本棚（シリーズビュー）で巻数による絞り込み機能を提供するスクリプト。
+
+**機能:**
+- **最小/最大モード切り替え**: 指定巻数以上または以下のシリーズを表示
+- **トップバー統合**: 既存の検索・フィルター・並べ替えボタンと統合されたUI
+- **リアルタイムフィルタリング**: 入力と同時にフィルタリング実行
+- **動的コンテンツ対応**: 無限スクロールで読み込まれる新コンテンツにも自動適用
+- **リセット機能**: ワンクリックでフィルターをクリア
+
+**対応サイト:**
+- `https://read.amazon.co.jp/kindle-library?tabView=series*` - Kindle本棚シリーズビュー
+
+**使用方法:**
+1. Kindle本棚のシリーズビューを開く
+2. トップバーの「最小:」ボタンをクリックして「最大:」に切り替え可能
+3. 数値入力フィールドに巻数を入力
+4. 指定条件に合うシリーズのみが表示される
+5. ×ボタンでフィルターをリセット
+
+**フィルタリング例:**
+- **最小モード「10」**: 10巻以上のシリーズのみ表示（長期連載作品の絞り込み）
+- **最大モード「5」**: 5巻以下のシリーズのみ表示（短編・完結作品の絞り込み）
+- **空欄**: 全シリーズを表示
+
 ### ⌨️ Amazon Kindle Reader統合スクリプト (`reader_key_remap/`)
 Amazon Kindle Readerでの包括的なキーボードショートカット機能を提供する統合スクリプト。
 
@@ -203,7 +228,8 @@ const KEY_BINDINGS = {
 2. **Paper to Kindle Checker**: `paper_to_kindle_checker/wrapper.js`
 3. **Sale Checker**: `sale_checker/wrapper.js`
 4. **Deleted Item Checker**: `deleted_item_checker/wrapper.js`
-5. **Amazon Kindle Reader統合スクリプト**: `reader_key_remap/wrapper.js`
+5. **本棚巻数フィルター**: `library_volume_filter/wrapper.js`
+6. **Amazon Kindle Reader統合スクリプト**: `reader_key_remap/wrapper.js`
 
 ### 3. パスの設定
 `wrapper.js`ファイル内の`@require`パスを環境に合わせて調整:
