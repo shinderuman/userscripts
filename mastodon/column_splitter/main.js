@@ -18,13 +18,32 @@
         EXPIRATION_TIME: 24 * 60 * 60 * 1000 * 7
     };
 
-    const rules = [{
-        'removeContent': {
-            'accounts': [
-                '@pose@mstdn.jp'
-            ],
+    const preCloneRules = [{
+        'expandPosts': {
+            'accounts': [],
             'func': (article) => {
-                article.querySelector('div.status__content.status__content--with-action')?.remove();
+                const button = article.querySelector('button.link-button');
+                if (button && button.textContent.trim() === '続きを表示') {
+                    button.click();
+                }
+            }
+        }
+    }];
+
+    const postCloneRules = [{
+        'removeHideButtons': {
+            'accounts': [],
+            'func': (article) => {
+                const button = article.querySelector('button.media-gallery__actions__pill');
+                if (button && button.textContent.trim() === '隠す') {
+                    button.remove();
+                }
+            }
+        },
+        'removeAltLabels': {
+            'accounts': [],
+            'func': (article) => {
+                article.querySelector('button.media-gallery__alt__label')?.remove();
             }
         },
         'removeArticle': {
@@ -58,29 +77,34 @@
         document.querySelectorAll(`.${CONFIG.COLUMN_CLASS}`).forEach(column => column.remove());
 
         for (let i = CONFIG.COLUMN_SPLIT_COUNT - 1; i >= 0; i--) {
+            processArticles(sourceColumn, i, preCloneRules, () => {});
+
             const newColumn = sourceColumn.cloneNode(true);
             newColumn.classList.add(CONFIG.COLUMN_CLASS);
             newColumn.ariaLabel = '';
 
-            newColumn.querySelectorAll('article').forEach((article, index) => {
-                if (index % CONFIG.COLUMN_SPLIT_COUNT !== i) {
-                    article.remove();
-                    return;
-                }
-
-                rules.forEach((ruleSet) => {
-                    Object.values(ruleSet).forEach((rule) => {
-                        if (rule.accounts.length === 0 || rule.accounts.includes(article.querySelector('span.display-name__account')?.textContent.trim())) {
-                            rule.func(article);
-                        }
-                    });
-                });
-            });
+            processArticles(newColumn, i, postCloneRules, (article) => article.remove());
 
             sourceColumn.parentElement.insertBefore(newColumn, document.querySelector(`div[aria-label="${CONFIG.INSERT_BEFORE_LABEL}"]`).nextSibling);
         }
 
         sourceColumn.parentElement.appendChild(sourceColumn);
+    };
+
+    const processArticles = (column, columnIndex, rules, nonTargetAction) => {
+        column.querySelectorAll('article').forEach((article, articleIndex) => {
+            if (articleIndex % CONFIG.COLUMN_SPLIT_COUNT !== columnIndex) {
+                nonTargetAction(article);
+                return;
+            }
+            rules.forEach((ruleSet) => {
+                Object.values(ruleSet).forEach((rule) => {
+                    if (rule.accounts.length === 0 || rule.accounts.includes(article.querySelector('span.display-name__account')?.textContent.trim())) {
+                        rule.func(article);
+                    }
+                });
+            });
+        });
     };
 
     const fetchOurtAI = async (id) => {
@@ -166,10 +190,6 @@
                 mainMutationObserver.disconnect();
 
                 const columnMutationObserver = new DeferredMutationObserver(() => {
-                    [...document.querySelectorAll(`div[aria-label="${CONFIG.TARGET_COLUMN_LABEL}"] article button.link-button`)].filter(button => button.textContent.trim() === '続きを表示').forEach(button => button.click());
-                    [...document.querySelectorAll(`div[aria-label="${CONFIG.TARGET_COLUMN_LABEL}"] button.media-gallery__actions__pill`)].filter(button => button.textContent.trim() === '隠す').forEach(button => button.remove());
-                    [...document.querySelectorAll(`div[aria-label="${CONFIG.TARGET_COLUMN_LABEL}"] button.media-gallery__alt__label`)].forEach(button => button.remove());
-
                     updateSplitColumns(sourceColumn);
                 });
                 columnMutationObserver.observe(sourceColumn, { childList: true, subtree: true });
