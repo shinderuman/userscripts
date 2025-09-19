@@ -46,6 +46,15 @@
                 article.querySelector('button.media-gallery__alt__label')?.remove();
             }
         },
+        'removeLongText': {
+            'accounts': [],
+            'func': (article) => {
+                const contentElement = article.querySelector('div.status__content.status__content--with-action > div > p > span:nth-child(1)');
+                if (contentElement && contentElement.textContent.length >= 120) {
+                    contentElement.remove();
+                }
+            }
+        },
         'removeArticle': {
             'accounts': [],
             'func': (article) => {
@@ -77,7 +86,7 @@
         document.querySelectorAll(`.${CONFIG.COLUMN_CLASS}`).forEach(column => column.remove());
 
         for (let i = CONFIG.COLUMN_SPLIT_COUNT - 1; i >= 0; i--) {
-            processArticles(sourceColumn, i, preCloneRules, () => {});
+            processArticles(sourceColumn, i, preCloneRules, () => { });
 
             const newColumn = sourceColumn.cloneNode(true);
             newColumn.classList.add(CONFIG.COLUMN_CLASS);
