@@ -71,13 +71,6 @@
         openInTab(`${CONFIG.SEARCH_ENGINE}${encodeURIComponent(filteredTitle)}`, CONFIG.TAB_OPTIONS);
     };
 
-    // ISBN判定関数
-    const isISBN = (asin) => {
-        if (!asin) return false;
-        const length = asin.length;
-        return (length >= 10 && length <= 13) && /^\d+$/.test(asin);
-    };
-
     const copyProductInfo = async () => {
         const { asin, title } = getPageInfo();
         if (!asin || !title) return;
@@ -98,8 +91,7 @@
                 ?.textContent.replace(/[^\d]/g, '')
         ) || currentPrice;
 
-        // ISBNの場合はURLを空にする
-        const url = isISBN(asin) ? '' : `https://www.amazon.co.jp/dp/${asin}?tag=shinderuman03-22&linkCode=ogi&th=1&psc=1`;
+        const url = `https://www.amazon.co.jp/dp/${asin}?tag=shinderuman03-22&linkCode=ogi&th=1&psc=1`;
 
         const productInfo = JSON.stringify({
             ASIN: asin,
