@@ -11,4 +11,5 @@
 // @grant        GM_openInTab
 // @grant        GM_notification
 // @grant        unsafeWindow
+// @noframes
 // ==/UserScript==

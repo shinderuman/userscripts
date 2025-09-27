@@ -12,4 +12,5 @@
 // @grant        GM_openInTab
 // @grant        unsafeWindow
 // @icon         https://www.amazon.co.jp/favicon.ico
+// @noframes
 // ==/UserScript==

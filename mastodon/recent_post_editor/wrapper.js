@@ -9,4 +9,5 @@
 // @require      file:///Users/shinderuman/src/kindle_bot/userscripts/mastodon/recent_post_editor/main.js
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=mastodooooooon.xyz
 // @grant        unsafeWindow
+// @noframes
 // ==/UserScript==

@@ -9,4 +9,5 @@
 // @require      file:///Users/shinderuman/src/kindle_bot/userscripts/niconico/vertical_to_horizontal_reader/main.js
 // @grant        GM_notification
 // @grant        unsafeWindow
+// @noframes
 // ==/UserScript==

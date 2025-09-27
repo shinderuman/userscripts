@@ -9,6 +9,7 @@
 // @require      file:///Users/shinderuman/src/kindle_bot/userscripts/github/common.js
 // @require      file:///Users/shinderuman/src/kindle_bot/userscripts/github/gist_link_opener/main.js
 // @grant        unsafeWindow
+// @noframes
 // ==/UserScript==
 
 // このファイルはTampermonkey用のラッパーです

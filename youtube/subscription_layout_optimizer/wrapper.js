@@ -11,4 +11,5 @@
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=youtube.com
 // @grant        unsafeWindow
 // @run-at       document-idle
+// @noframes
 // ==/UserScript==

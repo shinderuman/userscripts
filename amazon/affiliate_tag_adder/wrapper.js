@@ -9,4 +9,5 @@
 // @require      file:///Users/shinderuman/src/kindle_bot/userscripts/amazon/affiliate_tag_adder/main.js
 // @icon         https://www.amazon.co.jp/favicon.ico
 // @grant        unsafeWindow
+// @noframes
 // ==/UserScript==

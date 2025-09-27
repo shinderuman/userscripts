@@ -10,4 +10,5 @@
 // @icon         https://cdn-icons-png.flaticon.com/512/124/124021.png
 // @grant        unsafeWindow
 // @run-at       document-idle
+// @noframes
 // ==/UserScript==

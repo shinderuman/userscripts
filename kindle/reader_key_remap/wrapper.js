@@ -9,4 +9,5 @@
 // @require      file:///Users/shinderuman/src/kindle_bot/userscripts/kindle/common.js
 // @require      file:///Users/shinderuman/src/kindle_bot/userscripts/kindle/reader_key_remap/main.js
 // @grant        unsafeWindow
+// @noframes
 // ==/UserScript==

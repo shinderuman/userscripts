@@ -11,4 +11,5 @@
 // @grant        GM_xmlhttpRequest
 // @grant        GM_notification
 // @icon         https://www.amazon.co.jp/favicon.ico
+// @noframes
 // ==/UserScript==

@@ -9,4 +9,5 @@
 // @require      file:///Users/shinderuman/src/kindle_bot/userscripts/twitter/tweet_intent_clipboard/main.js
 // @icon         https://cdn-icons-png.flaticon.com/512/124/124021.png
 // @grant        unsafeWindow
+// @noframes
 // ==/UserScript==

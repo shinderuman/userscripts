@@ -9,4 +9,5 @@
 // @require      file:///Users/shinderuman/src/kindle_bot/userscripts/kindle/campaign_sorter/main.js
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=amazon.co.jp
 // @grant        unsafeWindow
+// @noframes
 // ==/UserScript==

@@ -9,4 +9,5 @@
 // @require      file:///Users/shinderuman/src/kindle_bot/userscripts/niconico/video_series_navigation/main.js
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=nicovideo.jp
 // @grant        unsafeWindow
+// @noframes
 // ==/UserScript==

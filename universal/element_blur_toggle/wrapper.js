@@ -8,4 +8,5 @@
 // @require      file:///Users/shinderuman/src/kindle_bot/userscripts/universal/common.js
 // @require      file:///Users/shinderuman/src/kindle_bot/userscripts/universal/element_blur_toggle/main.js
 // @grant        unsafeWindow
+// @noframes
 // ==/UserScript==

@@ -9,4 +9,5 @@
 // @require      file:///Users/shinderuman/src/kindle_bot/userscripts/kindle/common.js
 // @require      file:///Users/shinderuman/src/kindle_bot/userscripts/kindle/library_volume_filter/main.js
 // @grant        unsafeWindow
+// @noframes
 // ==/UserScript==
