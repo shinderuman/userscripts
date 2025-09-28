@@ -22,7 +22,8 @@ userscripts/
 │   ├── README.md                      # Amazonスクリプトの詳細説明
 │   ├── common.js                      # 共通ライブラリ
 │   ├── highlight/                     # ウィッシュリストハイライト
-│   └── affiliate_tag_adder/           # アフィリエイトタグ自動追加
+│   ├── affiliate_tag_adder/           # アフィリエイトタグ自動追加
+│   └── asin_link_generator/           # ASINリンク生成
 ├── dmm/                               # DMM関連スクリプト
 │   ├── common.js                      # 共通ライブラリ
 │   └── video_tab_opener/              # 動画タブオープナー
@@ -59,7 +60,7 @@ userscripts/
 
 ### 現在対応済み
 - **Amazon Kindle** (`kindle/`) - 書籍の新刊・セール・利用可能性チェック
-- **Amazon** (`amazon/`) - ウィッシュリストハイライト・アフィリエイトタグ自動追加
+- **Amazon** (`amazon/`) - ウィッシュリストハイライト・アフィリエイトタグ自動追加・ASINリンク生成
 - **DMM** (`dmm/`) - 動画プレイヤーの新しいタブ表示
 - **Universal** (`universal/`) - 汎用的な機能（要素ぼかし・キーバインド管理）
 - **ニコニコ動画** (`niconico/`) - 漫画横読み変換・シリーズナビゲーション・キャンペーン自動処理
@@ -97,6 +98,7 @@ userscripts/
 
 - **ウィッシュリストハイライト**: 特定条件のアイテムをハイライト表示
 - **アフィリエイトタグ自動追加**: ペースト時にAmazonリンクにタグを自動追加
+- **ASINリンク生成**: HTML上のKindleのASIN（Bから始まる10文字）を自動的にAmazonリンクに変換
 
 ### DMM (`dmm/`)
 

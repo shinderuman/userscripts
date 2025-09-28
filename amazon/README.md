@@ -57,6 +57,34 @@ const CONFIG = {
 };
 ```
 
+### 📚 ASIN Link Generator (`asin_link_generator/`)
+HTML上のKindleのASIN（Bから始まる10文字）を自動的にAmazonリンクに変換するスクリプト。
+
+**機能:**
+- 全サイト対応（`*://*/*`）
+- KindleのASIN自動検出（B[0-9A-Z]{9}パターン）
+- 新しいタブでAmazon商品ページを開くリンクに変換
+- 動的コンテンツの監視と自動変換
+- 既存のリンク内テキストはスキップ
+- 控えめなボーダーによる視覚的な強調表示
+
+**設定項目:**
+```javascript
+const CONFIG = {
+    KINDLE_ASIN_PATTERN: /B[0-9A-Z]{9}/g,
+    AMAZON_BASE_URL: 'https://www.amazon.co.jp/dp/',
+    LINK_STYLES: {
+        color: '#0066c0',
+        textDecoration: 'underline',
+        cursor: 'pointer',
+        fontWeight: '500',
+        border: '1px solid #ddd',
+        padding: '1px 2px',
+        borderRadius: '2px'
+    }
+};
+```
+
 ## 🔧 共通ライブラリ (`common.js`)
 
 全スクリプトで共有される汎用機能を提供します。
@@ -107,6 +135,7 @@ const newUrl = addUrlParams('https://amazon.co.jp/dp/B123#section', {
 
 1. **Highlight**: `highlight/wrapper.js`
 2. **Affiliate Tag Adder**: `affiliate_tag_adder/wrapper.js`
+3. **ASIN Link Generator**: `asin_link_generator/wrapper.js`
 
 ### 3. パスの設定
 `wrapper.js`ファイル内の`@require`パスを環境に合わせて調整:
@@ -121,6 +150,7 @@ const newUrl = addUrlParams('https://amazon.co.jp/dp/B123#section', {
 ### 対象サイト
 - **Highlight**: 特定のウィッシュリスト（`https://www.amazon.co.jp/hz/wishlist/ls/1PCUI8FL5L6QU*`）
 - **Affiliate Tag Adder**: 全サイト（`*://*/*`）
+- **ASIN Link Generator**: 全サイト（`*://*/*`）
 
 ### カスタマイズ
 各スクリプトの`main.js`内の`CONFIG`オブジェクトで設定を変更できます。
@@ -139,6 +169,9 @@ initializeHighlight()
 
 // Affiliate Tag Adder
 initializeAffiliateTagAdder()
+
+// ASIN Link Generator
+initializeAsinLinkGenerator()
 ```
 
 ## 📊 ログ出力
@@ -148,6 +181,7 @@ initializeAffiliateTagAdder()
 - 💡 初期化完了通知
 - 🎯 ハイライト実行状況
 - 🔗 アフィリエイトタグ追加状況
+- 📚 ASINリンク生成状況
 - ❌ エラー情報
 
 ## 🛠️ 開発・カスタマイズ
