@@ -99,7 +99,8 @@
             }
         }
 
-        console.log(`✅ チェック完了: ${availableCount}件が両方利用可能でした`);
+        const now = new Date().toLocaleString('ja-JP');
+        console.log(`✅ チェック完了: ${availableCount}件が両方利用可能でした (${now})`);
 
         // 完了通知
         sendCompletionNotification('利用可能性チェック', books.length, availableCount);

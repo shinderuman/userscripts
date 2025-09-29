@@ -143,7 +143,8 @@
             }
         }
 
-        console.log(`✅ チェック完了: ${saleCount}件のセールを発見しました`);
+        const now = new Date().toLocaleString('ja-JP');
+        console.log(`✅ チェック完了: ${saleCount}件のセールを発見しました (${now})`);
 
         // 完了通知
         sendCompletionNotification('セールチェック', books.length, saleCount);

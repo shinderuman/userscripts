@@ -121,7 +121,8 @@
             }
         }
 
-        console.log(`✅ チェック完了: ${newReleaseCount}冊の新刊を発見しました`);
+        const now = new Date().toLocaleString('ja-JP');
+        console.log(`✅ チェック完了: ${newReleaseCount}冊の新刊を発見しました (${now})`);
 
         // 完了通知
         sendCompletionNotification('新刊チェック', authors.length, newReleaseCount);
