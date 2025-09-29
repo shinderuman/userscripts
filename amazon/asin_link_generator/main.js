@@ -39,7 +39,14 @@
         if (!matches) return;
 
         const parent = textNode.parentNode;
-        if (!parent || parent.tagName === 'A') return;
+        if (!parent) return;
+
+        // 親要素を遡ってリンク内かどうかチェック
+        let currentParent = parent;
+        while (currentParent) {
+            if (currentParent.tagName === 'A') return;
+            currentParent = currentParent.parentNode;
+        }
 
         let lastIndex = 0;
         const fragment = document.createDocumentFragment();
@@ -72,8 +79,12 @@
             {
                 acceptNode: (node) => {
                     // 既にリンク内にあるテキストはスキップ
-                    if (node.parentNode && node.parentNode.tagName === 'A') {
-                        return NodeFilter.FILTER_REJECT; // eslint-disable-line no-undef
+                    let parent = node.parentNode;
+                    while (parent) {
+                        if (parent.tagName === 'A') {
+                            return NodeFilter.FILTER_REJECT; // eslint-disable-line no-undef
+                        }
+                        parent = parent.parentNode;
                     }
                     // ASINパターンを含むテキストのみ処理
                     return CONFIG.KINDLE_ASIN_PATTERN.test(node.textContent)
