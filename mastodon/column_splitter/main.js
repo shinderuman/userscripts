@@ -43,7 +43,7 @@
         'removeAltLabels': {
             'accounts': [],
             'func': (article) => {
-                article.querySelector('button.media-gallery__alt__label')?.remove();
+                article.querySelectorAll('button.media-gallery__alt__label').forEach(label => label.remove());
             }
         },
         'removeLongText': {
