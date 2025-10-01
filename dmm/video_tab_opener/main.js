@@ -37,9 +37,6 @@
         console.log('💡 DMM動画を新しいタブで開くように変更します');
     };
 
-    // グローバル関数として公開
-    unsafeWindow.initializePlayerOpenTab = initializePlayerOpenTab;
-
     // 自動初期化
     initializePlayerOpenTab();
 })();

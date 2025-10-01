@@ -208,9 +208,6 @@
         console.log('💡 Alt+矢印キーで各種機能を使用できます');
     };
 
-    // グローバル関数として公開
-    unsafeWindow.initializeCustomKeybindHandler = initializeCustomKeybindHandler;
-
     // 自動初期化
     initializeCustomKeybindHandler();
 })();

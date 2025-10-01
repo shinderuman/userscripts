@@ -56,9 +56,6 @@
         moveColumns();
     };
 
-    // グローバル関数として公開
-    unsafeWindow.initializeColumnCombiner = initializeColumnCombiner;
-
     // 自動初期化
     initializeColumnCombiner();
 })();

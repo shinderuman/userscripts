@@ -138,9 +138,6 @@
         console.log('💡 BからはじまるKindleのASIN（10文字）を自動的にリンクに変換します');
     };
 
-    // グローバル関数として公開
-    unsafeWindow.initializeAsinLinkGenerator = initializeAsinLinkGenerator;
-
     // 自動初期化
     initializeAsinLinkGenerator();
 })();

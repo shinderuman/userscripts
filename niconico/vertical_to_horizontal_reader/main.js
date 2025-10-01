@@ -202,9 +202,6 @@
         console.log('📖 ニコニコ漫画横読み変換が初期化されました');
     };
 
-    // グローバル関数として公開
-    unsafeWindow.initializeMangaReader = initializeMangaReader;
-
     // イベントリスナー設定
     document.addEventListener('keydown', handleAbortKey);
     window.addEventListener('load', () => setTimeout(initializeMangaReader, 1000));

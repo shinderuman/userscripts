@@ -91,9 +91,6 @@
         console.log('🚀 Amazon Highlight が初期化されました');
     };
 
-    // グローバル関数として公開
-    unsafeWindow.initializeHighlight = initializeHighlight;
-
     // 自動初期化
     initializeHighlight();
 })();

@@ -208,9 +208,6 @@
         mainMutationObserver.observe(document.body, { childList: true, subtree: true });
     };
 
-    // グローバル関数として公開
-    unsafeWindow.initializeColumnSplitter = initializeColumnSplitter;
-
     // 自動初期化
     initializeColumnSplitter();
 })();

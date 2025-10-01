@@ -76,9 +76,6 @@
         console.log('  Command+Shift+↑: 最新の投稿にリプライ');
     };
 
-    // グローバル関数として公開
-    unsafeWindow.initializeRecentPostEditor = initializeRecentPostEditor;
-
     // 自動初期化
     initializeRecentPostEditor();
 })();

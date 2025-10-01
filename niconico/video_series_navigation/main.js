@@ -261,9 +261,6 @@
         console.log('🚀 ニコニコ動画シリーズナビゲーターが初期化されました');
     };
 
-    // グローバル関数として公開
-    unsafeWindow.initializeSeriesVideoNavigator = initializeSeriesVideoNavigator;
-
     // 自動初期化
     initializeSeriesVideoNavigator();
 })();

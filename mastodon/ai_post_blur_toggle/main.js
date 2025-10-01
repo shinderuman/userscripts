@@ -31,9 +31,6 @@
         console.log('🚀 Mastodon Blur Sensitive Contents が初期化されました');
     };
 
-    // グローバル関数として公開
-    unsafeWindow.initializeBlurSensitiveContents = initializeBlurSensitiveContents;
-
     // 自動初期化
     initializeBlurSensitiveContents();
 })();

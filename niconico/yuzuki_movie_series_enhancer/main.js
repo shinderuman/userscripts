@@ -69,9 +69,6 @@
         console.log('💡 「結月さん映画を鑑賞する」シリーズに🎬アイコンで配信サイト検索機能を追加しました');
     };
 
-    // グローバル関数として公開
-    unsafeWindow.initializeYuzukiMovieSeriesEnhancer = initializeYuzukiMovieSeriesEnhancer;
-
     // 自動初期化
     initializeYuzukiMovieSeriesEnhancer();
 })();

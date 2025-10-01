@@ -325,9 +325,6 @@ ${productUrl}
         console.log('🚀 Kindle Price and Point Highlighter が初期化されました');
     };
 
-    // グローバル関数として公開
-    unsafeWindow.initializePriceAndPointHighlighter = initializePriceAndPointHighlighter;
-
     // 自動初期化
     window.addEventListener('load', initializePriceAndPointHighlighter);
 })();

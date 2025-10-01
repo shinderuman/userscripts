@@ -160,9 +160,6 @@
         console.log('📘 Kindle Campaign Sorter が初期化されました');
     };
 
-    // グローバル関数として公開
-    unsafeWindow.initializeCampaignSorter = initializeCampaignSorter;
-
     // 自動初期化
     initializeCampaignSorter();
 })();

@@ -49,9 +49,6 @@
         console.log('🚀 Twitter Show Yourself が初期化されました');
     };
 
-    // グローバル関数として公開
-    unsafeWindow.initializeShowYourself = initializeShowYourself;
-
     // 自動初期化
     initializeShowYourself();
 })();

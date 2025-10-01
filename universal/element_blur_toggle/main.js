@@ -26,9 +26,6 @@
         console.log('💡 Option+Clickで要素にモザイクをかけることができます');
     };
 
-    // グローバル関数として公開
-    unsafeWindow.initializeBlurOnClick = initializeBlurOnClick;
-
     // 自動初期化
     initializeBlurOnClick();
 })();

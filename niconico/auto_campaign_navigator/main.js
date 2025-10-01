@@ -77,9 +77,6 @@
         console.log('🚀 ニコニコキャンペーンリンクヘルパーが初期化されました');
     };
 
-    // グローバル関数として公開
-    unsafeWindow.initializeCampaignLinkHelper = initializeCampaignLinkHelper;
-
     // 自動初期化
     initializeCampaignLinkHelper();
 })();

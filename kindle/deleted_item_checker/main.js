@@ -411,9 +411,6 @@
         console.log('🗑️ Kindle Deleted Item Checker が初期化されました');
     };
 
-    // グローバル関数として公開
-    unsafeWindow.initializeDeletedItemChecker = initializeDeletedItemChecker;
-
     // 自動初期化
     initializeDeletedItemChecker();
 })();

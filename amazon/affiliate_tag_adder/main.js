@@ -61,9 +61,6 @@
         console.log('💡 Amazonリンクをペーストすると自動的にアフィリエイトタグが追加されます');
     };
 
-    // グローバル関数として公開
-    unsafeWindow.initializeAffiliateTagAdder = initializeAffiliateTagAdder;
-
     // 自動初期化
     initializeAffiliateTagAdder();
 })();

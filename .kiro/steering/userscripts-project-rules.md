@@ -58,8 +58,8 @@ userscripts/
     
     // メインロジック
     
-    // グローバル関数として公開
-    unsafeWindow.initializeFeature = initializeFeature;
+    // 自動初期化
+    initializeFeature();
 })();
 ```
 

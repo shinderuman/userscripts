@@ -192,9 +192,6 @@
         }, 500);
     };
 
-    // グローバル関数として公開
-    unsafeWindow.initializeLibraryVolumeFilter = initializeLibraryVolumeFilter;
-
     // 自動初期化
     initializeLibraryVolumeFilter();
 })();

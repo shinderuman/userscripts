@@ -28,9 +28,6 @@
         console.log(`💡 ${CONFIG.COLUMN_COUNT}列表示に設定し、配信済み動画を非表示にします`);
     };
 
-    // グローバル関数として公開
-    unsafeWindow.initializeSubscriptionModifier = initializeSubscriptionModifier;
-
     // 自動初期化
     initializeSubscriptionModifier();
 })();

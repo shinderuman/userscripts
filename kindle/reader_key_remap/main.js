@@ -197,9 +197,6 @@
         console.log(`💡 ${KEY_BINDINGS.PREV_PAGE.replace('Key', '')}キー → 前のページ、${KEY_BINDINGS.NEXT_PAGE.replace('Key', '')}キー → 次のページ、${KEY_BINDINGS.NEXT_VOLUME.replace('Key', '')}キー → 次の巻、${KEY_BINDINGS.FIRST_PAGE.replace('Digit', '')}キー → 最初のページ`);
     };
 
-    // グローバル関数として公開（デベロッパーツールから呼び出し可能）
-    unsafeWindow.initializeKindleReader = initializeKindleReader;
-
     // 自動初期化
     initializeKindleReader();
 })();

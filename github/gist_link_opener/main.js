@@ -81,9 +81,6 @@
         return skipList.some(keyword => linkText.includes(keyword));
     };
 
-    // グローバル関数として公開
-    unsafeWindow.initializeGistLinkOpener = initializeGistLinkOpener;
-
     // 自動初期化
     initializeGistLinkOpener();
 })();
