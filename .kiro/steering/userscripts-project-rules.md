@@ -130,6 +130,22 @@ userscripts/
 - ~/.kiro/steering/coding-standards.mdの禁止事項に加えて：
 - ❌ ハードコードされた設定値
 
+### UserScript初期化ルール
+- **DOMContentLoaded判定は不要**: UserScriptは既にDOMが読み込まれた後に実行されるため
+- **直接初期化**: `initializeFunction()`を直接呼び出す
+- **禁止パターン**: 以下のような条件分岐は不要
+```javascript
+// ❌ 不要なパターン
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeFunction);
+} else {
+    initializeFunction();
+}
+
+// ✅ 正しいパターン
+initializeFunction();
+```
+
 ## 参照必須ファイル
 
 このプロジェクトルールに加えて、以下のファイルを**必ず参照・遵守**してください：
