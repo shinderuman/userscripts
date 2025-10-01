@@ -47,6 +47,7 @@ userscripts/
 // @require      file:///path/to/common.js
 // @require      file:///path/to/main.js
 // @grant        unsafeWindow
+// @noframes
 // ==/UserScript==
 
 // main.js
