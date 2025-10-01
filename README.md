@@ -35,7 +35,8 @@ userscripts/
 │   ├── common.js                      # 共通ライブラリ
 │   ├── vertical_to_horizontal_reader/ # 縦読み→横読み変換
 │   ├── video_series_navigation/       # シリーズナビゲーション
-│   └── auto_campaign_navigator/       # 自動キャンペーンナビゲーター
+│   ├── auto_campaign_navigator/       # 自動キャンペーンナビゲーター
+│   └── yuzuki_movie_series_enhancer/  # 結月さん映画シリーズエンハンサー
 ├── twitter/                           # Twitter/X関連スクリプト
 │   ├── common.js                      # 共通ライブラリ
 │   ├── tweet_intent_clipboard/        # ツイートインテント クリップボード
@@ -114,6 +115,7 @@ userscripts/
 - **縦読み→横読み変換**: ニコニコ漫画の縦読みを右から左の横読み形式に変換
 - **シリーズナビゲーション**: シリーズ動画間のナビゲーションボタンとキーボードショートカット（Z/X/C）を追加
 - **自動キャンペーンナビゲーター**: キャンペーンリンクを自動処理（遅延実行・クリックキャンセル機能付き）
+- **結月さん映画シリーズエンハンサー**: 「結月さん映画を鑑賞する」シリーズに🎬アイコンで映画配信サイト検索機能を追加
 
 ### Twitter/X (`twitter/`)
 

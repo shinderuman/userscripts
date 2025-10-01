@@ -115,6 +115,29 @@ const CONFIG = {
 };
 ```
 
+### 🎬 Yuzuki Movie Series Enhancer (`yuzuki_movie_series_enhancer/`)
+「結月さん映画を鑑賞する」シリーズに映画配信サイト検索機能を追加するスクリプト。
+
+**機能:**
+- 映画タイトルの自動抽出（「」『』で囲まれた部分）
+- 🎬アイコンによる配信サイト検索リンク
+- 動的コンテンツの自動監視・対応
+- シンプルで軽量な実装
+
+**対象サイト:**
+- `https://www.nicovideo.jp/user/91534/series/351508*`
+
+**動作:**
+1. 動画タイトルから映画タイトルを自動抽出
+2. 各タイトルに🎬アイコンを追加
+3. クリックでGoogle検索（映画名 + 配信）を実行
+4. 新しいタブで検索結果を表示
+
+**対応タイトル例:**
+- `映画「BEAST/ビースト」を結月さん鑑賞する` → `BEAST/ビースト`
+- `結月さんの映画紹介「レイキャヴィク・ホエール・ウォッチング・マサカー」` → `レイキャヴィク・ホエール・ウォッチング・マサカー`
+- `映画『ＮＯＰＥ／ノープ』を結月さん鑑賞する` → `ＮＯＰＥ／ノープ`
+
 ## 🔧 共通ライブラリ (`common.js`)
 
 ニコニコ関連スクリプトで共有される汎用機能を提供します。
@@ -163,6 +186,7 @@ const videoId = extractVideoId(linkElement);
 1. **Vertical to Horizontal Reader**: `vertical_to_horizontal_reader/wrapper.js`
 2. **Video Series Navigation**: `video_series_navigation/wrapper.js`
 3. **Auto Campaign Navigator**: `auto_campaign_navigator/wrapper.js`
+4. **Yuzuki Movie Series Enhancer**: `yuzuki_movie_series_enhancer/wrapper.js`
 
 ### 3. パスの設定
 `wrapper.js`ファイル内の`@require`パスを環境に合わせて調整:
@@ -178,6 +202,7 @@ const videoId = extractVideoId(linkElement);
 - **ニコニコ動画**: `https://www.nicovideo.jp/watch/*`
 - **ニコニコ漫画**: `https://manga.nicovideo.jp/watch/*`
 - **ニコニコキャンペーン**: `https://koken.nicovideo.jp/campaign`
+- **結月さんシリーズ**: `https://www.nicovideo.jp/user/91534/series/351508*`
 
 ### 権限設定
 一部スクリプトで以下の権限が必要:
@@ -205,6 +230,12 @@ const videoId = extractVideoId(linkElement);
 4. 複数の場合: 新しいタブで一括オープン
 5. クリックでキャンセル可能
 
+### Yuzuki Movie Series Enhancer
+1. 結月さんの映画シリーズページを開く
+2. 各動画タイトルに🎬アイコンが自動追加される
+3. アイコンクリックで映画の配信サイト検索
+4. 新しいタブでGoogle検索結果を表示
+
 ### 手動実行（デバッグ用）
 デベロッパーツールのコンソールで以下の関数を実行可能:
 
@@ -217,6 +248,9 @@ initializeSeriesVideoNavigator()
 
 // Auto Campaign Navigator
 initializeCampaignLinkHelper()
+
+// Yuzuki Movie Series Enhancer
+initializeYuzukiMovieSeriesEnhancer()
 ```
 
 ## 📊 ログ出力
@@ -227,6 +261,7 @@ initializeCampaignLinkHelper()
 - 📖 漫画変換処理状況
 - 🎬 動画ナビゲーション状況
 - 🎯 キャンペーンリンク処理状況
+- 🎬 映画タイトル抽出・アイコン追加状況
 
 ## 🛠️ 開発・カスタマイズ
 
