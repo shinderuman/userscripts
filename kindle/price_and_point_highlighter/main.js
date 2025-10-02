@@ -22,6 +22,7 @@
     const SELECTORS = {
         favicon: 'link[rel*=\'icon\'], link[rel=\'shortcut icon\']',
         navbar: '#nav-belt',
+        postTrigger: '#nav-logo',
         title: '#productTitle',
         seriesTitle: '#collection-masthead__title',
         asin: '#ASIN, input[name=\'idx.asin\'], input[name=\'ASIN.0\'], input[name=\'titleID\']',
@@ -269,10 +270,10 @@ ${productUrl}
         return null;
     };
 
-    const addNavbarClickHandler = (title, detail) => {
-        const navbar = document.querySelector(SELECTORS.navbar);
-        if (navbar) {
-            navbar.addEventListener('click', (e) => {
+    const addPostClickHandler = (title, detail) => {
+        const clickTarget = document.querySelector(SELECTORS.postTrigger);
+        if (clickTarget) {
+            clickTarget.addEventListener('click', (e) => {
                 e.preventDefault();
                 postToAllPlatforms(title, detail);
             });
@@ -286,7 +287,7 @@ ${productUrl}
         if (detail) {
             highlightNavbar();
             addBadgeToFavicon('red');
-            addNavbarClickHandler(title, detail);
+            addPostClickHandler(title, detail);
             if (!isNotified()) {
                 sendNotification(title, detail);
                 markAsNotified();
