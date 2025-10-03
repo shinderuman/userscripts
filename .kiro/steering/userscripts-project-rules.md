@@ -4,8 +4,52 @@ inclusion: always
 
 # UserScripts Project Rules
 
-このファイルは、UserScriptsプロジェクト固有のルールを定義します。
-**重要**: このルールに加えて、必ず `~/.kiro/steering/` の全てのファイルも参照・遵守してください。
+## 🚨 最重要：作業前必須確認ルール
+
+### 絶対必須確認プロセス
+**すべての作業を開始する前に、以下を必ず実行してください：**
+
+1. **`~/.kiro/steering`ディレクトリの確認**
+   ```bash
+   ls -la ~/.kiro/steering
+   ```
+
+2. **全steeringファイルの内容確認**
+   ```bash
+   cat ~/.kiro/steering/coding-standards.md
+   cat ~/.kiro/steering/communication-guidelines.md
+   cat ~/.kiro/steering/eslint-usage.md
+   cat ~/.kiro/steering/git-commands.md
+   cat ~/.kiro/steering/steering-management.md
+   ```
+
+3. **確認完了の明示**
+   - 上記コマンドを実行し、全ファイルの内容を確認したことを明示する
+   - 確認後に作業を開始する
+
+### 確認の重要性
+- **ルール違反の防止**: 最新のsteeringルールを把握することで違反を防ぐ
+- **品質保証**: 一貫した作業品質を維持する
+- **効率向上**: 正しい手順を最初から実行することで手戻りを防ぐ
+- **プロフェッショナリズム**: 規約遵守の姿勢を示す
+
+### 違反時の対応
+- steeringファイル確認を怠った場合は、即座に確認を実行する
+- 確認不足による作業品質の問題は重大な違反とみなす
+- 継続的な違反は信頼関係を損なう
+
+## 参照必須ファイル
+
+このプロジェクトルールに加えて、以下のファイルを**必ず参照・遵守**してください：
+
+### ~/.kiro/steering/ の全ファイル
+- **coding-standards.md**: 一般的なコーディング規約、関数配置ルール
+- **communication-guidelines.md**: コミュニケーション規約、言語使用ルール
+- **eslint-usage.md**: ESLint使用ガイドライン
+- **git-commands.md**: Git運用ルール、コミットメッセージ規約
+- **steering-management.md**: Steeringファイル管理ガイドライン
+
+**これらのルールは このプロジェクトルールより優先 されます。競合する場合は`~/.kiro/steering/`のルールに従ってください。**
 
 ## プロジェクト構造ルール
 
@@ -35,9 +79,6 @@ userscripts/
 - **unsafeWindow使用**: `unsafeWindow.[ServiceName]Common`として公開
 - **関数の粒度**: 真に再利用可能な機能のみを共通化
 - **特化ロジック**: サービス固有の処理は各`main.js`に配置
-
-### 関数配置ルール
-- ~/.kiro/steering/coding-standards.mdの関数配置ルールに従う
 
 ### UserScript構成
 ```javascript
@@ -99,9 +140,7 @@ userscripts/
 - API変更時は共通ライブラリの説明を更新
 - 設定項目変更時は設定セクションを更新
 
-## Git運用ルール
-- ~/.kiro/steering/git-commands.mdの全ルールに従う
-- このプロジェクト特有の追加要件はなし
+
 
 ## 品質保証ルール
 
@@ -125,10 +164,8 @@ userscripts/
 ### 構造違反
 - ❌ UserScriptヘッダーを`main.js`に含める
 - ❌ サービス固有ロジックを他サービスの`common.js`に配置
-- その他の違反は ~/.kiro/steering/ の各ルールを参照
 
 ### コーディング違反
-- ~/.kiro/steering/coding-standards.mdの禁止事項に加えて：
 - ❌ ハードコードされた設定値
 
 ### UserScript初期化ルール
@@ -146,14 +183,3 @@ if (document.readyState === 'loading') {
 // ✅ 正しいパターン
 initializeFunction();
 ```
-
-## 参照必須ファイル
-
-このプロジェクトルールに加えて、以下のファイルを**必ず参照・遵守**してください：
-
-### ~/.kiro/steering/ の全ファイル
-- **coding-standards.md**: 一般的なコーディング規約、関数配置ルール
-- **git-commands.md**: Git運用ルール、コミットメッセージ規約
-- その他の全てのステアリングファイル
-
-これらのルールは**このプロジェクトルールより優先**されます。競合する場合は`~/.kiro/steering/`のルールに従ってください。
