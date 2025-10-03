@@ -152,6 +152,8 @@ ${productUrl}
         const message = createMessage(title, detail);
         postToSlack(message);
         postToMastodon(message);
+
+        GM_setClipboard(asin);
     };
 
     const postToSlack = (message) => {

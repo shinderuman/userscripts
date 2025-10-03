@@ -10,6 +10,7 @@
 // @require      file:///Users/shinderuman/src/kindle_bot/userscripts/kindle/price_and_point_highlighter/main.js
 // @grant        GM_xmlhttpRequest
 // @grant        GM_notification
+// @grant        GM_setClipboard
 // @icon         https://www.amazon.co.jp/favicon.ico
 // @noframes
 // ==/UserScript==
