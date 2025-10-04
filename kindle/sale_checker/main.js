@@ -6,7 +6,6 @@
         COMMON_CONFIG,
         fetchJsonFromS3,
         fetchPageInfo,
-        sendNotification,
         sendCompletionNotification,
         getElementValue
     } = unsafeWindow.KindleCommon;
@@ -95,21 +94,30 @@
         return conditions.length > 0 ? conditions.join(' ') : null;
     };
 
-    // 通知を送信
-    const sendSaleNotification = (info, conditions) => {
-        sendNotification(
-            `🎉 セール発見: ${info.title}`,
-            `条件達成: ${conditions}`,
-            info.cleanUrl
-        );
+    // セール発見通知を送信
+    const sendBatchSaleNotification = (saleBooks) => {
+        const title = `🎉 ${saleBooks.length}件のセールを発見`;
+        const text = saleBooks.map(book => `• ${book.info.title}`).join('\n');
+
+        GM_notification({
+            title: title,
+            text: text,
+            image: 'https://www.google.com/s2/favicons?sz=64&domain=amazon.co.jp',
+            timeout: 0,
+            onclick: () => {
+                saleBooks.forEach(book => {
+                    GM_openInTab(book.info.cleanUrl, { active: false });
+                });
+            }
+        });
     };
 
     // 非同期でページをチェック（バッチ処理）
     const checkPagesInBatches = async (books) => {
         console.log(`📚 ${books.length}冊のセール情報をチェック開始...`);
 
-        let saleCount = 0;
         let processedCount = 0;
+        const saleBooks = [];
 
         for (let i = 0; i < books.length; i += CONFIG.CONCURRENT_REQUESTS) {
             const batch = books.slice(i, i + CONFIG.CONCURRENT_REQUESTS);
@@ -123,9 +131,8 @@
                     console.log(`進捗: ${processedCount}/${books.length} - ${pageInfo.title}`);
 
                     if (conditions) {
-                        saleCount++;
                         console.log(`🎉 セール発見: ${pageInfo.title} - ${conditions}`);
-                        sendSaleNotification(pageInfo, conditions);
+                        saleBooks.push({ info: pageInfo, conditions });
                     }
 
                     return { success: true, info: pageInfo, conditions };
@@ -144,10 +151,14 @@
         }
 
         const now = new Date().toLocaleString('ja-JP');
-        console.log(`✅ チェック完了: ${saleCount}件のセールを発見しました (${now})`);
+        console.log(`✅ チェック完了: ${saleBooks.length}件のセールを発見しました (${now})`);
 
-        // 完了通知
-        sendCompletionNotification('セールチェック', books.length, saleCount);
+        // セール発見時は統合通知、未発見時は完了通知
+        if (saleBooks.length) {
+            sendBatchSaleNotification(saleBooks);
+        } else {
+            sendCompletionNotification('セールチェック', books.length, 0);
+        }
     };
 
     // メイン関数
