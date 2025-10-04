@@ -102,8 +102,9 @@
                         console.log(`📚 新刊発見: ${pageInfo.Name} - ${pageInfo.newReleases.length}冊`);
                         pageInfo.newReleases.forEach(book => {
                             console.log(`  - ${book.title} (${book.releaseDate})`);
+                            GM_openInTab(book.url, { active: false });
+                            saveNotifiedItem(book.asin, book.releaseDate, book.title, book.author);
                         });
-                        sendNewReleaseNotification(pageInfo);
                     }
 
                     return { success: true, info: pageInfo, hasNewReleases };
@@ -194,6 +195,12 @@
 
             const { title, bookUrl } = basicInfo;
             const asin = extractAsinFromUrl(bookUrl);
+
+            // ASINチェック
+            if (!asin) {
+                console.log('⏭️ スキップ: ASINを取得できませんでした');
+                continue;
+            }
 
             // ISBNフィルタリングチェック
             if (checkISBNFiltering(asin, isbnMode)) {
@@ -399,26 +406,6 @@
 
     const checkNewReleaseConditions = (info) => {
         return info.newReleases && info.newReleases.length > 0;
-    };
-
-    const sendNewReleaseNotification = (info) => {
-        info.newReleases.forEach(book => {
-            // 通知を送信
-            GM_notification({
-                title: `📚 ${info.Name}の新刊発見`,
-                text: `${book.title}`,
-                image: 'https://www.google.com/s2/favicons?sz=64&domain=amazon.co.jp',
-                timeout: 0,
-                onclick: () => {
-                    GM_openInTab(book.url, { active: true });
-                }
-            });
-
-            // 通知済みアイテムとして保存
-            if (book.asin) {
-                saveNotifiedItem(book.asin, book.releaseDate, book.title, book.author);
-            }
-        });
     };
 
     const saveNotifiedItem = (asin, releaseDate, title, author) => {

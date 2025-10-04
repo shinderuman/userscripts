@@ -6,7 +6,6 @@
         COMMON_CONFIG,
         fetchJsonFromS3,
         fetchPageInfo,
-        sendNotification,
         sendCompletionNotification
     } = unsafeWindow.KindleCommon;
 
@@ -50,15 +49,6 @@
         return info.paperBookAvailable && info.kindleBookAvailable;
     };
 
-    // 通知を送信
-    const sendAvailabilityNotification = (info) => {
-        sendNotification(
-            '📚 紙書籍・Kindle両方利用可能',
-            `${info.title}`,
-            info.cleanUrl
-        );
-    };
-
     // 非同期でページをチェック（バッチ処理）
     const checkPagesInBatches = async (books) => {
         console.log(`📚 ${books.length}冊の利用可能性をチェック開始...`);
@@ -81,7 +71,7 @@
                     if (isAvailable) {
                         availableCount++;
                         console.log(`📚 両方利用可能: ${pageInfo.title}`);
-                        sendAvailabilityNotification(pageInfo);
+                        GM_openInTab(pageInfo.cleanUrl, { active: false });
                     }
 
                     return { success: true, info: pageInfo, isAvailable };
