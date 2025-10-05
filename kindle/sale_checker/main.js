@@ -105,8 +105,8 @@
             image: 'https://www.google.com/s2/favicons?sz=64&domain=amazon.co.jp',
             timeout: 0,
             onclick: () => {
-                saleBooks.forEach(book => {
-                    GM_openInTab(book.info.cleanUrl, { active: false });
+                saleBooks.forEach((book, index) => {
+                    GM_openInTab(book.info.cleanUrl, { active: index === 0 });
                 });
             }
         });
