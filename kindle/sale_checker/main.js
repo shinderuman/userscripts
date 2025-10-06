@@ -106,7 +106,7 @@
             timeout: 0,
             onclick: () => {
                 saleBooks.forEach((book, index) => {
-                    GM_openInTab(book.info.cleanUrl, { active: index === 0 });
+                    GM_openInTab(book.info.URL, { active: index === 0 });
                 });
             }
         });
