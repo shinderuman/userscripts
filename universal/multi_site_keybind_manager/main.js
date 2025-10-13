@@ -79,7 +79,7 @@
             document.querySelector('#rpi-attribute-book_details-publication_date > div.a-section.a-spacing-none.a-text-center.rpi-attribute-value > span')
                 ?.textContent.trim().replace(/\//g, '-')
         );
-        releaseDate.setHours(releaseDate.getHours() + 9);
+        releaseDate.setUTCHours(0, 0, 0, 0);
 
         const currentPrice = Number(
             document.querySelector('#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span')
