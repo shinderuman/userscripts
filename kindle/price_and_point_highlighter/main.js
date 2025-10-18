@@ -29,9 +29,26 @@
         kindlePrice: '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span',
         paperPrice: '[id^=\'tmm-grid-swatch\']:not([id$=\'KINDLE\']) > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span',
         points: '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span, #tmm-grid-swatch-OTHER > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span',
-        ownershipVolume: '#hulk_buy_ownership_volume > span',
+        seriesPoints: '#buy-box > div.a-row.a-spacing-mini > div.a-column.a-span7.a-text-right.a-span-last > span',
+        offerButtons: 'button[id^="offer-tab-button_offer_"]',
+        offerButtonTotal: 'div > span',
+        offerButtonPrice: 'div > div > span',
         kindleBookAvailable: '#tmm-grid-swatch-KINDLE',
         paperBookAvailable: '[id^=\'tmm-grid-swatch\']:not([id$=\'KINDLE\'])'
+    };
+
+    const PATTERNS = {
+        offerButtonId: /offer-tab-button_offer_(\d+)/,
+        totalBooks: [
+            /購入可能な全\s*(\d+)\s*冊/,
+            /次の(\d+)冊/,
+            /(\d+)冊すべて/
+        ],
+        seriesPrice: /(\d+(?:,\d+)*)/,
+        seriesPoints: /(\d+)\s*pt/,
+        points: /(\d+)pt/,
+        price: /([\d,]+)/,
+        asinFromUrl: /\/(?:dp|gp\/product)\/([A-Z0-9]{10})[/?]?/
     };
 
     let asin = null;
@@ -68,7 +85,7 @@ ${productUrl}
     };
 
     const extractASINFromURL = () => {
-        const match = window.location.href.match(/\/(?:dp|gp\/product)\/([A-Z0-9]{10})[/?]?/);
+        const match = window.location.href.match(PATTERNS.asinFromUrl);
         return match ? match[1] : null;
     };
 
@@ -208,9 +225,9 @@ ${productUrl}
     };
 
     const evaluateConditions = () => {
-        const points = getElementValue(document, SELECTORS.points, /(\d+)pt/);
-        const kindlePrice = getElementValue(document, SELECTORS.kindlePrice, /([\d,]+)/);
-        const paperPrice = getElementValue(document, SELECTORS.paperPrice, /([\d,]+)/);
+        const points = getElementValue(document, SELECTORS.points, PATTERNS.points);
+        const kindlePrice = getElementValue(document, SELECTORS.kindlePrice, PATTERNS.price);
+        const paperPrice = getElementValue(document, SELECTORS.paperPrice, PATTERNS.price);
 
         const conditions = [];
         if (points >= CONFIG.POINT_THRESHOLD) {
@@ -226,50 +243,86 @@ ${productUrl}
     };
 
     const checkSeriesConditions = () => {
-        const ownershipText = document.querySelector(SELECTORS.ownershipVolume)?.innerText;
-        let total = 0;
-        let purchased = 0;
-        if (ownershipText) {
-            [total, purchased] = ownershipText.match(/全(\d+)巻中(\d+)冊/).slice(1, 3).map(Number);
+        const maxOfferButton = getMaxOfferButton();
+        if (!maxOfferButton) return null;
+
+        const bookCount = getSeriesTotalFromButton(maxOfferButton);
+        if (bookCount === 0) return null;
+
+        const seriesPrice = getSeriesPriceFromButton(maxOfferButton);
+        const seriesPoints = getSeriesPoints();
+
+        // 条件チェック
+        if (seriesPoints >= CONFIG.POINT_THRESHOLD) {
+            return `シリーズのポイントが ${seriesPoints}pt です。`;
         }
 
-        for (let i = 5; i >= 0; i--) {
-            const seriesPoints = getElementValue(
-                document,
-                `#hulk_buy_points_COMPLETE_SERIES_VOLUME_volume_${i} > div.a-column.a-span6.a-text-right.a-span-last > div > div > span.a-size-small.a-text-bold`,
-                /(\d+)pt/
-            );
-            if (seriesPoints >= CONFIG.POINT_THRESHOLD) {
-                return `シリーズのポイントが ${seriesPoints}pt です。`;
+        if (bookCount > 0 && seriesPrice > 0) {
+            const averagePrice = seriesPrice / bookCount;
+            if (averagePrice <= CONFIG.AVERAGE_PRICE_THRESHOLD) {
+                return `${bookCount}冊が平均 ${averagePrice.toFixed(2)}円 で購入可能です。`;
             }
+        }
 
-            const seriesPrice = getElementValue(
-                document,
-                `#hulk_buy_bundle_button_COMPLETE_SERIES_VOLUME_volume_${i}-announce > div > div > span`,
-                /([\d,]+)/
-            );
+        return null;
+    };
 
-            if (!total) {
-                total = getElementValue(
-                    document,
-                    `#hulk_buy_bundle_button_COMPLETE_SERIES_VOLUME_volume_${i}-announce > div > span`,
-                    /(\d+)冊/
-                );
-                purchased = 0;
-            }
+    const getMaxOfferButton = () => {
+        const offerButtons = document.querySelectorAll(SELECTORS.offerButtons);
+        let maxOfferButton = null;
+        let maxOfferNumber = -1;
 
-            const restBooks = total - purchased;
-
-            if (restBooks > 0 && seriesPrice > 0) {
-                if (seriesPrice / restBooks <= CONFIG.AVERAGE_PRICE_THRESHOLD) {
-                    return `残りの本が平均 ${(seriesPrice / restBooks).toFixed(2)}円 で購入可能です。`;
-                } else {
-                    return null;
+        offerButtons.forEach(button => {
+            const match = button.id.match(PATTERNS.offerButtonId);
+            if (match) {
+                const offerNumber = parseInt(match[1]);
+                if (offerNumber > maxOfferNumber) {
+                    maxOfferNumber = offerNumber;
+                    maxOfferButton = button;
                 }
             }
+        });
 
+        return maxOfferButton;
+    };
+
+    const getSeriesTotalFromButton = (button) => {
+        const totalSpan = button.querySelector(SELECTORS.offerButtonTotal);
+        if (!totalSpan) return 0;
+
+        const totalText = totalSpan.textContent;
+
+        for (const pattern of PATTERNS.totalBooks) {
+            const match = totalText.match(pattern);
+            if (match) {
+                return parseInt(match[1]);
+            }
         }
-        return null;
+        return 0;
+    };
+
+    const getSeriesPriceFromButton = (button) => {
+        const priceSpan = button.querySelector(SELECTORS.offerButtonPrice);
+        if (!priceSpan) return 0;
+
+        const priceText = priceSpan.textContent;
+        const priceMatch = priceText.match(PATTERNS.seriesPrice);
+        if (priceMatch) {
+            return parseInt(priceMatch[1].replace(/,/g, ''));
+        }
+        return 0;
+    };
+
+    const getSeriesPoints = () => {
+        const seriesPointsElement = document.querySelector(SELECTORS.seriesPoints);
+        if (!seriesPointsElement) return 0;
+
+        const pointsText = seriesPointsElement.textContent;
+        const pointsMatch = pointsText.match(PATTERNS.seriesPoints);
+        if (pointsMatch) {
+            return parseInt(pointsMatch[1]);
+        }
+        return 0;
     };
 
     const addPostClickHandler = (title, detail) => {
@@ -284,7 +337,7 @@ ${productUrl}
 
     const checkConditions = () => {
         const title = document.querySelector(SELECTORS.title)?.innerText.trim() || document.querySelector(SELECTORS.seriesTitle)?.innerText.trim() || '商品タイトル不明';
-        const detail = evaluateConditions();
+        const detail = evaluateConditions() || checkSeriesConditions();
 
         if (detail) {
             highlightNavbar();
@@ -294,10 +347,6 @@ ${productUrl}
                 sendNotification(title, detail);
                 markAsNotified();
             }
-            return true;
-        } else if (checkSeriesConditions()) {
-            highlightNavbar();
-            addBadgeToFavicon('red');
             return true;
         }
         return false;
