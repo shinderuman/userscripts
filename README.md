@@ -51,10 +51,14 @@ userscripts/
 │   ├── column_combiner/               # カラム結合
 │   ├── recent_post_editor/            # 投稿編集ショートカット
 │   └── ai_post_blur_toggle/           # AI投稿ぼかし切り替え
-└── github/                            # GitHub関連スクリプト
-    ├── README.md                      # GitHubスクリプトの詳細説明
+├── github/                            # GitHub関連スクリプト
+│   ├── README.md                      # GitHubスクリプトの詳細説明
+│   ├── common.js                      # 共通ライブラリ
+│   └── gist_link_opener/              # Gistリンクオープナー
+└── aws/                               # AWS関連スクリプト
+    ├── README.md                      # AWSスクリプトの詳細説明
     ├── common.js                      # 共通ライブラリ
-    └── gist_link_opener/              # Gistリンクオープナー
+    └── cloudwatch_refresh/            # CloudWatchダッシュボードリフレッシュ
 ```
 
 ## 🎯 対応サービス
@@ -69,6 +73,7 @@ userscripts/
 - **YouTube** (`youtube/`) - 登録チャンネルレイアウト最適化
 - **Mastodon** (`mastodon/`) - カラム管理・投稿編集・AI投稿ぼかし・UI改善
 - **GitHub** (`github/`) - Gistページでの日付フィルタリング機能付きリンク一括開き
+- **AWS** (`aws/`) - CloudWatchダッシュボードのキーボードショートカット
 
 ## 🚀 使用方法
 
@@ -136,6 +141,10 @@ userscripts/
 ### GitHub (`github/`)
 
 - **Gistリンクオープナー**: GitHub Gistページで日付フィルタリング機能付きのリンク一括開きボタンを表示
+
+### AWS (`aws/`)
+
+- **CloudWatch Dashboard Refresh**: CloudWatchダッシュボードで'r'キーを押してリフレッシュボタンをクリック
 
 詳細は各サービスディレクトリ内の`README.md`を参照してください。
 
