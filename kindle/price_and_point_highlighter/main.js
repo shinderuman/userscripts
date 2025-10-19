@@ -29,10 +29,11 @@
         kindlePrice: '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span',
         paperPrice: '[id^=\'tmm-grid-swatch\']:not([id$=\'KINDLE\']) > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span',
         points: '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span, #tmm-grid-swatch-OTHER > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span',
-        seriesPoints: '#buy-box > div.a-row.a-spacing-mini > div.a-column.a-span7.a-text-right.a-span-last > span',
         offerButtons: 'button[id^="offer-tab-button_offer_"]',
         offerButtonTotal: 'div > span',
         offerButtonPrice: 'div > div > span',
+        offerBuyBox: '[data-offer-id="offer_{OFFER_NUMBER}"] #buy-box',
+        buyBoxPoints: 'div.a-row.a-spacing-mini > div.a-column.a-span7.a-text-right.a-span-last > span',
         kindleBookAvailable: '#tmm-grid-swatch-KINDLE',
         paperBookAvailable: '[id^=\'tmm-grid-swatch\']:not([id$=\'KINDLE\'])'
     };
@@ -48,7 +49,7 @@
         seriesPoints: /(\d+)\s*pt/,
         points: /(\d+)pt/,
         price: /([\d,]+)/,
-        asinFromUrl: /\/(?:dp|gp\/product)\/([A-Z0-9]{10})[/?]?/
+        asinFromUrl: /\/(?:dp|gp\/product|kindle-dbs\/product)\/([A-Z0-9]{10})[/?]?/
     };
 
     let asin = null;
@@ -250,7 +251,9 @@ ${productUrl}
         if (bookCount === 0) return null;
 
         const seriesPrice = getSeriesPriceFromButton(maxOfferButton);
-        const seriesPoints = getSeriesPoints();
+        const seriesPoints = getSeriesPoints(maxOfferButton);
+
+        console.log('📊 シリーズ情報 - 冊数:', bookCount, '価格:', seriesPrice, 'ポイント:', seriesPoints);
 
         // 条件チェック
         if (seriesPoints >= CONFIG.POINT_THRESHOLD) {
@@ -313,14 +316,23 @@ ${productUrl}
         return 0;
     };
 
-    const getSeriesPoints = () => {
-        const seriesPointsElement = document.querySelector(SELECTORS.seriesPoints);
-        if (!seriesPointsElement) return 0;
+    const getSeriesPoints = (button) => {
+        // buttonのIDからoffer IDを抽出
+        const match = button.id.match(PATTERNS.offerButtonId);
+        if (!match) return 0;
 
-        const pointsText = seriesPointsElement.textContent;
-        const pointsMatch = pointsText.match(PATTERNS.seriesPoints);
-        if (pointsMatch) {
-            return parseInt(pointsMatch[1]);
+        // 対応するbuy-boxを探す
+        const buyBoxSelector = SELECTORS.offerBuyBox.replace('{OFFER_NUMBER}', match[1]);
+        const buyBox = document.querySelector(buyBoxSelector);
+        if (!buyBox) return 0;
+
+        const pointsElement = buyBox.querySelector(SELECTORS.buyBoxPoints);
+        if (pointsElement) {
+            const pointsText = pointsElement.textContent;
+            const pointsMatch = pointsText.match(PATTERNS.seriesPoints);
+            if (pointsMatch) {
+                return parseInt(pointsMatch[1]);
+            }
         }
         return 0;
     };
