@@ -34,6 +34,8 @@
         offerButtonPrice: 'div > div > span',
         offerBuyBox: '[data-offer-id="offer_{OFFER_NUMBER}"] #buy-box',
         buyBoxPoints: 'div.a-row.a-spacing-mini > div.a-column.a-span7.a-text-right.a-span-last > span',
+        accordionRow: '[data-a-accordion-row-name], [data-accordion-id]',
+        accordionHeader: '.a-heading-text, h3',
         kindleBookAvailable: '#tmm-grid-swatch-KINDLE',
         paperBookAvailable: '[id^=\'tmm-grid-swatch\']:not([id$=\'KINDLE\'])'
     };
@@ -42,6 +44,7 @@
         offerButtonId: /offer-tab-button_offer_(\d+)/,
         totalBooks: [
             /購入可能な全\s*(\d+)\s*冊/,
+            /残りの全\s*(\d+)\s*冊/,
             /次の(\d+)冊/,
             /(\d+)冊すべて/
         ],
@@ -276,6 +279,14 @@ ${productUrl}
         let maxOfferNumber = -1;
 
         offerButtons.forEach(button => {
+            const accordionRow = button.closest(SELECTORS.accordionRow);
+            if (accordionRow) {
+                const headerText = accordionRow.querySelector(SELECTORS.accordionHeader);
+                if (headerText && headerText.textContent.includes('まとめ買い (話)')) {
+                    return;
+                }
+            }
+
             const match = button.id.match(PATTERNS.offerButtonId);
             if (match) {
                 const offerNumber = parseInt(match[1]);
