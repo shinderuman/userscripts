@@ -96,8 +96,13 @@
 
     // セール発見通知を送信
     const sendBatchSaleNotification = (saleBooks) => {
-        const title = `🎉 ${saleBooks.length}件のセールを発見`;
-        const text = saleBooks.map(book => `• ${book.info.title}`).join('\n');
+        const count = saleBooks.length;
+        const title = `🎉 ${count}件のセールを発見`;
+
+        let text = saleBooks.slice(0, 2).map(book => `• ${book.info.title}`).join('\n');
+        if (count > 2) {
+            text += `\n... 他${count - 2}件`;
+        }
 
         GM_notification({
             title: title,
