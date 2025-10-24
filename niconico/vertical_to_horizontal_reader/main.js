@@ -15,6 +15,10 @@
             PREV_LINK: 'p.prev > a:not(.disabled)',
             NEXT_LINK: 'p.next > a:not(.disabled)'
         },
+        KEY_MAPPING: {
+            PREV_PAGE: ['ArrowRight', 'ArrowUp', 'x'],
+            NEXT_PAGE: ['ArrowLeft', 'ArrowDown', 'z']
+        },
         STYLES: {
             CONTAINER: {
                 position: 'fixed',
@@ -121,14 +125,14 @@
         };
 
         const handleKeydown = e => {
-            if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+            if (CONFIG.KEY_MAPPING.PREV_PAGE.includes(e.key)) {
                 if (currentUnit > 0) {
                     currentUnit--;
                     render();
                 } else if (prevEpisodeURL) {
                     window.location.href = prevEpisodeURL;
                 }
-            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+            } else if (CONFIG.KEY_MAPPING.NEXT_PAGE.includes(e.key)) {
                 if (currentUnit + 1 < displayUnits.length) {
                     currentUnit++;
                     render();
