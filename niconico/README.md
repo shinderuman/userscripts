@@ -18,8 +18,8 @@
 - `https://manga.nicovideo.jp/watch/*`
 
 **操作方法:**
-- **→/↑**: 前のページ（右から左へ）
-- **←/↓**: 次のページ
+- **→/↑/X**: 前のページ（右から左へ）
+- **←/↓/Z**: 次のページ
 - **ESC**: 処理中断
 
 **設定項目:**
@@ -29,6 +29,10 @@ const CONFIG = {
         PAGE_CONTENTS: 'ul#page_contents > li',
         PREV_LINK: 'p.prev > a:not(.disabled)',
         NEXT_LINK: 'p.next > a:not(.disabled)'
+    },
+    KEY_MAPPING: {
+        PREV_PAGE: ['ArrowRight', 'ArrowUp', 'x'],
+        NEXT_PAGE: ['ArrowLeft', 'ArrowDown', 'z']
     },
     STYLES: {
         CANVAS: {
@@ -213,7 +217,7 @@ const videoId = extractVideoId(linkElement);
 ### Vertical to Horizontal Reader
 1. ニコニコ漫画のエピソードページを開く
 2. 自動的に横読み形式に変換される
-3. 矢印キーでページ移動
+3. 矢印キー（→/↑/←/↓）またはX/Zキーでページ移動
 4. ESCキーで処理中断
 
 ### Video Series Navigation
