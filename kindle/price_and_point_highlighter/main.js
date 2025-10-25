@@ -14,6 +14,7 @@
         ...COMMON_CONFIG,
         LOCAL_STORAGE_KEYS: {
             LAST_CLEAR_DATE: 'lastClearDate',
+            LAST_MARKED_CLEANUP_DATE: 'lastMarkedCleanupDate',
             NOTIFIED: 'notifiedASINs',
             MARKED: 'markedASINs'
         }
@@ -112,6 +113,26 @@ ${productUrl}
         if (lastClearDate !== today) {
             localStorage.removeItem(CONFIG.LOCAL_STORAGE_KEYS.NOTIFIED);
             localStorage.setItem(CONFIG.LOCAL_STORAGE_KEYS.LAST_CLEAR_DATE, today);
+        }
+    };
+
+    const clearExpiredMarkedASINs = () => {
+        const lastCleanupDate = localStorage.getItem(CONFIG.LOCAL_STORAGE_KEYS.LAST_MARKED_CLEANUP_DATE);
+        const today = new Date().toISOString().split('T')[0];
+
+        if (lastCleanupDate !== today) {
+            const asins = getMarkedASINs();
+            const expirationTime = Date.now() - CONFIG.MARKED_ASINS_EXPIRATION;
+            const validAsins = {};
+
+            for (const [asin, timestamp] of Object.entries(asins)) {
+                if (Number(timestamp) >= expirationTime) {
+                    validAsins[asin] = timestamp;
+                }
+            }
+
+            localStorage.setItem(CONFIG.LOCAL_STORAGE_KEYS.MARKED, JSON.stringify(validAsins));
+            localStorage.setItem(CONFIG.LOCAL_STORAGE_KEYS.LAST_MARKED_CLEANUP_DATE, today);
         }
     };
 
@@ -395,6 +416,7 @@ ${productUrl}
         if (!asin) return;
 
         clearNotifiedASINsDaily();
+        clearExpiredMarkedASINs();
         checkConditions() || checkAndApplyBadgeForKindleAvailability();
 
         console.log('🚀 Kindle Price and Point Highlighter が初期化されました');

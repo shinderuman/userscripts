@@ -25,7 +25,8 @@ unsafeWindow.KindleCommon = (function () {
 
         // その他
         AFFILIATE_PARAMS: '?tag=shinderuman03-22&linkCode=ogi&th=1&psc=1',
-        BADGE_EXPIRATION: 5 * 60 * 1000
+        BADGE_EXPIRATION: 5 * 60 * 1000,
+        MARKED_ASINS_EXPIRATION: 30 * 24 * 60 * 60 * 1000
     };
 
     // S3からJSONデータを取得する共通関数
