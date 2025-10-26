@@ -71,15 +71,20 @@
         openInTab(`${CONFIG.SEARCH_ENGINE}${encodeURIComponent(filteredTitle)}`, CONFIG.TAB_OPTIONS);
     };
 
+    const normalizeToUTCDate = (date) => {
+        date.setTime(date.getTime() + 9 * 60 * 60 * 1000);
+        date.setUTCHours(0, 0, 0, 0);
+        return date;
+    };
+
     const copyProductInfo = async () => {
         const { asin, title } = getPageInfo();
         if (!asin || !title) return;
 
-        const releaseDate = new Date(
+        const releaseDate = normalizeToUTCDate(new Date(
             document.querySelector('#rpi-attribute-book_details-publication_date > div.a-section.a-spacing-none.a-text-center.rpi-attribute-value > span')
-                ?.textContent.trim().replace(/\//g, '-')
-        );
-        releaseDate.setUTCHours(0, 0, 0, 0);
+                ?.textContent.trim()
+        ));
 
         const currentPrice = Number(
             document.querySelector('#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span')
