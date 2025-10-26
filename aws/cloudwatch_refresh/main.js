@@ -7,7 +7,7 @@
     }
 
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'r') {
+        if (event.key === 'r' && !event.metaKey) {
             const refreshButton = document.querySelector('button[data-analytics="Refresh-btn"]');
             if (refreshButton) {
                 refreshButton.click();
