@@ -54,7 +54,8 @@ userscripts/
 ├── github/                            # GitHub関連スクリプト
 │   ├── README.md                      # GitHubスクリプトの詳細説明
 │   ├── common.js                      # 共通ライブラリ
-│   └── gist_link_opener/              # Gistリンクオープナー
+│   ├── sale_wishlist_opener/          # セールウィッシュリストオープナー
+│   └── new_release_checker/           # 新刊リリースチェッカー
 └── aws/                               # AWS関連スクリプト
     ├── README.md                      # AWSスクリプトの詳細説明
     ├── common.js                      # 共通ライブラリ
@@ -72,7 +73,7 @@ userscripts/
 - **Twitter/X** (`twitter/`) - インテントコピー・ユーザーフィルター
 - **YouTube** (`youtube/`) - 登録チャンネルレイアウト最適化
 - **Mastodon** (`mastodon/`) - カラム管理・投稿編集・AI投稿ぼかし・UI改善
-- **GitHub** (`github/`) - Gistページでの日付フィルタリング機能付きリンク一括開き
+- **GitHub** (`github/`) - Gistページでのセール本・新刊チェック用リンク一括開き
 - **AWS** (`aws/`) - CloudWatchダッシュボードのキーボードショートカット
 
 ## 🚀 使用方法
@@ -140,7 +141,8 @@ userscripts/
 
 ### GitHub (`github/`)
 
-- **Gistリンクオープナー**: GitHub Gistページで日付フィルタリング機能付きのリンク一括開きボタンを表示
+- **セールウィッシュリストオープナー**: セールになってほしい本.mdのリンクを日付フィルタリングで一括開き
+- **新刊リリースチェッカー**: 新刊チェック中の作者.mdのリンクを基準日付で一括開き（日付入力フィールド付き）
 
 ### AWS (`aws/`)
 

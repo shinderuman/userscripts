@@ -4,10 +4,17 @@ GitHub関連のUserScriptを提供します。
 
 ## スクリプト一覧
 
-### Gist Link Opener
-- **ファイル**: `gist_link_opener/`
-- **機能**: GitHub Gistページで日付フィルタリング機能付きのリンク一括開きボタンを表示
+### Sale Wishlist Opener
+- **ファイル**: `sale_wishlist_opener/`
+- **機能**: セールになってほしい本.mdのリンクを日付フィルタリングで一括開き
 - **対象URL**: `https://gist.github.com/shinderuman/571a55fc0f9e56156cae277ded0cf09c`
+- **特徴**: 過去・今日以降・全件の3つのフィルタリングオプション
+
+### New Release Checker
+- **ファイル**: `new_release_checker/`
+- **機能**: 新刊チェック中の作者.mdのリンクを基準日付で一括開き
+- **対象URL**: `https://gist.github.com/shinderuman/d5116b8fdce5cdd1995c2a7a3be325f4`
+- **特徴**: 日付入力フィールドで基準日を設定可能（デフォルトは現在日時）
 
 ## 共通ライブラリ
 
@@ -47,6 +54,19 @@ GitHub関連のUserScriptを提供します。
 
 ### スタイルカスタマイズ
 `GitHubCommon.createButton()`や`GitHubCommon.createContainer()`の引数でスタイルをカスタマイズできます。
+
+### 使用方法
+
+#### Sale Wishlist Opener
+1. セールになってほしい本.mdのGistページを開く
+2. 右側に表示されるパネルから希望するフィルタリングボタンをクリック
+3. 条件に合致するリンクが新しいタブで一括開封
+
+#### New Release Checker
+1. 新刊チェック中の作者.mdのGistページを開く
+2. 右側パネルの日付入力フィールドで基準日を設定
+3. 「過去のリンクを開く」または「基準日以降のリンクを開く」をクリック
+4. 日付条件に合致するリンクが新しいタブで一括開封
 
 ### 新機能追加
 1. `github/[feature_name]/`ディレクトリを作成

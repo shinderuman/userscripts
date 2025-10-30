@@ -17,9 +17,9 @@
         '不遇職『鍛冶師』だけど最強です'
     ];
 
-    const initializeGistLinkOpener = () => {
+    const initializeSaleWishlistOpener = () => {
         setupUI();
-        console.log('🚀 Gist Link Opener が初期化されました');
+        console.log('🚀 Sale Wishlist Opener が初期化されました');
     };
 
     const setupUI = () => {
@@ -82,5 +82,5 @@
     };
 
     // 自動初期化
-    initializeGistLinkOpener();
+    initializeSaleWishlistOpener();
 })();
