@@ -5,8 +5,8 @@
     const { applyStyles } = unsafeWindow.AmazonCommon;
 
     const CONFIG = {
-        // BからはじまるKindleのASINパターン（10文字）
-        KINDLE_ASIN_PATTERN: /B[0-9A-Z]{9}/g,
+        // BからはじまるKindleのASINパターン（10文字、前後に英数字がない）
+        KINDLE_ASIN_PATTERN: /(?<![A-Z0-9])B[0-9A-Z]{9}(?![A-Z0-9])/g,
         AMAZON_BASE_URL: 'https://www.amazon.co.jp/dp/',
         LINK_STYLES: {
             color: '#0066c0',
