@@ -158,9 +158,7 @@
         try {
             const playerContainer = document.querySelector(CONFIG.SELECTORS.PLAYER_CONTAINER);
             if (playerContainer) {
-                if (document.querySelector(`${CONFIG.SELECTORS.SERIES_SECTION} > div.bdr_m.ov_hidden, ${CONFIG.SELECTORS.SERIES_LINKS}`)) {
-                    createNavigationButtons(playerContainer, fetchSeriesLinks());
-                }
+                createNavigationButtons(playerContainer, fetchSeriesLinks());
             } else {
                 removeNavigationButtons();
             }
