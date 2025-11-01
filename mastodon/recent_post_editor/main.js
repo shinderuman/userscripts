@@ -2,14 +2,13 @@
     'use strict';
 
     // 共通ライブラリから関数を取得
-    // 共通ライブラリから関数を取得
     const {
     } = unsafeWindow.MastodonCommon;
 
     const CONFIG = {
         USERNAME: 'asmodeus',
         HOME_COLUMN_SELECTOR: 'div[aria-label="ホーム"]',
-        COMPOSE_TEXTAREA_SELECTOR: 'form > div.compose-form__highlightable > div.compose-form__scrollable > div > textarea'
+        COMPOSE_TEXTAREA_SELECTOR: 'textarea.autosuggest-textarea__textarea'
     };
 
     const getRecentTootElement = () => {
@@ -38,7 +37,7 @@
 
     const observeDropdownMenuForEdit = () => {
         const observer = new MutationObserver(() => {
-            const editButton = Array.from(document.querySelectorAll('div.dropdown-menu__container > ul > li.dropdown-menu__item > a')).find(a => a.textContent.trim() === '編集');
+            const editButton = Array.from(document.querySelectorAll('div.dropdown-menu__container > ul > li.dropdown-menu__item > button')).find(a => a.textContent.trim() === '編集');
 
             if (editButton) {
                 editButton.click();

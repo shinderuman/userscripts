@@ -8,7 +8,7 @@
 
     const COLUMN_PAIRS = [
         {
-            topColumnName: '投稿の新規作成',
+            topColumnName: '新しい投稿',
             bottomColumnName: '通知'
         },
         {
