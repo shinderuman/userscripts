@@ -3,12 +3,13 @@
 
     // 共通ライブラリから関数を取得
     const {
+        COMMON_SELECTORS
     } = unsafeWindow.MastodonCommon;
 
     const CONFIG = {
         USERNAME: 'asmodeus',
-        HOME_COLUMN_SELECTOR: 'div[aria-label="ホーム"]',
-        COMPOSE_TEXTAREA_SELECTOR: 'textarea.autosuggest-textarea__textarea'
+        HOME_COLUMN_SELECTOR: COMMON_SELECTORS.HOME_COLUMN,
+        COMPOSE_TEXTAREA_SELECTOR: COMMON_SELECTORS.TEXTAREA
     };
 
     const getRecentTootElement = () => {

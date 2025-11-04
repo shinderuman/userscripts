@@ -2,6 +2,16 @@
 unsafeWindow.MastodonCommon = (function () {
     'use strict';
 
+    // 共通定数
+    const COMMON_SELECTORS = {
+        TEXTAREA: 'textarea.autosuggest-textarea__textarea',
+        HOME_COLUMN: 'div[aria-label="ホーム"]'
+    };
+
+    const COMMON_ENDPOINTS = {
+        STATUSES: '/api/v1/statuses'
+    };
+
     // IndexedDBを使用した画像キャッシュクラス
     class ImageCache {
         constructor(dbName = 'ImageCacheDB', storeName = 'images', expirationTime = 24 * 60 * 60 * 1000 * 7) {
@@ -187,6 +197,8 @@ unsafeWindow.MastodonCommon = (function () {
         waitForElement,
         waitForElements,
         fetchAPI,
-        getCurrentUsername
+        getCurrentUsername,
+        COMMON_SELECTORS,
+        COMMON_ENDPOINTS
     };
 })();

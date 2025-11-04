@@ -60,8 +60,34 @@ const COLUMN_PAIRS = [
 ```javascript
 const CONFIG = {
     USERNAME: 'asmodeus',  // 対象ユーザー名
-    HOME_COLUMN_SELECTOR: 'div[aria-label="ホーム"]',
-    COMPOSE_TEXTAREA_SELECTOR: 'form > div.compose-form__highlightable > div.compose-form__scrollable > div > textarea'
+    HOME_COLUMN_SELECTOR: COMMON_SELECTORS.HOME_COLUMN,
+    COMPOSE_TEXTAREA_SELECTOR: COMMON_SELECTORS.TEXTAREA
+};
+```
+
+### 🔒 Visibility Modifier (`visibility_modifier/`)
+キーボードショートカットで投稿の公開範囲を自動変更するスクリプト。
+
+**機能:**
+- **Command+Enter**: 通常の投稿（元の設定のまま）
+- **Shift+Command+Enter**: プライベート投稿として自動変更
+- API通信を監視してpayloadを書き換え
+- fetchとXMLHttpRequestの両方に対応
+
+**自動変更内容:**
+```javascript
+// Shift+Command+Enter時の変更
+{
+    "visibility": "private",           // 公開範囲をプライベートに
+    "quote_approval_policy": "nobody"  // 引用承認を無効に
+}
+```
+
+**設定項目:**
+```javascript
+const CONFIG = {
+    API_ENDPOINT: COMMON_ENDPOINTS.STATUSES,  // APIエンドポイント
+    TEXTAREA_SELECTOR: COMMON_SELECTORS.TEXTAREA  // テキストエリア
 };
 ```
 
@@ -94,6 +120,23 @@ const CONFIG = {
 ## 🔧 共通ライブラリ (`common.js`)
 
 全スクリプトで共有される汎用機能を提供します。
+
+### 共通定数
+
+#### COMMON_SELECTORS
+```javascript
+const COMMON_SELECTORS = {
+    TEXTAREA: 'textarea.autosuggest-textarea__textarea',  // 投稿用テキストエリア
+    HOME_COLUMN: 'div[aria-label="ホーム"]'              // ホームカラム
+};
+```
+
+#### COMMON_ENDPOINTS
+```javascript
+const COMMON_ENDPOINTS = {
+    STATUSES: '/api/v1/statuses'  // 投稿API
+};
+```
 
 ### 主要機能
 
@@ -140,7 +183,8 @@ observer.observe(target, options);
 1. **Column Splitter**: `column_splitter/wrapper.js`
 2. **Column Combiner**: `column_combiner/wrapper.js`
 3. **Recent Post Editor**: `recent_post_editor/wrapper.js`
-4. **AI Post Blur Toggle**: `ai_post_blur_toggle/wrapper.js`
+4. **Visibility Modifier**: `visibility_modifier/wrapper.js`
+5. **AI Post Blur Toggle**: `ai_post_blur_toggle/wrapper.js`
 
 ### 3. パスの設定
 `wrapper.js`ファイル内の`@require`パスを環境に合わせて調整:
@@ -176,6 +220,9 @@ initializeColumnCombiner()
 
 // Recent Post Editor
 initializeRecentPostEditor()
+
+// Visibility Modifier
+initializeVisibilityModifier()
 
 // AI Post Blur Toggle
 initializeBlurSensitiveContents()
