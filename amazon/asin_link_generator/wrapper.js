@@ -5,8 +5,8 @@
 // @description  BからはじまるKindleのASINを自動的にAmazonリンクに変換する
 // @author       shinderuman
 // @match        *://*/*
-// @require      file:///Users/shinderuman/src/kindle_bot/userscripts/amazon/common.js
-// @require      file:///Users/shinderuman/src/kindle_bot/userscripts/amazon/asin_link_generator/main.js
+// @require      file:///Users/shinderuman/src/userscripts/amazon/common.js
+// @require      file:///Users/shinderuman/src/userscripts/amazon/asin_link_generator/main.js
 // @icon         https://www.amazon.co.jp/favicon.ico
 // @grant        unsafeWindow
 // @noframes

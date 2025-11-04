@@ -6,8 +6,8 @@
 // @author       shinderuman
 // @match        https://www.youtube.com/feed/subscriptions
 // @match        https://www.youtube.com
-// @require      file:///Users/shinderuman/src/kindle_bot/userscripts/youtube/common.js
-// @require      file:///Users/shinderuman/src/kindle_bot/userscripts/youtube/subscription_layout_optimizer/main.js
+// @require      file:///Users/shinderuman/src/userscripts/youtube/common.js
+// @require      file:///Users/shinderuman/src/userscripts/youtube/subscription_layout_optimizer/main.js
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=youtube.com
 // @grant        unsafeWindow
 // @run-at       document-idle

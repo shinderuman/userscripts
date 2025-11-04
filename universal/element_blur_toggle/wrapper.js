@@ -5,8 +5,8 @@
 // @description  Optionキーを押しながらクリックした要素にモザイクをかけます（style.filterで状態確認）
 // @author       shinderuman
 // @match        *://*/*
-// @require      file:///Users/shinderuman/src/kindle_bot/userscripts/universal/common.js
-// @require      file:///Users/shinderuman/src/kindle_bot/userscripts/universal/element_blur_toggle/main.js
+// @require      file:///Users/shinderuman/src/userscripts/universal/common.js
+// @require      file:///Users/shinderuman/src/userscripts/universal/element_blur_toggle/main.js
 // @grant        unsafeWindow
 // @noframes
 // ==/UserScript==

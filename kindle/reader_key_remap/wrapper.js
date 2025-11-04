@@ -6,8 +6,8 @@
 // @author       shinderuman
 // @match        https://read.amazon.co.jp/manga/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=amazon.co.jp
-// @require      file:///Users/shinderuman/src/kindle_bot/userscripts/kindle/common.js
-// @require      file:///Users/shinderuman/src/kindle_bot/userscripts/kindle/reader_key_remap/main.js
+// @require      file:///Users/shinderuman/src/userscripts/kindle/common.js
+// @require      file:///Users/shinderuman/src/userscripts/kindle/reader_key_remap/main.js
 // @grant        unsafeWindow
 // @noframes
 // ==/UserScript==
