@@ -199,7 +199,7 @@
             if (window.location.href.startsWith('https://www.amazon.co.jp/')) {
                 handleAmazonSearch();
             } else {
-                window.open(CONFIG.NAVIGATION_URLS.ArrowRight, '_blank', 'width=800,height=1200,noopener,noreferrer');
+                window.open(CONFIG.NAVIGATION_URLS.ArrowRight, '_blank', 'width=580,height=1200,noopener,noreferrer');
             }
             break;
         default:

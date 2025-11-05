@@ -57,7 +57,7 @@
         } else {
             links.forEach(link => {
                 openedLinks.add(link.href);
-                window.open(link.href, '_blank', 'width=800,height=1200,noopener,noreferrer');
+                window.open(link.href, '_blank', 'width=580,height=1200,noopener,noreferrer');
             });
         }
     };
