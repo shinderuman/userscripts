@@ -4,6 +4,11 @@
 (function () {
     'use strict';
 
+    // セレクタ定数
+    const SELECTORS = {
+        WISHLIST_LINKS: '#file-md-readme > article > ul > li > a'
+    };
+
     // UI関連の共通機能
     const createButton = (label, onClick, styles = {}) => {
         const button = document.createElement('button');
@@ -61,7 +66,9 @@
         if (!match) return null;
 
         const [, year, month, day] = match;
-        return new Date(`${year}-${month}-${day}`);
+        const date = new Date(`${year}-${month}-${day}`);
+        date.setHours(0, 0, 0, 0);
+        return date;
     };
 
     const getTodayStart = () => {
@@ -72,6 +79,9 @@
 
     // GitHubCommonオブジェクトとしてunsafeWindowに公開
     unsafeWindow.GitHubCommon = {
+        // セレクタ
+        SELECTORS,
+
         // UI関連
         createButton,
         createContainer,

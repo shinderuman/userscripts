@@ -6,7 +6,8 @@
         createButton,
         createContainer,
         parseDate,
-        getTodayStart
+        getTodayStart,
+        SELECTORS
     } = unsafeWindow.GitHubCommon;
 
     // スキップするキーワードリスト
@@ -40,11 +41,18 @@
             filterLinks(() => true);
         }));
 
+        // 現在日時にスクロールするボタン
+        container.appendChild(createButton('現在日時にスクロール', () => {
+            scrollToCurrentDate();
+        }, {
+            backgroundColor: '#28a745'
+        }));
+
         document.body.appendChild(container);
     };
 
     const filterLinks = (conditionFn) => {
-        const links = document.querySelectorAll('#file-md-readme > article > ul > li > a');
+        const links = document.querySelectorAll(SELECTORS.WISHLIST_LINKS);
         if (links.length === 0) {
             console.warn('対象のリンクが見つかりませんでした');
             return;
@@ -74,6 +82,60 @@
         if (conditionFn(linkDate, today)) {
             window.open(link.href, '_blank');
             counters.opened++;
+        }
+    };
+
+    const scrollToCurrentDate = () => {
+        const links = document.querySelectorAll(SELECTORS.WISHLIST_LINKS);
+        if (links.length === 0) {
+            console.warn('対象のリンクが見つかりませんでした');
+            return;
+        }
+
+        const today = getTodayStart();
+        let closestLink = null;
+        let minDiff = Infinity;
+
+        Array.from(links).forEach(link => {
+            const linkDate = parseDate(link.textContent);
+            if (!linkDate) return;
+
+            // 未来の日付は対象外
+            if (linkDate > today) return;
+
+            const diff = today.getTime() - linkDate.getTime();
+            if (diff < minDiff) {
+                minDiff = diff;
+                closestLink = link;
+            }
+        });
+
+        if (closestLink) {
+            // ページの高さを取得して1/8の位置を計算
+            const viewportHeight = window.innerHeight;
+            const targetPosition = viewportHeight * (1/16);
+
+            // 要素の現在の位置を取得
+            const rect = closestLink.getBoundingClientRect();
+            const currentScrollY = window.pageYOffset;
+            const targetScrollY = currentScrollY + rect.top - targetPosition;
+
+            // スムーズにスクロール
+            window.scrollTo({
+                top: targetScrollY,
+                behavior: 'smooth'
+            });
+
+            // 視覚的なハイライトを追加
+            const originalBackground = closestLink.style.backgroundColor;
+            closestLink.style.backgroundColor = '#ffffcc';
+            closestLink.style.transition = 'background-color 0.3s';
+
+            setTimeout(() => {
+                closestLink.style.backgroundColor = originalBackground;
+            }, 2000);
+        } else {
+            console.warn('日付付きのリンクが見つかりませんでした');
         }
     };
 
