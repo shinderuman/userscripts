@@ -23,6 +23,9 @@
             '超会議応援！',
             '推しﾀｸﾞ動画が'
         ],
+        ADDITIONAL_URLS: [
+            'https://blog.nicovideo.jp/niconews/261266.html?ref=noticebox'
+        ],
         LINK_OPEN_DELAY_MS: 1000
     };
 
@@ -47,6 +50,10 @@
     };
 
     const handleCampaignLinks = (links) => {
+        CONFIG.ADDITIONAL_URLS.forEach(url => {
+            window.open(url, '_blank', 'width=580,height=1200,noopener,noreferrer');
+        });
+
         if (links.length === 1) {
             setTimeout(() => {
                 if (!isNavigationCancelled) {
