@@ -1,6 +1,11 @@
 (function () {
     'use strict';
 
+    /**
+     * 通知済みのものを表示:
+     * console.table(JSON.parse(localStorage.getItem('newReleaseNotifications')));
+     */
+
     // 共通ライブラリから関数を取得
     const {
         COMMON_CONFIG,
