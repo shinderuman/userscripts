@@ -51,7 +51,9 @@
 
     const handleCampaignLinks = (links) => {
         CONFIG.ADDITIONAL_URLS.forEach(url => {
-            window.open(url, '_blank', 'width=580,height=1200,noopener,noreferrer');
+            if (!openedLinks.has(url)) {
+                window.open(url, '_blank', 'width=580,height=1200,noopener,noreferrer');
+            }
         });
 
         if (links.length === 1) {
