@@ -20,9 +20,9 @@
             PLAYER_CONTAINER: 'div.pos_relative.asp_auto.w_100\\%.ov_hidden.bdr_m',
             SERIES_SECTION: 'div.grid-area_\\[bottom\\].d_flex.flex-d_column.gap_x2',
             SERIES_LINKS: 'div.grid-area_\\[sidebar\\] > div.d_flex.flex-d_column.gap_x2 > section > div > div > div > div > div > a',
-            BUTTON_PAUSE: '#tooltip\\:«r6»\\:trigger',
-            BUTTON_REWIND: '#tooltip\\:«r9»\\:trigger',
-            BUTTON_FORWARD: '#tooltip\\:«ra»\\:trigger',
+            BUTTON_PAUSE: '#tooltip\\:«r8»\\:trigger',
+            BUTTON_REWIND: '#tooltip\\:«rb»\\:trigger',
+            BUTTON_FORWARD: '#tooltip\\:«rc»\\:trigger',
             ANCHORS: {
                 FIRST: 'a[data-anchor-detail="first"]',
                 PREVIOUS: 'a[data-anchor-detail="prev"]',
