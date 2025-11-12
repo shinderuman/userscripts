@@ -38,7 +38,8 @@
         accordionRow: '[data-a-accordion-row-name], [data-accordion-id]',
         accordionHeader: '.a-heading-text, h3',
         kindleBookAvailable: '#tmm-grid-swatch-KINDLE',
-        paperBookAvailable: '[id^=\'tmm-grid-swatch\']:not([id$=\'KINDLE\'])'
+        paperBookAvailable: '[id^=\'tmm-grid-swatch\']:not([id$=\'KINDLE\'])',
+        couponBadge: 'i.a-icon.a-icon-addon.newCouponBadge'
     };
 
     const PATTERNS = {
@@ -253,8 +254,12 @@ ${productUrl}
         const points = getElementValue(document, SELECTORS.points, PATTERNS.points);
         const kindlePrice = getElementValue(document, SELECTORS.kindlePrice, PATTERNS.price);
         const paperPrice = getElementValue(document, SELECTORS.paperPrice, PATTERNS.price);
+        const couponInfo = getCouponInfo();
 
         const conditions = [];
+        if (couponInfo.hasCoupon) {
+            conditions.push(`✅クーポンあり (${couponInfo.couponText})`);
+        }
         if (points >= CONFIG.POINT_THRESHOLD) {
             conditions.push(`✅ポイント ${points}pt`);
         }
@@ -267,6 +272,14 @@ ${productUrl}
         return conditions.join(' ');
     };
 
+    // クーポン情報を取得する関数
+    const getCouponInfo = () => {
+        return {
+            hasCoupon: document.querySelector(SELECTORS.couponBadge)?.textContent?.includes('クーポン:') || false,
+            couponText: document.querySelector('.couponLabelText')?.firstChild?.textContent?.trim() || ''
+        };
+    };
+
     const checkSeriesConditions = () => {
         const maxOfferButton = getMaxOfferButton();
         if (!maxOfferButton) return null;
@@ -276,22 +289,26 @@ ${productUrl}
 
         const seriesPrice = getSeriesPriceFromButton(maxOfferButton);
         const seriesPoints = getSeriesPoints(maxOfferButton);
+        const seriesCouponInfo = getSeriesCouponInfo(maxOfferButton);
 
-        console.log('📊 シリーズ情報 - 冊数:', bookCount, '価格:', seriesPrice, 'ポイント:', seriesPoints);
+        console.log('📊 シリーズ情報 - 冊数:', bookCount, '価格:', seriesPrice, 'ポイント:', seriesPoints, 'シリーズクーポン:', seriesCouponInfo.hasSeriesCoupon);
 
-        // 条件チェック
+        const conditions = [];
+        if (seriesCouponInfo.hasSeriesCoupon) {
+            conditions.push(`✅シリーズクーポンあり (${seriesCouponInfo.seriesCouponText})`);
+        }
         if (seriesPoints >= CONFIG.POINT_THRESHOLD) {
-            return `シリーズのポイントが ${seriesPoints}pt です。`;
+            conditions.push(`✅シリーズのポイントが ${seriesPoints}pt です。`);
         }
 
         if (bookCount > 0 && seriesPrice > 0) {
             const averagePrice = seriesPrice / bookCount;
             if (averagePrice <= CONFIG.AVERAGE_PRICE_THRESHOLD) {
-                return `${bookCount}冊が平均 ${averagePrice.toFixed(2)}円 で購入可能です。`;
+                conditions.push(`${bookCount}冊が平均 ${averagePrice.toFixed(2)}円 で購入可能です。`);
             }
         }
 
-        return null;
+        return conditions.length > 0 ? conditions.join(' ') : null;
     };
 
     const getMaxOfferButton = () => {
@@ -367,6 +384,38 @@ ${productUrl}
             }
         }
         return 0;
+    };
+
+    // シリーズ用のクーポン情報を取得する関数
+    const getSeriesCouponInfo = (maxOfferButton) => {
+        if (!maxOfferButton) {
+            return { hasSeriesCoupon: false, seriesCouponText: '' };
+        }
+
+        // maxOfferButtonからoffer IDを抽出
+        const match = maxOfferButton.id.match(PATTERNS.offerButtonId);
+        if (!match) {
+            return { hasSeriesCoupon: false, seriesCouponText: '' };
+        }
+
+        const offerNumber = match[1];
+
+        // 対応するbuy-box内のクーポン情報を取得
+        const buyBoxSelector = SELECTORS.offerBuyBox.replace('{OFFER_NUMBER}', offerNumber);
+        const buyBox = document.querySelector(buyBoxSelector);
+
+        if (!buyBox) {
+            return { hasSeriesCoupon: false, seriesCouponText: '' };
+        }
+
+        const couponElement = buyBox.querySelector('._hulk-buy-card_buyBox_coupon-message__3BUsi');
+        const hasSeriesCoupon = !!couponElement;
+        const seriesCouponText = couponElement?.textContent?.trim() || '';
+
+        return {
+            hasSeriesCoupon,
+            seriesCouponText
+        };
     };
 
     const addPostClickHandler = (title, detail) => {

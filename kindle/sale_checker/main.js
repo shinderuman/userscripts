@@ -32,7 +32,8 @@
             '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span',
             // OTHERポイント
             '#tmm-grid-swatch-OTHER > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span'
-        ].join(', ')
+        ].join(', '),
+        couponBadge: 'i.a-icon.a-icon-addon.newCouponBadge'
     };
 
     // 書籍データをS3から取得
@@ -51,6 +52,8 @@
         const points = getElementValue(doc, SELECTORS.points, /(\d+)pt/);
         const kindlePrice = getElementValue(doc, SELECTORS.kindlePrice, /([\d,]+)/);
         const paperPrice = getElementValue(doc, SELECTORS.paperPrice, /([\d,]+)/);
+        const couponBadge = doc.querySelector(SELECTORS.couponBadge);
+        const hasCoupon = couponBadge?.textContent?.includes('クーポン:') || false;
 
         // 取得できなかった値についてログを出力
         if (points === 0) {
@@ -72,15 +75,19 @@
             points,
             kindlePrice,
             paperPrice,
+            hasCoupon,
             cleanUrl
         };
     };
 
     // セール条件をチェック
     const checkSaleConditions = (info) => {
-        const { points, kindlePrice, paperPrice } = info;
+        const { points, kindlePrice, paperPrice, hasCoupon } = info;
         const conditions = [];
 
+        if (hasCoupon) {
+            conditions.push(`✅クーポンあり`);
+        }
         if (points >= CONFIG.POINT_THRESHOLD) {
             conditions.push(`✅ポイント ${points}pt`);
         }
