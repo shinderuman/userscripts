@@ -4,24 +4,15 @@
     // 共通ライブラリから関数を取得
     const {
         COMMON_CONFIG,
+        COMMON_SELECTORS,
         fetchJsonFromS3,
         fetchPageInfo,
         sendCompletionNotification
     } = unsafeWindow.KindleCommon;
 
-    const CONFIG = {
-        ...COMMON_CONFIG
-    };
-
-    const SELECTORS = {
-        title: '#productTitle',
-        paperBookAvailable: '[id^=\'tmm-grid-swatch\']:not([id$=\'KINDLE\'])',
-        kindleBookAvailable: '#tmm-grid-swatch-KINDLE'
-    };
-
     // 書籍データをS3から取得
     const fetchBooks = () => {
-        return fetchJsonFromS3(CONFIG.PAPER_BOOKS_URL, 'books');
+        return fetchJsonFromS3(COMMON_CONFIG.PAPER_BOOKS_URL, 'books');
     };
 
     // 個別ページの情報を取得
@@ -31,9 +22,9 @@
 
     // ページから利用可能性情報を抽出
     const extractPageInfo = (doc, bookInfo, cleanUrl) => {
-        const title = doc.querySelector(SELECTORS.title)?.innerText.trim() || bookInfo.Title;
-        const paperBookAvailable = doc.querySelector(SELECTORS.paperBookAvailable);
-        const kindleBookAvailable = doc.querySelector(SELECTORS.kindleBookAvailable);
+        const title = doc.querySelector(COMMON_SELECTORS.title)?.innerText.trim() || bookInfo.Title;
+        const paperBookAvailable = doc.querySelector(COMMON_SELECTORS.paperBookAvailable);
+        const kindleBookAvailable = doc.querySelector(COMMON_SELECTORS.kindleBookAvailable);
 
         return {
             ...bookInfo,
@@ -56,8 +47,8 @@
         let availableCount = 0;
         let processedCount = 0;
 
-        for (let i = 0; i < books.length; i += CONFIG.CONCURRENT_REQUESTS) {
-            const batch = books.slice(i, i + CONFIG.CONCURRENT_REQUESTS);
+        for (let i = 0; i < books.length; i += COMMON_CONFIG.CONCURRENT_REQUESTS) {
+            const batch = books.slice(i, i + COMMON_CONFIG.CONCURRENT_REQUESTS);
 
             const promises = batch.map(async (bookInfo) => {
                 try {
@@ -84,8 +75,8 @@
             await Promise.all(promises);
 
             // 次のバッチまで待機（レート制限対策）
-            if (i + CONFIG.CONCURRENT_REQUESTS < books.length) {
-                await new Promise(resolve => setTimeout(resolve, CONFIG.REQUEST_DELAY));
+            if (i + COMMON_CONFIG.CONCURRENT_REQUESTS < books.length) {
+                await new Promise(resolve => setTimeout(resolve, COMMON_CONFIG.REQUEST_DELAY));
             }
         }
 

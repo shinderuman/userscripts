@@ -4,6 +4,7 @@
     // 共通ライブラリから関数を取得
     const {
         COMMON_CONFIG,
+        COMMON_SELECTORS,
         getElementValue
     } = unsafeWindow.KindleCommon;
 
@@ -21,25 +22,19 @@
     };
 
     const SELECTORS = {
+        ...COMMON_SELECTORS,
         favicon: 'link[rel*=\'icon\'], link[rel=\'shortcut icon\']',
         navbar: '#nav-belt',
         postTrigger: '#nav-logo',
-        title: '#productTitle',
         seriesTitle: '#collection-masthead__title',
         asin: '#ASIN, input[name=\'idx.asin\'], input[name=\'ASIN.0\'], input[name=\'titleID\']',
-        kindlePrice: '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span',
-        paperPrice: '[id^=\'tmm-grid-swatch\']:not([id$=\'KINDLE\']) > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span',
-        points: '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span, #tmm-grid-swatch-OTHER > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span',
         offerButtons: 'button[id^="offer-tab-button_offer_"]',
         offerButtonTotal: 'div > span',
         offerButtonPrice: 'div > div > span',
         offerBuyBox: '[data-offer-id="offer_{OFFER_NUMBER}"] #buy-box',
         buyBoxPoints: 'div.a-row.a-spacing-mini > div.a-column.a-span7.a-text-right.a-span-last > span',
         accordionRow: '[data-a-accordion-row-name], [data-accordion-id]',
-        accordionHeader: '.a-heading-text, h3',
-        kindleBookAvailable: '#tmm-grid-swatch-KINDLE',
-        paperBookAvailable: '[id^=\'tmm-grid-swatch\']:not([id$=\'KINDLE\'])',
-        couponBadge: 'i.a-icon.a-icon-addon.newCouponBadge'
+        accordionHeader: '.a-heading-text, h3'
     };
 
     const PATTERNS = {
@@ -260,13 +255,13 @@ ${productUrl}
         if (couponInfo.hasCoupon) {
             conditions.push(`✅クーポンあり (${couponInfo.couponText})`);
         }
-        if (points >= CONFIG.POINT_THRESHOLD) {
+        if (points >= COMMON_CONFIG.POINT_THRESHOLD) {
             conditions.push(`✅ポイント ${points}pt`);
         }
-        if (kindlePrice && (points / kindlePrice) * 100 >= CONFIG.POINTS_RATE_THRESHOLD) {
+        if (kindlePrice && (points / kindlePrice) * 100 >= COMMON_CONFIG.POINTS_RATE_THRESHOLD) {
             conditions.push(`✅ポイント還元 ${(points / kindlePrice * 100).toFixed(2)}%`);
         }
-        if (paperPrice && kindlePrice > 0 && paperPrice - kindlePrice >= CONFIG.POINT_THRESHOLD) {
+        if (paperPrice && kindlePrice > 0 && paperPrice - kindlePrice >= COMMON_CONFIG.POINT_THRESHOLD) {
             conditions.push(`✅価格差 ${paperPrice - kindlePrice}円`);
         }
         return conditions.join(' ');
@@ -297,13 +292,13 @@ ${productUrl}
         if (seriesCouponInfo.hasSeriesCoupon) {
             conditions.push(`✅シリーズクーポンあり (${seriesCouponInfo.seriesCouponText})`);
         }
-        if (seriesPoints >= CONFIG.POINT_THRESHOLD) {
+        if (seriesPoints >= COMMON_CONFIG.POINT_THRESHOLD) {
             conditions.push(`✅シリーズのポイントが ${seriesPoints}pt です。`);
         }
 
         if (bookCount > 0 && seriesPrice > 0) {
             const averagePrice = seriesPrice / bookCount;
-            if (averagePrice <= CONFIG.AVERAGE_PRICE_THRESHOLD) {
+            if (averagePrice <= COMMON_CONFIG.AVERAGE_PRICE_THRESHOLD) {
                 conditions.push(`${bookCount}冊が平均 ${averagePrice.toFixed(2)}円 で購入可能です。`);
             }
         }

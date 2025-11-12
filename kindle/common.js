@@ -2,6 +2,23 @@
 unsafeWindow.KindleCommon = (function () {
     'use strict';
 
+    // 共通セレクタ
+    const COMMON_SELECTORS = {
+        title: '#productTitle',
+        kindleBookAvailable: '#tmm-grid-swatch-KINDLE',
+        paperBookAvailable: '[id^=\'tmm-grid-swatch\']:not([id$=\'KINDLE\'])',
+        couponBadge: 'i.a-icon.a-icon-addon.newCouponBadge',
+        kindlePrice: [
+            '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span',
+            '#tmm-grid-swatch-OTHER > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span',
+            '#kindle-price',
+            '#a-autoid-2-announce > span.slot-price > span',
+            '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-extraMessage .kindleExtraMessage .a-color-price'
+        ].join(', '),
+        paperPrice: '[id^=\'tmm-grid-swatch\']:not([id$=\'KINDLE\']) > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span',
+        points: '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span, #tmm-grid-swatch-OTHER > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span'
+    };
+
     // 共通設定
     const COMMON_CONFIG = {
         // S3 URLs
@@ -231,6 +248,7 @@ unsafeWindow.KindleCommon = (function () {
     // 公開API
     return {
         COMMON_CONFIG,
+        COMMON_SELECTORS,
         fetchJsonFromS3,
         fetchPageInfo,
         processBatch,

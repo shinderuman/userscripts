@@ -4,41 +4,16 @@
     // 共通ライブラリから関数を取得
     const {
         COMMON_CONFIG,
+        COMMON_SELECTORS,
         fetchJsonFromS3,
         fetchPageInfo,
         sendCompletionNotification,
         getElementValue
     } = unsafeWindow.KindleCommon;
 
-    const CONFIG = {
-        ...COMMON_CONFIG
-    };
-
-    const SELECTORS = {
-        title: '#productTitle',
-        kindlePrice: [
-            '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span',
-            '#tmm-grid-swatch-OTHER > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span',
-            '#kindle-price',
-            '#a-autoid-2-announce > span.slot-price > span',
-            '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-extraMessage .kindleExtraMessage .a-color-price'
-        ].join(', '),
-        paperPrice: [
-            // 紙書籍価格（KINDLE以外）
-            '[id^=\'tmm-grid-swatch\']:not([id$=\'KINDLE\']) > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span'
-        ].join(', '),
-        points: [
-            // Kindleポイント
-            '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span',
-            // OTHERポイント
-            '#tmm-grid-swatch-OTHER > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span'
-        ].join(', '),
-        couponBadge: 'i.a-icon.a-icon-addon.newCouponBadge'
-    };
-
     // 書籍データをS3から取得
     const fetchBooks = () => {
-        return fetchJsonFromS3(CONFIG.UNPROCESSED_BOOKS_URL, 'books');
+        return fetchJsonFromS3(COMMON_CONFIG.UNPROCESSED_BOOKS_URL, 'books');
     };
 
     // 個別ページの情報を取得
@@ -48,25 +23,25 @@
 
     // ページから価格・ポイント情報を抽出
     const extractPageInfo = (doc, bookInfo, cleanUrl) => {
-        const title = doc.querySelector(SELECTORS.title)?.innerText.trim() || bookInfo.Title;
-        const points = getElementValue(doc, SELECTORS.points, /(\d+)pt/);
-        const kindlePrice = getElementValue(doc, SELECTORS.kindlePrice, /([\d,]+)/);
-        const paperPrice = getElementValue(doc, SELECTORS.paperPrice, /([\d,]+)/);
-        const couponBadge = doc.querySelector(SELECTORS.couponBadge);
+        const title = doc.querySelector(COMMON_SELECTORS.title)?.innerText.trim() || bookInfo.Title;
+        const points = getElementValue(doc, COMMON_SELECTORS.points, /(\d+)pt/);
+        const kindlePrice = getElementValue(doc, COMMON_SELECTORS.kindlePrice, /([\d,]+)/);
+        const paperPrice = getElementValue(doc, COMMON_SELECTORS.paperPrice, /([\d,]+)/);
+        const couponBadge = doc.querySelector(COMMON_SELECTORS.couponBadge);
         const hasCoupon = couponBadge?.textContent?.includes('クーポン:') || false;
 
         // 取得できなかった値についてログを出力
         if (points === 0) {
             console.warn(`⚠️ ポイント情報を取得できませんでした - ${title} (${cleanUrl})`);
-            console.warn('セレクタ:', SELECTORS.points);
+            console.warn('セレクタ:', COMMON_SELECTORS.points);
         }
         if (kindlePrice === 0) {
             console.warn(`⚠️ Kindle価格情報を取得できませんでした - ${title} (${cleanUrl})`);
-            console.warn('セレクタ:', SELECTORS.kindlePrice);
+            console.warn('セレクタ:', COMMON_SELECTORS.kindlePrice);
         }
         if (paperPrice === 0) {
             console.log(`📖 紙書籍価格情報を取得できませんでした - ${title} (${cleanUrl})`);
-            console.log('セレクタ:', SELECTORS.paperPrice);
+            console.log('セレクタ:', COMMON_SELECTORS.paperPrice);
         }
 
         return {
@@ -88,13 +63,13 @@
         if (hasCoupon) {
             conditions.push(`✅クーポンあり`);
         }
-        if (points >= CONFIG.POINT_THRESHOLD) {
+        if (points >= COMMON_CONFIG.POINT_THRESHOLD) {
             conditions.push(`✅ポイント ${points}pt`);
         }
-        if (kindlePrice && (points / kindlePrice) * 100 >= CONFIG.POINTS_RATE_THRESHOLD) {
+        if (kindlePrice && (points / kindlePrice) * 100 >= COMMON_CONFIG.POINTS_RATE_THRESHOLD) {
             conditions.push(`✅ポイント還元 ${(points / kindlePrice * 100).toFixed(2)}%`);
         }
-        if (paperPrice && kindlePrice > 0 && paperPrice - kindlePrice >= CONFIG.POINT_THRESHOLD) {
+        if (paperPrice && kindlePrice > 0 && paperPrice - kindlePrice >= COMMON_CONFIG.POINT_THRESHOLD) {
             conditions.push(`✅価格差 ${paperPrice - kindlePrice}円`);
         }
 
@@ -131,8 +106,8 @@
         let processedCount = 0;
         const saleBooks = [];
 
-        for (let i = 0; i < books.length; i += CONFIG.CONCURRENT_REQUESTS) {
-            const batch = books.slice(i, i + CONFIG.CONCURRENT_REQUESTS);
+        for (let i = 0; i < books.length; i += COMMON_CONFIG.CONCURRENT_REQUESTS) {
+            const batch = books.slice(i, i + COMMON_CONFIG.CONCURRENT_REQUESTS);
 
             const promises = batch.map(async (bookInfo) => {
                 try {
@@ -157,8 +132,8 @@
             await Promise.all(promises);
 
             // 次のバッチまで待機（レート制限対策）
-            if (i + CONFIG.CONCURRENT_REQUESTS < books.length) {
-                await new Promise(resolve => setTimeout(resolve, CONFIG.REQUEST_DELAY));
+            if (i + COMMON_CONFIG.CONCURRENT_REQUESTS < books.length) {
+                await new Promise(resolve => setTimeout(resolve, COMMON_CONFIG.REQUEST_DELAY));
             }
         }
 
