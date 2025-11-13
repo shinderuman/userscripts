@@ -46,6 +46,7 @@
 
         let availableCount = 0;
         let processedCount = 0;
+        const availableBooks = [];
 
         for (let i = 0; i < books.length; i += COMMON_CONFIG.CONCURRENT_REQUESTS) {
             const batch = books.slice(i, i + COMMON_CONFIG.CONCURRENT_REQUESTS);
@@ -62,7 +63,7 @@
                     if (isAvailable) {
                         availableCount++;
                         console.log(`📚 両方利用可能: ${pageInfo.title}`);
-                        GM_openInTab(pageInfo.cleanUrl, { active: false });
+                        availableBooks.push(pageInfo.cleanUrl);
                     }
 
                     return { success: true, info: pageInfo, isAvailable };
@@ -82,6 +83,13 @@
 
         const now = new Date().toLocaleString('ja-JP');
         console.log(`✅ チェック完了: ${availableCount}件が両方利用可能でした (${now})`);
+
+        // 見つかった書籍をすべて新しいタブで開く
+        if (availableBooks.length > 0) {
+            availableBooks.forEach(url => {
+                GM_openInTab(url, { active: false });
+            });
+        }
 
         // 完了通知
         sendCompletionNotification('利用可能性チェック', books.length, availableCount);

@@ -86,6 +86,7 @@
 
         let newReleaseCount = 0;
         let processedCount = 0;
+        const newReleaseUrls = [];
 
         for (let i = 0; i < authors.length; i += CONFIG.CONCURRENT_REQUESTS) {
             const batch = authors.slice(i, i + CONFIG.CONCURRENT_REQUESTS);
@@ -107,7 +108,7 @@
                         console.log(`📚 新刊発見: ${pageInfo.Name} - ${pageInfo.newReleases.length}冊`);
                         pageInfo.newReleases.forEach(book => {
                             console.log(`  - ${book.title} (${book.releaseDate})`);
-                            GM_openInTab(book.url, { active: false });
+                            newReleaseUrls.push(book.url);
                             saveNotifiedItem(book.asin, book.releaseDate, book.title, book.author);
                         });
                     }
@@ -129,6 +130,13 @@
 
         const now = new Date().toLocaleString('ja-JP');
         console.log(`✅ チェック完了: ${newReleaseCount}冊の新刊を発見しました (${now})`);
+
+        // 見つかった新刊をすべて新しいタブで開く
+        if (newReleaseUrls.length > 0) {
+            newReleaseUrls.forEach(url => {
+                GM_openInTab(url, { active: false });
+            });
+        }
 
         // 完了通知
         sendCompletionNotification('新刊チェック', authors.length, newReleaseCount);
