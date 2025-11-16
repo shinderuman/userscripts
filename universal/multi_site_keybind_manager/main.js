@@ -34,7 +34,10 @@
             active: true,
             insert: true,
             setParent: true
-        }
+        },
+        GET_PARAM_DISPOSAL_SITES: [
+            'https://ja.aliexpress.com'
+        ]
     };
 
     const getPageInfo = () => {
@@ -46,7 +49,17 @@
 
     const copyPageInfo = async () => {
         const title = document.title;
-        const url = cleanUrl(window.location.href);
+        let url = window.location.href;
+
+        // GETパラメータを破棄するサイトの場合
+        if (CONFIG.GET_PARAM_DISPOSAL_SITES.some(site => window.location.href.startsWith(site))) {
+            const urlObj = new URL(url);
+            urlObj.search = '';
+            url = urlObj.toString();
+        } else {
+            url = cleanUrl(url);
+        }
+
         const content = `${title}\n${url}`;
 
         const success = await copyToClipboard(content);
