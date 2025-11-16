@@ -13,7 +13,7 @@
         sendErrorNotification,
         sendCompletionNotification,
         extractAsinFromUrl,
-        saveStorageItem,
+        saveStorageItems,
         isAlreadyStored,
         cleanupOldStorageItems
     } = unsafeWindow.KindleCommon;
@@ -86,7 +86,7 @@
 
         let newReleaseCount = 0;
         let processedCount = 0;
-        const newReleaseUrls = [];
+        const newReleaseBooks = [];
 
         for (let i = 0; i < authors.length; i += CONFIG.CONCURRENT_REQUESTS) {
             const batch = authors.slice(i, i + CONFIG.CONCURRENT_REQUESTS);
@@ -108,8 +108,7 @@
                         console.log(`📚 新刊発見: ${pageInfo.Name} - ${pageInfo.newReleases.length}冊`);
                         pageInfo.newReleases.forEach(book => {
                             console.log(`  - ${book.title} (${book.releaseDate})`);
-                            newReleaseUrls.push(book.url);
-                            saveNotifiedItem(book.asin, book.releaseDate, book.title, book.author);
+                            newReleaseBooks.push(book);
                         });
                     }
 
@@ -132,10 +131,13 @@
         console.log(`✅ チェック完了: ${newReleaseCount}冊の新刊を発見しました (${now})`);
 
         // 見つかった新刊をすべて新しいタブで開く
-        if (newReleaseUrls.length > 0) {
-            newReleaseUrls.forEach(url => {
-                GM_openInTab(url, { active: false });
+        if (newReleaseBooks.length > 0) {
+            newReleaseBooks.forEach(book => {
+                GM_openInTab(book.url, { active: false });
             });
+
+            // 通知済みアイテムをまとめて保存
+            saveStorageItems(CONFIG.LOCAL_STORAGE_KEYS.NOTIFICATIONS, newReleaseBooks);
         }
 
         // 完了通知
@@ -421,16 +423,6 @@
         return info.newReleases && info.newReleases.length > 0;
     };
 
-    const saveNotifiedItem = (asin, releaseDate, title, author) => {
-        const newItem = {
-            asin,
-            releaseDate,
-            title,
-            author,
-            notifiedAt: new Date().toISOString()
-        };
-        saveStorageItem(CONFIG.LOCAL_STORAGE_KEYS.NOTIFICATIONS, newItem);
-    };
 
     // グローバル関数として公開（デベロッパーツールから呼び出し可能）
     unsafeWindow.checkNewReleases = checkNewReleases;

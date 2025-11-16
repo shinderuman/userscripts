@@ -63,7 +63,7 @@
                     if (isAvailable) {
                         availableCount++;
                         console.log(`📚 両方利用可能: ${pageInfo.title}`);
-                        availableBooks.push(pageInfo.cleanUrl);
+                        availableBooks.push(pageInfo);
                     }
 
                     return { success: true, info: pageInfo, isAvailable };
@@ -86,8 +86,8 @@
 
         // 見つかった書籍をすべて新しいタブで開く
         if (availableBooks.length > 0) {
-            availableBooks.forEach(url => {
-                GM_openInTab(url, { active: false });
+            availableBooks.forEach(pageInfo => {
+                GM_openInTab(pageInfo.cleanUrl, { active: false });
             });
         }
 

@@ -209,7 +209,7 @@ const KEY_BINDINGS = {
 
 #### ストレージ管理
 - `getStorageItems(storageKey)`: localStorage読み込み
-- `saveStorageItem(storageKey, item)`: localStorage保存
+- `saveStorageItems(storageKey, items)`: localStorage一括保存
 - `isAlreadyStored(storageKey, checkFunction)`: 重複チェック
 - `cleanupOldStorageItems(storageKey, cutoffDate)`: 古いデータ削除
 

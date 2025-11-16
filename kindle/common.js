@@ -211,14 +211,14 @@ unsafeWindow.KindleCommon = (function () {
         }
     };
 
-    const saveStorageItem = (storageKey, item) => {
+    const saveStorageItems = (storageKey, newItems) => {
         try {
             const items = getStorageItems(storageKey);
-            items.push(item);
+            items.push(...newItems);
             localStorage.setItem(storageKey, JSON.stringify(items));
-            console.log(`💾 アイテムを保存: ${item.asin || item.id || 'Unknown'}`);
+            console.log(`💾 ${newItems.length}アイテムをまとめて保存`);
         } catch (error) {
-            console.error('❌ localStorage保存エラー:', error);
+            console.error('❌ localStorage一括保存エラー:', error);
         }
     };
 
@@ -258,7 +258,7 @@ unsafeWindow.KindleCommon = (function () {
         extractAsinFromUrl,
         getElementValue,
         getStorageItems,
-        saveStorageItem,
+        saveStorageItems,
         isAlreadyStored,
         cleanupOldStorageItems
     };
