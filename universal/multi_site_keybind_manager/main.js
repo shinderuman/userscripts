@@ -68,19 +68,29 @@
         }
     };
 
-    const handleAmazonSearch = () => {
-        const { title } = getPageInfo();
-        if (!title) return;
-
+    const filterSearchTitle = (title) => {
         const unwantedPatterns = [...Array(10).keys()].map(String)
             .concat(CONFIG.UNDESIRABLE_CHARS)
             .concat(getFullWidthDigits());
 
-        const filteredTitle = unwantedPatterns.reduce(
-            (title, pattern) => title.split(pattern)[0].trim(),
-            title
-        );
+        let filteredTitle = title;
 
+        // タイトルがunwantedPatternsで始まっていない場合のみフィルタリング
+        if (!unwantedPatterns.some(pattern => filteredTitle.startsWith(pattern))) {
+            filteredTitle = unwantedPatterns.reduce(
+                (title, pattern) => title.split(pattern)[0].trim(),
+                title
+            );
+        }
+
+        return filteredTitle;
+    };
+
+    const handleAmazonSearch = () => {
+        const { title } = getPageInfo();
+        if (!title) return;
+
+        const filteredTitle = filterSearchTitle(title);
         openInTab(`${CONFIG.SEARCH_ENGINE}${encodeURIComponent(filteredTitle)}`, CONFIG.TAB_OPTIONS);
     };
 
