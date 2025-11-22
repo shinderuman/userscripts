@@ -4,6 +4,53 @@ inclusion: always
 
 # UserScripts Project Rules
 
+## 🚨 最重要：作業前必須確認ルール
+
+### 絶対必須確認プロセス
+**すべての作業を開始する前に、以下を必ず実行してください：**
+
+1. **`~/.kiro/steering`ディレクトリの確認**
+   ```bash
+   ls -la ~/.kiro/steering
+   ```
+
+2. **全steeringファイルの内容確認**
+   ```bash
+   cat ~/.kiro/steering/coding-standards.md
+   cat ~/.kiro/steering/communication-guidelines.md
+   cat ~/.kiro/steering/eslint-usage.md
+   cat ~/.kiro/steering/git-commands.md
+   cat ~/.kiro/steering/steering-management.md
+   ```
+
+3. **確認完了の明示**
+   - 上記コマンドを実行し、全ファイルの内容を確認したことを明示する
+   - 確認後に作業を開始する
+
+### 確認の重要性
+- **ルール違反の防止**: 最新のsteeringルールを把握することで違反を防ぐ
+- **品質保証**: 一貫した作業品質を維持する
+- **効率向上**: 正しい手順を最初から実行することで手戻りを防ぐ
+- **プロフェッショナリズム**: 規約遵守の姿勢を示す
+
+### 違反時の対応
+- steeringファイル確認を怠った場合は、即座に確認を実行する
+- 確認不足による作業品質の問題は重大な違反とみなす
+- 継続的な違反は信頼関係を損なう
+
+## 参照必須ファイル
+
+このプロジェクトルールに加えて、以下のファイルを**必ず参照・遵守**してください：
+
+### ~/.kiro/steering/ の全ファイル
+- **coding-standards.md**: 一般的なコーディング規約、関数配置ルール
+- **communication-guidelines.md**: コミュニケーション規約、言語使用ルール
+- **eslint-usage.md**: ESLint使用ガイドライン
+- **git-commands.md**: Git運用ルール、コミットメッセージ規約
+- **steering-management.md**: Steeringファイル管理ガイドライン
+
+**これらのルールは このプロジェクトルールより優先 されます。競合する場合は`~/.kiro/steering/`のルールに従ってください。**
+
 ## プロジェクト構造ルール
 
 ### ディレクトリ構成
