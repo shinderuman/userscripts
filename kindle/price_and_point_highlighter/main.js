@@ -5,7 +5,8 @@
     const {
         COMMON_CONFIG,
         COMMON_SELECTORS,
-        getElementValue
+        extractAmazonProductInfo,
+        evaluateSaleConditions
     } = unsafeWindow.KindleCommon;
 
     // グローバル設定を取得
@@ -246,25 +247,16 @@ ${productUrl}
     };
 
     const evaluateConditions = () => {
-        const points = getElementValue(document, SELECTORS.points, PATTERNS.points);
-        const kindlePrice = getElementValue(document, SELECTORS.kindlePrice, PATTERNS.price);
-        const paperPrice = getElementValue(document, SELECTORS.paperPrice, PATTERNS.price);
-        const couponInfo = getCouponInfo();
+        const productInfo = extractAmazonProductInfo(document);
+        const conditions = evaluateSaleConditions(productInfo, COMMON_CONFIG);
 
-        const conditions = [];
-        if (couponInfo.hasCoupon) {
-            conditions.push(`✅クーポンあり (${couponInfo.couponText})`);
+        // 共通関数ではクーポン詳細テキストが含まれないので、別途追加
+        const couponInfo = getCouponInfo();
+        if (couponInfo.hasCoupon && couponInfo.couponText) {
+            return conditions.replace('✅クーポンあり', `✅クーポンあり (${couponInfo.couponText})`);
         }
-        if (points >= COMMON_CONFIG.POINT_THRESHOLD) {
-            conditions.push(`✅ポイント ${points}pt`);
-        }
-        if (kindlePrice && (points / kindlePrice) * 100 >= COMMON_CONFIG.POINTS_RATE_THRESHOLD) {
-            conditions.push(`✅ポイント還元 ${(points / kindlePrice * 100).toFixed(2)}%`);
-        }
-        if (paperPrice && kindlePrice > 0 && paperPrice - kindlePrice >= COMMON_CONFIG.POINT_THRESHOLD) {
-            conditions.push(`✅価格差 ${paperPrice - kindlePrice}円`);
-        }
-        return conditions.join(' ');
+
+        return conditions || '';
     };
 
     // クーポン情報を取得する関数
@@ -424,7 +416,8 @@ ${productUrl}
     };
 
     const checkConditions = () => {
-        const title = document.querySelector(SELECTORS.title)?.innerText.trim() || document.querySelector(SELECTORS.seriesTitle)?.innerText.trim() || '商品タイトル不明';
+        const productInfo = extractAmazonProductInfo(document);
+        const title = productInfo.title || document.querySelector(SELECTORS.seriesTitle)?.innerText.trim() || '商品タイトル不明';
         const detail = evaluateConditions() || checkSeriesConditions();
 
         if (detail) {

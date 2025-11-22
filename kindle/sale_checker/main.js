@@ -4,77 +4,12 @@
     // 共通ライブラリから関数を取得
     const {
         COMMON_CONFIG,
-        COMMON_SELECTORS,
         fetchJsonFromS3,
         fetchPageInfo,
         sendCompletionNotification,
-        getElementValue
+        extractAmazonProductInfo,
+        evaluateSaleConditions
     } = unsafeWindow.KindleCommon;
-
-    // 書籍データをS3から取得
-    const fetchBooks = () => {
-        return fetchJsonFromS3(COMMON_CONFIG.UNPROCESSED_BOOKS_URL, 'books');
-    };
-
-    // 個別ページの情報を取得
-    const fetchBookPageInfo = (bookInfo) => {
-        return fetchPageInfo(bookInfo.URL, (doc, cleanUrl) => extractPageInfo(doc, bookInfo, cleanUrl));
-    };
-
-    // ページから価格・ポイント情報を抽出
-    const extractPageInfo = (doc, bookInfo, cleanUrl) => {
-        const title = doc.querySelector(COMMON_SELECTORS.title)?.innerText.trim() || bookInfo.Title;
-        const points = getElementValue(doc, COMMON_SELECTORS.points, /(\d+)pt/);
-        const kindlePrice = getElementValue(doc, COMMON_SELECTORS.kindlePrice, /([\d,]+)/);
-        const paperPrice = getElementValue(doc, COMMON_SELECTORS.paperPrice, /([\d,]+)/);
-        const couponBadge = doc.querySelector(COMMON_SELECTORS.couponBadge);
-        const hasCoupon = couponBadge?.textContent?.includes('クーポン:') || false;
-
-        // 取得できなかった値についてログを出力
-        if (points === 0) {
-            console.warn(`⚠️ ポイント情報を取得できませんでした - ${title} (${cleanUrl})`);
-            console.warn('セレクタ:', COMMON_SELECTORS.points);
-        }
-        if (kindlePrice === 0) {
-            console.warn(`⚠️ Kindle価格情報を取得できませんでした - ${title} (${cleanUrl})`);
-            console.warn('セレクタ:', COMMON_SELECTORS.kindlePrice);
-        }
-        if (paperPrice === 0) {
-            console.log(`📖 紙書籍価格情報を取得できませんでした - ${title} (${cleanUrl})`);
-            console.log('セレクタ:', COMMON_SELECTORS.paperPrice);
-        }
-
-        return {
-            ...bookInfo,
-            title,
-            points,
-            kindlePrice,
-            paperPrice,
-            hasCoupon,
-            cleanUrl
-        };
-    };
-
-    // セール条件をチェック
-    const checkSaleConditions = (info) => {
-        const { points, kindlePrice, paperPrice, hasCoupon } = info;
-        const conditions = [];
-
-        if (hasCoupon) {
-            conditions.push(`✅クーポンあり`);
-        }
-        if (points >= COMMON_CONFIG.POINT_THRESHOLD) {
-            conditions.push(`✅ポイント ${points}pt`);
-        }
-        if (kindlePrice && (points / kindlePrice) * 100 >= COMMON_CONFIG.POINTS_RATE_THRESHOLD) {
-            conditions.push(`✅ポイント還元 ${(points / kindlePrice * 100).toFixed(2)}%`);
-        }
-        if (paperPrice && kindlePrice > 0 && paperPrice - kindlePrice >= COMMON_CONFIG.POINT_THRESHOLD) {
-            conditions.push(`✅価格差 ${paperPrice - kindlePrice}円`);
-        }
-
-        return conditions.length > 0 ? conditions.join(' ') : null;
-    };
 
     // セール発見通知を送信
     const sendBatchSaleNotification = (saleBooks) => {
@@ -111,8 +46,20 @@
 
             const promises = batch.map(async (bookInfo) => {
                 try {
-                    const pageInfo = await fetchBookPageInfo(bookInfo);
-                    const conditions = checkSaleConditions(pageInfo);
+                    const pageInfo = await fetchPageInfo(bookInfo.URL, (doc, cleanUrl) => {
+                        const productInfo = extractAmazonProductInfo(doc, `(${cleanUrl})`);
+
+                        return {
+                            ...bookInfo,
+                            title: productInfo.title || bookInfo.Title,
+                            points: productInfo.points,
+                            kindlePrice: productInfo.kindlePrice,
+                            paperPrice: productInfo.paperPrice,
+                            hasCoupon: productInfo.hasCoupon,
+                            cleanUrl
+                        };
+                    });
+                    const conditions = evaluateSaleConditions(pageInfo, COMMON_CONFIG);
 
                     processedCount++;
                     console.log(`進捗: ${processedCount}/${books.length} - ${pageInfo.title}`);
@@ -152,7 +99,7 @@
     const checkWishlistSales = async () => {
         try {
             console.log('📖 書籍データを取得中...');
-            const books = await fetchBooks();
+            const books = await fetchJsonFromS3(COMMON_CONFIG.UNPROCESSED_BOOKS_URL, 'books');
             console.log(`📚 ${books.length}冊をチェックします`);
 
             console.log('📖 セール情報をチェック中...');

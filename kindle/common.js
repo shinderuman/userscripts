@@ -19,6 +19,12 @@ unsafeWindow.KindleCommon = (function () {
         points: '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span, #tmm-grid-swatch-OTHER > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span'
     };
 
+    // 共通正規表現
+    const COMMON_PATTERNS = {
+        POINTS: /(\d+)pt/,
+        PRICE: /([\d,]+)/
+    };
+
     // 共通設定
     const COMMON_CONFIG = {
         // S3 URLs
@@ -245,10 +251,65 @@ unsafeWindow.KindleCommon = (function () {
         }
     };
 
+      // Amazon商品情報抽出
+    const extractAmazonProductInfo = (doc, logContext = '') => {
+        const title = doc.querySelector(COMMON_SELECTORS.title)?.innerText.trim();
+        const points = getElementValue(doc, COMMON_SELECTORS.points, COMMON_PATTERNS.POINTS);
+        const kindlePrice = getElementValue(doc, COMMON_SELECTORS.kindlePrice, COMMON_PATTERNS.PRICE);
+        const paperPrice = getElementValue(doc, COMMON_SELECTORS.paperPrice, COMMON_PATTERNS.PRICE);
+        const couponBadge = doc.querySelector(COMMON_SELECTORS.couponBadge);
+        const hasCoupon = couponBadge?.textContent?.includes('クーポン:') || false;
+
+        // 取得できなかった値についてログを出力
+        if (points === 0) {
+            console.warn(`⚠️ ポイント情報を取得できませんでした - ${title} ${logContext}`);
+            console.warn('セレクタ:', COMMON_SELECTORS.points);
+        }
+        if (kindlePrice === 0) {
+            console.warn(`⚠️ Kindle価格情報を取得できませんでした - ${title} ${logContext}`);
+            console.warn('セレクタ:', COMMON_SELECTORS.kindlePrice);
+        }
+        if (paperPrice === 0) {
+            console.log(`📖 紙書籍価格情報を取得できませんでした - ${title} ${logContext}`);
+            console.log('セレクタ:', COMMON_SELECTORS.paperPrice);
+        }
+
+        return {
+            title,
+            asin: extractAsinFromUrl(doc.location?.href || window.location.href),
+            points,
+            kindlePrice,
+            paperPrice,
+            hasCoupon
+        };
+    };
+
+    // セール条件評価
+    const evaluateSaleConditions = (productInfo, config = COMMON_CONFIG) => {
+        const { points, kindlePrice, paperPrice, hasCoupon } = productInfo;
+        const conditions = [];
+
+        if (hasCoupon) {
+            conditions.push(`✅クーポンあり`);
+        }
+        if (points >= config.POINT_THRESHOLD) {
+            conditions.push(`✅ポイント ${points}pt`);
+        }
+        if (kindlePrice && (points / kindlePrice) * 100 >= config.POINTS_RATE_THRESHOLD) {
+            conditions.push(`✅ポイント還元 ${(points / kindlePrice * 100).toFixed(2)}%`);
+        }
+        if (paperPrice && kindlePrice > 0 && paperPrice - kindlePrice >= config.POINT_THRESHOLD) {
+            conditions.push(`✅価格差 ${paperPrice - kindlePrice}円`);
+        }
+
+        return conditions.length > 0 ? conditions.join(' ') : null;
+    };
+
     // 公開API
     return {
         COMMON_CONFIG,
         COMMON_SELECTORS,
+        COMMON_PATTERNS,
         fetchJsonFromS3,
         fetchPageInfo,
         processBatch,
@@ -260,6 +321,8 @@ unsafeWindow.KindleCommon = (function () {
         getStorageItems,
         saveStorageItems,
         isAlreadyStored,
-        cleanupOldStorageItems
+        cleanupOldStorageItems,
+        extractAmazonProductInfo,
+        evaluateSaleConditions
     };
 })();
