@@ -208,5 +208,5 @@
 
     // イベントリスナー設定
     document.addEventListener('keydown', handleAbortKey);
-    window.addEventListener('load', () => setTimeout(initializeMangaReader, 1000));
+    setTimeout(initializeMangaReader, 1000);
 })();

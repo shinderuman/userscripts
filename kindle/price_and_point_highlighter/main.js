@@ -460,5 +460,5 @@ ${productUrl}
     };
 
     // 自動初期化
-    window.addEventListener('load', initializePriceAndPointHighlighter);
+    initializePriceAndPointHighlighter();
 })();
