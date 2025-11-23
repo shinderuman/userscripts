@@ -38,6 +38,7 @@ unsafeWindow.KindleCommon = (function () {
         POINTS_RATE_THRESHOLD: 20,
         AVERAGE_PRICE_THRESHOLD: 350,
         MIN_PRICE: 221,
+        PAPER_BOOK_MAX_REASONABLE_PRICE: 2000,
 
         // 新刊チェック設定
         NEW_RELEASE_DAYS: 7,
@@ -298,11 +299,29 @@ unsafeWindow.KindleCommon = (function () {
         if (kindlePrice && (points / kindlePrice) * 100 >= config.POINTS_RATE_THRESHOLD) {
             conditions.push(`✅ポイント還元 ${(points / kindlePrice * 100).toFixed(2)}%`);
         }
-        if (paperPrice && kindlePrice > 0 && paperPrice - kindlePrice >= config.POINT_THRESHOLD) {
+        if (shouldAddPriceDifference(paperPrice, kindlePrice, config)) {
             conditions.push(`✅価格差 ${paperPrice - kindlePrice}円`);
         }
 
         return conditions.length > 0 ? conditions.join(' ') : null;
+    };
+
+    // 紙書籍価格差を追加すべきか判定
+    const shouldAddPriceDifference = (paperPrice, kindlePrice, config) => {
+        if (!paperPrice) {
+            return false;
+        }
+        if (paperPrice >= config.PAPER_BOOK_MAX_REASONABLE_PRICE) {
+            console.warn(`⚠️ 紙書籍価格が高すぎます (${paperPrice}円)。定価ではないと思われるため価格差比較を除外します。`);
+            return false;
+        }
+        if (kindlePrice <= 0) {
+            return false;
+        }
+        if (paperPrice - kindlePrice < config.POINT_THRESHOLD) {
+            return false;
+        }
+        return true;
     };
 
     // 公開API
