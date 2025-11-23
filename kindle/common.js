@@ -109,45 +109,6 @@ unsafeWindow.KindleCommon = (function () {
         });
     };
 
-    // バッチ処理の共通関数
-    const processBatch = async (items, processorFunction, config) => {
-        const { CONCURRENT_REQUESTS = 20, REQUEST_DELAY = 1000 } = config;
-
-        console.log(`📚 ${items.length}件の処理を開始...`);
-
-        let processedCount = 0;
-        let resultCount = 0;
-
-        for (let i = 0; i < items.length; i += CONCURRENT_REQUESTS) {
-            const batch = items.slice(i, i + CONCURRENT_REQUESTS);
-
-            const promises = batch.map(async (item) => {
-                try {
-                    const result = await processorFunction(item);
-                    processedCount++;
-
-                    if (result.success && result.shouldNotify) {
-                        resultCount++;
-                    }
-
-                    return result;
-                } catch (error) {
-                    console.error(`❌ エラー: ${item.URL || item.Name || 'Unknown'}`, error);
-                    return { success: false, error };
-                }
-            });
-
-            await Promise.all(promises);
-
-            // 次のバッチまで待機（レート制限対策）
-            if (i + CONCURRENT_REQUESTS < items.length) {
-                await new Promise(resolve => setTimeout(resolve, REQUEST_DELAY));
-            }
-        }
-
-        return { processedCount, resultCount };
-    };
-
     // 通知送信の共通関数
     const sendNotification = (title, text, url, timeout = 0) => {
         GM_notification({
@@ -286,20 +247,20 @@ unsafeWindow.KindleCommon = (function () {
     };
 
     // セール条件評価
-    const evaluateSaleConditions = (productInfo, config = COMMON_CONFIG) => {
+    const evaluateSaleConditions = (productInfo) => {
         const { points, kindlePrice, paperPrice, hasCoupon } = productInfo;
         const conditions = [];
 
         if (hasCoupon) {
             conditions.push(`✅クーポンあり`);
         }
-        if (points >= config.POINT_THRESHOLD) {
+        if (points >= COMMON_CONFIG.POINT_THRESHOLD) {
             conditions.push(`✅ポイント ${points}pt`);
         }
-        if (kindlePrice && (points / kindlePrice) * 100 >= config.POINTS_RATE_THRESHOLD) {
+        if (kindlePrice && (points / kindlePrice) * 100 >= COMMON_CONFIG.POINTS_RATE_THRESHOLD) {
             conditions.push(`✅ポイント還元 ${(points / kindlePrice * 100).toFixed(2)}%`);
         }
-        if (shouldAddPriceDifference(paperPrice, kindlePrice, config)) {
+        if (shouldAddPriceDifference(paperPrice, kindlePrice)) {
             conditions.push(`✅価格差 ${paperPrice - kindlePrice}円`);
         }
 
@@ -307,18 +268,18 @@ unsafeWindow.KindleCommon = (function () {
     };
 
     // 紙書籍価格差を追加すべきか判定
-    const shouldAddPriceDifference = (paperPrice, kindlePrice, config) => {
+    const shouldAddPriceDifference = (paperPrice, kindlePrice) => {
         if (!paperPrice) {
             return false;
         }
-        if (paperPrice >= config.PAPER_BOOK_MAX_REASONABLE_PRICE) {
+        if (paperPrice >= COMMON_CONFIG.PAPER_BOOK_MAX_REASONABLE_PRICE) {
             console.warn(`⚠️ 紙書籍価格が高すぎます (${paperPrice}円)。定価ではないと思われるため価格差比較を除外します。`);
             return false;
         }
         if (kindlePrice <= 0) {
             return false;
         }
-        if (paperPrice - kindlePrice < config.POINT_THRESHOLD) {
+        if (paperPrice - kindlePrice < COMMON_CONFIG.POINT_THRESHOLD) {
             return false;
         }
         return true;
@@ -331,7 +292,6 @@ unsafeWindow.KindleCommon = (function () {
         COMMON_PATTERNS,
         fetchJsonFromS3,
         fetchPageInfo,
-        processBatch,
         sendNotification,
         sendCompletionNotification,
         sendErrorNotification,

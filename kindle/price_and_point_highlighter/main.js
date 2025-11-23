@@ -248,7 +248,7 @@ ${productUrl}
 
     const evaluateConditions = () => {
         const productInfo = extractAmazonProductInfo(document);
-        const conditions = evaluateSaleConditions(productInfo, COMMON_CONFIG);
+        const conditions = evaluateSaleConditions(productInfo);
 
         // 共通関数ではクーポン詳細テキストが含まれないので、別途追加
         const couponInfo = getCouponInfo();

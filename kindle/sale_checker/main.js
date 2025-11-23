@@ -59,7 +59,7 @@
                             cleanUrl
                         };
                     });
-                    const conditions = evaluateSaleConditions(pageInfo, COMMON_CONFIG);
+                    const conditions = evaluateSaleConditions(pageInfo);
 
                     processedCount++;
                     console.log(`進捗: ${processedCount}/${books.length} - ${pageInfo.title}`);
