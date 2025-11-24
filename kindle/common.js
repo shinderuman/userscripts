@@ -39,6 +39,7 @@ unsafeWindow.KindleCommon = (function () {
         AVERAGE_PRICE_THRESHOLD: 350,
         MIN_PRICE: 221,
         PAPER_BOOK_MAX_REASONABLE_PRICE: 2000,
+        YOUNG_JUMP_MAX_REASONABLE_PRICE: 600,
 
         // 新刊チェック設定
         NEW_RELEASE_DAYS: 7,
@@ -248,7 +249,7 @@ unsafeWindow.KindleCommon = (function () {
 
     // セール条件評価
     const evaluateSaleConditions = (productInfo) => {
-        const { points, kindlePrice, paperPrice, hasCoupon } = productInfo;
+        const { points, kindlePrice, paperPrice, hasCoupon, title } = productInfo;
         const conditions = [];
 
         if (hasCoupon) {
@@ -260,7 +261,7 @@ unsafeWindow.KindleCommon = (function () {
         if (kindlePrice && (points / kindlePrice) * 100 >= COMMON_CONFIG.POINTS_RATE_THRESHOLD) {
             conditions.push(`✅ポイント還元 ${(points / kindlePrice * 100).toFixed(2)}%`);
         }
-        if (shouldAddPriceDifference(paperPrice, kindlePrice)) {
+        if (shouldAddPriceDifference(paperPrice, kindlePrice, title)) {
             conditions.push(`✅価格差 ${paperPrice - kindlePrice}円`);
         }
 
@@ -268,8 +269,12 @@ unsafeWindow.KindleCommon = (function () {
     };
 
     // 紙書籍価格差を追加すべきか判定
-    const shouldAddPriceDifference = (paperPrice, kindlePrice) => {
+    const shouldAddPriceDifference = (paperPrice, kindlePrice, title) => {
         if (!paperPrice) {
+            return false;
+        }
+        if (!isValidYoungJumpPrice(title, paperPrice)) {
+            console.warn(`⚠️ ヤングジャンプ価格が高すぎます (${paperPrice}円)。定価ではないと思われるため価格差比較を除外します。`);
             return false;
         }
         if (paperPrice >= COMMON_CONFIG.PAPER_BOOK_MAX_REASONABLE_PRICE) {
@@ -283,6 +288,20 @@ unsafeWindow.KindleCommon = (function () {
             return false;
         }
         return true;
+    };
+
+    // ヤングジャンプ雑誌の価格を判定
+    const isValidYoungJumpPrice = (title, paperPrice) => {
+        if (!title.includes('ヤングジャンプ')) {
+            return true;
+        }
+        if (!/\d{4} No\./.test(title)) {
+            return true;
+        }
+        if (paperPrice < COMMON_CONFIG.YOUNG_JUMP_MAX_REASONABLE_PRICE) {
+            return true;
+        }
+        return false;
     };
 
     // 公開API
