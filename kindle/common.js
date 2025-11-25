@@ -88,7 +88,7 @@ unsafeWindow.KindleCommon = (function () {
     };
 
     // 個別ページの情報を取得する共通関数
-    const fetchPageInfo = (url, extractorFunction) => {
+    const fetchPageInfo = (url, extractorFunction, bookTitle = null) => {
         return new Promise((resolve, reject) => {
             const cleanUrl = url.split('?')[0]; // アフィリエイトパラメータを除去
 
@@ -102,7 +102,11 @@ unsafeWindow.KindleCommon = (function () {
                         const info = extractorFunction(doc, cleanUrl);
                         resolve(info);
                     } else {
-                        reject(new Error(`Failed to fetch page: ${response.status}`));
+                        // HTTPエラーの場合に通知を送信
+                        const error = new Error(`Failed to fetch page: ${response.status}`);
+                        error.status = response.status;
+                        sendPageFetchErrorNotification(cleanUrl, bookTitle);
+                        reject(error);
                     }
                 },
                 onerror: (error) => reject(error)
@@ -142,6 +146,17 @@ unsafeWindow.KindleCommon = (function () {
             `${scriptName}中にエラーが発生しました: ${errorMessage}`,
             null,
             5000
+        );
+    };
+
+    // ページ取得エラー通知関数
+    const sendPageFetchErrorNotification = (url, title) => {
+        const message = `${title}のページ取得に失敗しました`;
+        sendNotification(
+            '⚠️ ページ取得エラー',
+            message,
+            url,
+            0
         );
     };
 
@@ -314,6 +329,7 @@ unsafeWindow.KindleCommon = (function () {
         sendNotification,
         sendCompletionNotification,
         sendErrorNotification,
+        sendPageFetchErrorNotification,
         extractAsinFromUrl,
         getElementValue,
         getStorageItems,

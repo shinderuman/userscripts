@@ -12,6 +12,7 @@
         fetchJsonFromS3,
         sendErrorNotification,
         sendCompletionNotification,
+        sendPageFetchErrorNotification,
         extractAsinFromUrl,
         saveStorageItems,
         isAlreadyStored,
@@ -166,6 +167,7 @@
                         resolve(info);
                     } else {
                         console.log(`❌ 検索ページ取得失敗: ${response.status}`);
+                        sendPageFetchErrorNotification(searchUrl, authorInfo.Name);
                         reject(new Error(`Failed to fetch search page: ${response.status}`));
                     }
                 },

@@ -17,7 +17,7 @@
 
     // 個別ページの情報を取得
     const fetchBookPageInfo = (bookInfo) => {
-        return fetchPageInfo(`https://www.amazon.co.jp/dp/${bookInfo.ASIN}`, (doc, cleanUrl) => extractPageInfo(doc, bookInfo, cleanUrl));
+        return fetchPageInfo(`https://www.amazon.co.jp/dp/${bookInfo.ASIN}`, (doc, cleanUrl) => extractPageInfo(doc, bookInfo, cleanUrl), bookInfo.Title);
     };
 
     // ページから利用可能性情報を抽出

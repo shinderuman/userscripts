@@ -58,7 +58,7 @@
                             hasCoupon: productInfo.hasCoupon,
                             cleanUrl
                         };
-                    });
+                    }, bookInfo.Title);
                     const conditions = evaluateSaleConditions(pageInfo);
 
                     processedCount++;
