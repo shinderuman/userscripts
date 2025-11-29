@@ -5,7 +5,7 @@
 
     // 定数定義
     const NO_TAG = '未設定';
-    const TAGS = ['私は大好き', '私は好き', '嫌いじゃないわね', 'その他', NO_TAG];
+    const TAGS = ['私は大好き', '私は好き', '嫌いじゃないわね', '嫌いじゃないわね以下', 'その他', NO_TAG];
     const STORAGE_KEY = 'yuzuki_movie_tags';
 
     // セレクタ定数
