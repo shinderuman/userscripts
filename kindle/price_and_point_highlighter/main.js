@@ -47,7 +47,7 @@
             /(\d+)冊すべて/
         ],
         seriesPrice: /(\d+(?:,\d+)*)/,
-        seriesPoints: /(\d+)\s*pt/,
+        seriesPoints: /(\d+(?:,\d+)*)\s*pt/,
         points: /(\d+)pt/,
         price: /([\d,]+)/,
         asinFromUrl: /\/(?:dp|gp\/product|kindle-dbs\/product)\/([A-Z0-9]{10})[/?]?/
@@ -367,7 +367,7 @@ ${productUrl}
             const pointsText = pointsElement.textContent;
             const pointsMatch = pointsText.match(PATTERNS.seriesPoints);
             if (pointsMatch) {
-                return parseInt(pointsMatch[1]);
+                return parseInt(pointsMatch[1].replace(/,/g, ''));
             }
         }
         return 0;
