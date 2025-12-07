@@ -182,6 +182,13 @@
     };
 
     const handleKeyEvents = (event) => {
+        // 入力フィールドにフォーカスがある場合は無効化
+        if (event.target.tagName === 'INPUT' ||
+            event.target.tagName === 'TEXTAREA' ||
+            event.target.isContentEditable) {
+            return;
+        }
+
         if (event.metaKey && event.code === 'KeyT') {
             event.preventDefault();
             openInTab('vivaldi://startpage/', CONFIG.TAB_OPTIONS);
