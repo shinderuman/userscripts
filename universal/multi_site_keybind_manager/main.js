@@ -37,6 +37,9 @@
         },
         GET_PARAM_DISPOSAL_SITES: [
             'https://ja.aliexpress.com'
+        ],
+        INPUT_FIELD_EXCEPTION_SITES: [
+            'kenji.asmodeus.jp'
         ]
     };
 
@@ -182,10 +185,16 @@
     };
 
     const handleKeyEvents = (event) => {
-        // 入力フィールドにフォーカスがある場合は無効化
-        if (event.target.tagName === 'INPUT' ||
+        // 入力フィールド例外サイトの判定
+        const isExceptionSite = CONFIG.INPUT_FIELD_EXCEPTION_SITES.some(site =>
+            window.location.hostname.includes(site)
+        );
+
+        // 入力フィールドにフォーカスがある場合は無効化（例外サイトを除く）
+        if (!isExceptionSite && (
+            event.target.tagName === 'INPUT' ||
             event.target.tagName === 'TEXTAREA' ||
-            event.target.isContentEditable) {
+            event.target.isContentEditable)) {
             return;
         }
 
