@@ -10,13 +10,27 @@
         MUTED_USERS: [
             '@maidrobo',
             '@mistraldroid',
-            '@mesugakiroid'
+            '@mesugakiroid',
+            '@deepseekroid'
         ],
         TARGET_COLUMN_LABEL: '通知',
         OBSERVE_INTERVAL: 1000
     };
 
+    const isFilterAllActive = () => {
+        const filterBar = document.querySelector('div[aria-label="通知"]').querySelector('div.notification__filter-bar');
+        if (!filterBar) return true; // フィルターバーがない場合はデフォルトで有効
+
+        const firstButton = filterBar.querySelector('button');
+        return firstButton && firstButton.classList.contains('active');
+    };
+
     const removeUserPosts = (column) => {
+        // 「すべて」フィルターがアクティブでない場合は処理しない
+        if (!isFilterAllActive()) {
+            return;
+        }
+
         column.querySelectorAll('article').forEach(article => {
             try {
                 const displayNameLinks = article.querySelectorAll('a.status__display-name > span > span');
