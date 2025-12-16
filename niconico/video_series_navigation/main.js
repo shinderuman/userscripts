@@ -20,20 +20,22 @@
             PLAYER_CONTAINER: 'div.pos_relative.asp_auto.w_100\\%.ov_hidden.bdr_m',
             SERIES_SECTION: 'div.grid-area_\\[bottom\\].d_flex.flex-d_column.gap_x2',
             SERIES_LINKS: 'div.grid-area_\\[sidebar\\] > div.d_flex.flex-d_column.gap_x2 > section > div > div > div > div > div > a',
-            BUTTON_PAUSE: '#tooltip\\:«r8»\\:trigger',
-            BUTTON_REWIND: '#tooltip\\:«rb»\\:trigger',
-            BUTTON_FORWARD: '#tooltip\\:«rc»\\:trigger',
+            BUTTON_PAUSE: '#tooltip\\:_r_8_\\:trigger',
+            BUTTON_REWIND: '#tooltip\\:_r_b_\\:trigger',
+            BUTTON_FORWARD: '#tooltip\\:_r_c_\\:trigger',
             ANCHORS: {
                 FIRST: 'a[data-anchor-detail="first"]',
                 PREVIOUS: 'a[data-anchor-detail="prev"]',
                 NEXT: 'a[data-anchor-detail="next"]'
             }
-        },
-        KEY_BINDINGS: {
-            'KeyZ': '#tooltip\\:«r9»\\:trigger',  // 10秒戻る
-            'KeyX': '#tooltip\\:«r6»\\:trigger',  // 一時停止
-            'KeyC': '#tooltip\\:«ra»\\:trigger'   // 10秒送る
         }
+    };
+
+    // キーバインドを設定（CONFIGの初期化後に設定）
+    CONFIG.KEY_BINDINGS = {
+        'KeyZ': CONFIG.SELECTORS.BUTTON_REWIND,   // 10秒戻る
+        'KeyX': CONFIG.SELECTORS.BUTTON_PAUSE,    // 一時停止
+        'KeyC': CONFIG.SELECTORS.BUTTON_FORWARD   // 10秒送る
     };
 
     let isProcessing = false;
