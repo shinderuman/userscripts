@@ -24,7 +24,6 @@
             '推しﾀｸﾞ動画が'
         ],
         ADDITIONAL_URLS: [
-            'https://blog.nicovideo.jp/niconews/261266.html?ref=noticebox'
         ],
         LINK_OPEN_DELAY_MS: 1000
     };
