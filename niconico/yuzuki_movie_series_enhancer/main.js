@@ -4,9 +4,47 @@
     const GOOGLE_SEARCH_BASE_URL = 'https://www.google.com/search?q=';
 
     // 定数定義
-    const NO_TAG = '未設定';
-    const TAGS = ['私は大好き', '私は好き', '嫌いじゃないわね', '嫌いじゃないわね以下', 'その他', NO_TAG];
     const STORAGE_KEY = 'yuzuki_movie_tags';
+
+    // タグ情報を一元管理（インデックスベース）
+    const TAG_COLORS = [
+        {
+            name: '私は大好き',
+            backgroundColor: '#ff6b6b',
+            borderColor: '#ff5252',
+            color: '#fff'
+        },
+        {
+            name: '私は好き',
+            backgroundColor: '#ffa726',
+            borderColor: '#ff9800',
+            color: '#fff'
+        },
+        {
+            name: '嫌いじゃないわね',
+            backgroundColor: '#66bb6a',
+            borderColor: '#4caf50',
+            color: '#fff'
+        },
+        {
+            name: '嫌いじゃないわね以下',
+            backgroundColor: '#42a5f5',
+            borderColor: '#2196f3',
+            color: '#fff'
+        },
+        {
+            name: 'その他',
+            backgroundColor: '#ab47bc',
+            borderColor: '#9c27b0',
+            color: '#fff'
+        },
+        {
+            name: '未設定',
+            backgroundColor: '#e8f4ff',
+            borderColor: '#b3d9ff',
+            color: '#333'
+        }
+    ];
 
     // セレクタ定数
     const SELECTORS = {
@@ -82,21 +120,24 @@
         return searchLink;
     };
 
-    const getTagIndexByTag = (tag) => {
-        const index = TAGS.indexOf(tag);
-        return index !== -1 ? index : TAGS.length - 1; // 見つからなければ「--」のインデックス
+    const getTagIndexByTag = (tagIndex) => {
+        return typeof tagIndex === 'number' && tagIndex >= 0 && tagIndex < TAG_COLORS.length
+            ? tagIndex
+            : TAG_COLORS.length - 1; // 無効な場合は未設定のインデックス
     };
 
     const createStyledTagButton = (videoId, currentTag = null) => {
         const tagButton = document.createElement('button');
-        const displayTag = currentTag || NO_TAG;
-        tagButton.textContent = `🏷️${displayTag}`;
+        const currentIndex = getTagIndexByTag(currentTag);
+        const tagData = TAG_COLORS[currentIndex];
+
+        tagButton.textContent = `🏷️${tagData.name}`;
         tagButton.title = 'クリックでタグを変更';
         tagButton.className = CLASS_NAMES.MOVIE_TAG_BUTTON;
-
-        // 現在のタグインデックスをdata属性に保存
-        const currentIndex = getTagIndexByTag(currentTag);
         tagButton.dataset.tagIndex = currentIndex.toString();
+
+        // タグに対応する色設定を取得（インデックスベース）
+        const tagColor = tagData;
 
         // スタイルを適用
         tagButton.style.cssText = `
@@ -104,11 +145,11 @@
             margin-left: 6px;
             margin-right: 8px;
             padding: 2px 6px;
-            background-color: #e8f4ff;
+            background-color: ${tagColor.backgroundColor};
             border-radius: 3px;
             font-size: 11px;
-            color: #333;
-            border: 1px solid #b3d9ff;
+            color: ${tagColor.color};
+            border: 1px solid ${tagColor.borderColor};
             cursor: pointer;
             vertical-align: top;
             line-height: 1.2;
@@ -125,15 +166,20 @@
 
             // 現在のタグインデックスをdata属性から取得
             const currentIndex = parseInt(tagButton.dataset.tagIndex);
-            const nextIndex = (currentIndex + 1) % TAGS.length;
-            const newTag = TAGS[nextIndex];
+            const nextIndex = (currentIndex + 1) % TAG_COLORS.length;
+            const newTagData = TAG_COLORS[nextIndex];
 
             // タグを保存
-            saveTag(videoId, newTag);
+            saveTag(videoId, nextIndex);
 
             // ボタン表示とdata属性を更新
-            tagButton.textContent = `🏷️${newTag}`;
+            tagButton.textContent = `🏷️${newTagData.name}`;
             tagButton.dataset.tagIndex = nextIndex.toString();
+
+            // 背景色とテキスト色を更新
+            tagButton.style.backgroundColor = newTagData.backgroundColor;
+            tagButton.style.color = newTagData.color;
+            tagButton.style.borderColor = newTagData.borderColor;
         });
     };
 
@@ -151,10 +197,12 @@
         }
 
         // 新しいタグを表示
-        if (tag && tag !== NO_TAG) {
+        if (tag !== null && tag !== undefined && tag !== TAG_COLORS.length - 1) {
+            const tagIndex = getTagIndexByTag(tag);
+            const tagData = TAG_COLORS[tagIndex];
             const tagDisplay = document.createElement('span');
             tagDisplay.className = CLASS_NAMES.MOVIE_TAG_DISPLAY;
-            tagDisplay.textContent = ` [${tag}]`;
+            tagDisplay.textContent = ` [${tagData.name}]`;
             tagDisplay.style.cssText = `
                 color: #0066cc;
                 font-weight: normal;
