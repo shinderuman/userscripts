@@ -79,11 +79,11 @@
         }
     };
 
-    // API Keyから一意のIDを生成
-    const getApiKeyId = (apiKey) => {
+    // API Keyから表示用の短縮名を生成
+    const getApiKeyDisplayName = (apiKey) => {
         if (!apiKeyMapping[apiKey]) {
-            const nextNumber = Object.keys(apiKeyMapping).length + 1;
-            apiKeyMapping[apiKey] = `Key${nextNumber}`;
+            const prefix = apiKey.substring(0, 3);
+            apiKeyMapping[apiKey] = `${prefix}...`;
         }
         return apiKeyMapping[apiKey];
     };
@@ -151,7 +151,7 @@
                 const apiCallsValue = parseInt(apiCallsText) || 0;
 
                 if (originalApiKey && chargeType) {
-                    const apiKeyId = getApiKeyId(originalApiKey);
+                    const apiKeyId = getApiKeyDisplayName(originalApiKey);
                     pageData.push({
                         apiKey: apiKeyId,
                         originalApiKey,
