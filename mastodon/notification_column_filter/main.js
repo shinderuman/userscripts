@@ -11,7 +11,8 @@
             '@maidrobo',
             '@mistraldroid',
             '@mesugakiroid',
-            '@deepseekroid'
+            '@deepseekroid',
+            '@glmdroid'
         ],
         TARGET_COLUMN_LABEL: '通知',
         OBSERVE_INTERVAL: 1000
