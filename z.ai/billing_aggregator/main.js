@@ -7,7 +7,8 @@
             API_KEY: 3,       // nth-child(3): API Key
             BILLING_DATE: 2,  // nth-child(2): Billing Date
             CHARGE_TYPE: 7,   // nth-child(7): Charge Type
-            LISTED_PRICE: 8   // nth-child(8): Listed Price
+            LISTED_PRICE: 8,  // nth-child(8): Listed Price
+            CODE: 6           // nth-child(6): Model (Code)
         }
     };
 
@@ -137,6 +138,7 @@
                 const billingDate = cells[CONFIG.TARGET_COLUMNS.BILLING_DATE - 1]?.textContent?.trim() || '';
                 const chargeType = cells[CONFIG.TARGET_COLUMNS.CHARGE_TYPE - 1]?.textContent?.trim() || '';
                 const listedPriceText = cells[CONFIG.TARGET_COLUMNS.LISTED_PRICE - 1]?.textContent?.trim() || '';
+                const code = cells[CONFIG.TARGET_COLUMNS.CODE - 1]?.textContent?.trim() || '';
 
                 // 使用量の列（USAGE）を取得 - 10番目の列
                 const usageText = cells[9]?.textContent?.trim() || '0 token';
@@ -156,6 +158,7 @@
                         apiKey: apiKeyId,
                         originalApiKey,
                         billingDate,
+                        code,
                         chargeType,
                         listedPrice: listedPriceText,
                         usage: usageValue,
@@ -256,7 +259,8 @@
             const existingIndex = aggregatedData.findIndex(
                 existing => existing.apiKey === item.apiKey &&
                          existing.chargeType === item.chargeType &&
-                         existing.billingDate === item.billingDate
+                         existing.billingDate === item.billingDate &&
+                         existing.code === item.code
             );
 
             if (existingIndex >= 0) {
@@ -281,9 +285,9 @@
     const addTotalRows = (data) => {
         const groupedByApiKeyAndDate = {};
 
-        // API Keyと請求日でグループ化
+        // API Key、請求日、コードでグループ化
         data.forEach(item => {
-            const key = `${item.apiKey}_${item.billingDate}`;
+            const key = `${item.apiKey}_${item.billingDate}_${item.code}`;
             if (!groupedByApiKeyAndDate[key]) {
                 groupedByApiKeyAndDate[key] = [];
             }
@@ -297,6 +301,7 @@
             const totalItem = {
                 apiKey: items[0].apiKey,
                 billingDate: items[0].billingDate,
+                code: items[0].code,
                 chargeType: 'TOTAL',
                 listedPrice: '-',
                 usage: items.reduce((sum, item) => sum + item.usage, 0),
@@ -328,6 +333,10 @@
             case 'billingDate':
                 aValue = new Date(a.billingDate);
                 bValue = new Date(b.billingDate);
+                break;
+            case 'code':
+                aValue = a.code.toLowerCase();
+                bValue = b.code.toLowerCase();
                 break;
             case 'chargeType':
                 // TOTAL行は常に最後に
@@ -445,6 +454,7 @@
         const headers = [
             { key: 'apiKey', text: 'API Key' },
             { key: 'billingDate', text: '請求日' },
+            { key: 'code', text: 'モデル' },
             { key: 'chargeType', text: '課金タイプ' },
             { key: 'usage', text: '使用量' },
             { key: 'amount', text: '請求額' },
@@ -480,6 +490,7 @@
             const cells = [
                 `<td style="padding: 8px; border: 1px solid #ddd; color: black; ${!isTotalRow ? 'cursor: pointer;' : ''}" title="${!isTotalRow ? 'クリックでこのAPI Keyをフィルタ' : 'TOTAL行'}">${item.apiKey}</td>`,
                 `<td style="padding: 8px; border: 1px solid #ddd; color: black; ${!isTotalRow ? 'cursor: pointer;' : ''}" title="${!isTotalRow ? 'クリックでこの請求日をフィルタ' : 'TOTAL行'}">${item.billingDate}</td>`,
+                `<td style="padding: 8px; border: 1px solid #ddd; color: black;">${item.code || ''}</td>`,
                 `<td style="padding: 8px; border: 1px solid #ddd; color: ${isTotalRow ? '#0066cc;' : 'black'}; ${!isTotalRow ? 'cursor: pointer;' : ''}" title="${!isTotalRow ? 'クリックでこの課金タイプをフィルタ' : 'TOTAL - OUTPUT, CACHE, INPUTの合計値'}">${item.chargeType}</td>`,
                 `<td style="padding: 8px; border: 1px solid #ddd; text-align: right; color: ${isTotalRow ? '#0066cc;' : 'black'};">${item.usage.toLocaleString()} token</td>`,
                 `<td style="padding: 8px; border: 1px solid #ddd; text-align: right; color: ${isTotalRow ? '#0066cc;' : 'black'};">$${item.amount.toFixed(4)}</td>`,
@@ -491,7 +502,7 @@
             // クリックイベントを追加
             const apiKeyCell = row.querySelector('td:nth-child(1)');
             const billingDateCell = row.querySelector('td:nth-child(2)');
-            const chargeTypeCell = row.querySelector('td:nth-child(3)');
+            const chargeTypeCell = row.querySelector('td:nth-child(4)');
 
             apiKeyCell.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -655,7 +666,7 @@
                     cellIndex = 1;
                     break;
                 case 'chargeType':
-                    cellIndex = 2;
+                    cellIndex = 3;
                     break;
                 default:
                     shouldShow = true;
