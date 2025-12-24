@@ -7,10 +7,7 @@
 
     const CONFIG = {
         AFFILIATE_PARAMS: {
-            tag: 'shinderuman03-22',
-            linkCode: 'ogi',
-            th: '1',
-            psc: '1'
+            tag: 'shinderuman03-22'
         },
         AMAZON_URL_PATTERN: /https?:\/\/(amzn\.asia|www\.amazon\.[a-z.]+)\/[^\s]+/g
     };
@@ -19,9 +16,6 @@
         try {
             const urlObj = new URL(url);
             urlObj.searchParams.set('tag', CONFIG.AFFILIATE_PARAMS.tag);
-            urlObj.searchParams.set('linkCode', CONFIG.AFFILIATE_PARAMS.linkCode);
-            urlObj.searchParams.set('th', CONFIG.AFFILIATE_PARAMS.th);
-            urlObj.searchParams.set('psc', CONFIG.AFFILIATE_PARAMS.psc);
             return urlObj.href;
         } catch (error) {
             console.error('URL処理エラー:', error);

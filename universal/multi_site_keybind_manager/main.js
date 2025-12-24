@@ -122,7 +122,7 @@
                 ?.textContent.replace(/[^\d]/g, '')
         ) || currentPrice;
 
-        const url = `https://www.amazon.co.jp/dp/${asin}?tag=shinderuman03-22&linkCode=ogi&th=1&psc=1`;
+        const url = `https://www.amazon.co.jp/dp/${asin}?tag=shinderuman03-22`;
 
         const productInfo = JSON.stringify({
             ASIN: asin,
