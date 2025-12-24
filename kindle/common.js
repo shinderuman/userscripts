@@ -49,7 +49,7 @@ unsafeWindow.KindleCommon = (function () {
         REQUEST_DELAY: 1000,
 
         // その他
-        AFFILIATE_PARAMS: '?tag=shinderuman03-22&linkCode=ogi&th=1&psc=1',
+        AFFILIATE_PARAMS: '?tag=shinderuman03-22',
         BADGE_EXPIRATION: 5 * 60 * 1000,
         MARKED_ASINS_EXPIRATION: 30 * 24 * 60 * 60 * 1000
     };
