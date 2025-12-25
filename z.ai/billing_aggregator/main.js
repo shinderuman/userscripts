@@ -1,4 +1,4 @@
-(function() {
+(function () {
     'use strict';
 
     const CONFIG = {
@@ -258,14 +258,15 @@
         currentPageData.forEach(item => {
             const existingIndex = aggregatedData.findIndex(
                 existing => existing.apiKey === item.apiKey &&
-                         existing.chargeType === item.chargeType &&
-                         existing.billingDate === item.billingDate &&
-                         existing.code === item.code
+                    existing.chargeType === item.chargeType &&
+                    existing.billingDate === item.billingDate &&
+                    existing.code === item.code
             );
 
             if (existingIndex >= 0) {
-                // 既存データを新しいデータで置き換え
-                aggregatedData[existingIndex] = item;
+                // 既存データを新しいデータで置き換え（rawDataを除外）
+                const { rawData, ...cleanItem } = item;
+                aggregatedData[existingIndex] = cleanItem;
             } else {
                 // 新規データを追加（rawDataプロパティを除外）
                 const { rawData, ...cleanItem } = item;
@@ -326,41 +327,41 @@
             let aValue, bValue;
 
             switch (sortBy) {
-            case 'apiKey':
-                aValue = a.apiKey.toLowerCase();
-                bValue = b.apiKey.toLowerCase();
-                break;
-            case 'billingDate':
-                aValue = new Date(a.billingDate);
-                bValue = new Date(b.billingDate);
-                break;
-            case 'code':
-                aValue = a.code.toLowerCase();
-                bValue = b.code.toLowerCase();
-                break;
-            case 'chargeType':
-                // TOTAL行は常に最後に
-                if (a.chargeType === 'TOTAL') aValue = 'ZZZZ';
-                else if (b.chargeType === 'TOTAL') bValue = 'ZZZZ';
-                else {
-                    aValue = a.chargeType.toLowerCase();
-                    bValue = b.chargeType.toLowerCase();
-                }
-                break;
-            case 'usage':
-                aValue = a.usage;
-                bValue = b.usage;
-                break;
-            case 'amount':
-                aValue = a.amount;
-                bValue = b.amount;
-                break;
-            case 'apiCalls':
-                aValue = a.apiCalls;
-                bValue = b.apiCalls;
-                break;
-            default:
-                return 0;
+                case 'apiKey':
+                    aValue = a.apiKey.toLowerCase();
+                    bValue = b.apiKey.toLowerCase();
+                    break;
+                case 'billingDate':
+                    aValue = new Date(a.billingDate);
+                    bValue = new Date(b.billingDate);
+                    break;
+                case 'code':
+                    aValue = a.code.toLowerCase();
+                    bValue = b.code.toLowerCase();
+                    break;
+                case 'chargeType':
+                    // TOTAL行は常に最後に
+                    if (a.chargeType === 'TOTAL') aValue = 'ZZZZ';
+                    else if (b.chargeType === 'TOTAL') bValue = 'ZZZZ';
+                    else {
+                        aValue = a.chargeType.toLowerCase();
+                        bValue = b.chargeType.toLowerCase();
+                    }
+                    break;
+                case 'usage':
+                    aValue = a.usage;
+                    bValue = b.usage;
+                    break;
+                case 'amount':
+                    aValue = a.amount;
+                    bValue = b.amount;
+                    break;
+                case 'apiCalls':
+                    aValue = a.apiCalls;
+                    bValue = b.apiCalls;
+                    break;
+                default:
+                    return 0;
             }
 
             if (sortOrder === 'asc') {
@@ -375,8 +376,164 @@
     let currentSortBy = 'apiKey';
     let currentSortOrder = 'asc';
 
+    // Global scope helper
+    const getGlobalContext = () => {
+        return typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
+    };
+
+    // Chart.jsをロード
+    const loadChartJs = () => {
+        return new Promise((resolve, reject) => {
+            const globalCtx = getGlobalContext();
+            if (globalCtx.Chart) {
+                resolve(globalCtx.Chart);
+                return;
+            }
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+            script.onload = () => {
+                if (globalCtx.Chart) {
+                    resolve(globalCtx.Chart);
+                } else {
+                    reject(new Error('Chart object not found in global context'));
+                }
+            };
+            script.onerror = () => reject(new Error('Chart.jsの読み込みに失敗しました'));
+            document.head.appendChild(script);
+        });
+    };
+
+    // 文字列から色を生成するハッシュ関数
+    const stringToColor = (str) => {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
+        return '#' + '00000'.substring(0, 6 - c.length) + c;
+    };
+
+    // チャート用データを処理
+    const processChartData = (data) => {
+        const groupedData = {};
+        const allDates = new Set();
+
+        data.forEach(item => {
+            if (item.billingDate) {
+                allDates.add(item.billingDate);
+
+                // グルーピングキー: API Key - Model (Type)
+                const key = `${item.apiKey} - ${item.code} (${item.chargeType})`;
+
+                if (!groupedData[key]) {
+                    groupedData[key] = {};
+                }
+                if (!groupedData[key][item.billingDate]) {
+                    groupedData[key][item.billingDate] = 0;
+                }
+
+                // トークン使用量を加算
+                groupedData[key][item.billingDate] += item.usage;
+            }
+        });
+
+        // 日付でソート
+        const sortedDates = Array.from(allDates).sort((a, b) => new Date(a) - new Date(b));
+
+        // データセット生成
+        const datasets = Object.keys(groupedData).map(key => {
+            const dataPoints = sortedDates.map(date => groupedData[key][date] || 0);
+            const color = stringToColor(key);
+
+            return {
+                label: key,
+                data: dataPoints,
+                borderColor: color,
+                backgroundColor: color, // 凡例用
+                borderWidth: 2,
+                fill: false, // 塗りつぶしなしで線のみ
+                tension: 0.1
+            };
+        }).filter(dataset => {
+            // トークン使用量が全て0のデータセットを除外
+            const total = dataset.data.reduce((sum, val) => sum + val, 0);
+            return total > 0;
+        });
+
+        return {
+            labels: sortedDates,
+            datasets: datasets
+        };
+    };
+
+    let currentChart = null;
+    const renderChart = (ctx, data) => {
+        if (currentChart) {
+            currentChart.destroy();
+        }
+
+        const globalCtx = getGlobalContext();
+        const ChartConstructor = globalCtx.Chart;
+
+        if (!ChartConstructor) {
+            console.error('Chart.js not found');
+            return;
+        }
+
+        currentChart = new ChartConstructor(ctx, {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Token Usage'
+                        },
+                        ticks: {
+                            callback: (value) => value.toLocaleString()
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        filter: function (tooltipItem) {
+                            return tooltipItem.parsed.y > 0;
+                        },
+                        callbacks: {
+                            label: (context) => {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y.toLocaleString() + ' token';
+                                }
+                                return label;
+                            }
+                        }
+                    },
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 10
+                        }
+                    }
+                }
+            }
+        });
+    };
+
     // 集計結果を表示
-    const showResults = () => {
+    const showResults = async () => {
         // 保存されたデータがあれば読み込む
         if (aggregatedData.length === 0) {
             const loaded = loadStoredData();
@@ -386,6 +543,13 @@
                 return;
             }
             showNotification(`${aggregatedData.length}件の保存データを読み込みました`, 'info');
+        }
+
+        try {
+            await loadChartJs();
+        } catch (e) {
+            console.error('Chart load failed', e);
+            showNotification('グラフの読み込みに失敗しました: ' + e.message, 'error');
         }
 
         // TOTAL行を追加してソート実行
@@ -418,6 +582,7 @@
             z-index: 9999999;
             max-height: 80vh;
             overflow: auto;
+            width: 80%;
             min-width: 800px;
             box-shadow: 0 6px 30px rgba(0,0,0,0.5);
             color: black;
@@ -605,8 +770,24 @@
             }
         };
 
+        // チャートコンテナ作成
+        const chartContainer = document.createElement('div');
+        chartContainer.style.cssText = 'height: 300px; width: 100%; margin-bottom: 20px;';
+        const canvas = document.createElement('canvas');
+        chartContainer.appendChild(canvas);
+
+        // チャート描画
+        const globalCtx = getGlobalContext();
+        if (globalCtx.Chart) {
+            const chartData = processChartData(aggregatedData);
+            renderChart(canvas.getContext('2d'), chartData);
+        } else {
+            console.warn('Canvas skipping because Chart is not defined');
+        }
+
         // モーダルの組み立て
         modal.appendChild(header);
+        modal.appendChild(chartContainer);
         modal.appendChild(table);
         modal.appendChild(clearButton);
         modal.appendChild(closeButton);
@@ -659,17 +840,17 @@
             if (filterValue) {
                 let cellIndex = 0;
                 switch (columnKey) {
-                case 'apiKey':
-                    cellIndex = 0;
-                    break;
-                case 'billingDate':
-                    cellIndex = 1;
-                    break;
-                case 'chargeType':
-                    cellIndex = 3;
-                    break;
-                default:
-                    shouldShow = true;
+                    case 'apiKey':
+                        cellIndex = 0;
+                        break;
+                    case 'billingDate':
+                        cellIndex = 1;
+                        break;
+                    case 'chargeType':
+                        cellIndex = 3;
+                        break;
+                    default:
+                        shouldShow = true;
                 }
 
                 if (cellIndex < cells.length) {
