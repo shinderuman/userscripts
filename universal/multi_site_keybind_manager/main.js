@@ -130,7 +130,8 @@
             ReleaseDate: releaseDate.toISOString(),
             CurrentPrice: currentPrice,
             MaxPrice: maxPrice,
-            URL: url
+            URL: url,
+            CreatedAt: normalizeToUTCDate(new Date()).toISOString()
         }, null, 4) + ',';
 
         const success = await copyToClipboard(productInfo);
