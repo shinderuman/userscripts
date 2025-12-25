@@ -27,10 +27,7 @@
     };
 
     const removeUserPosts = (column) => {
-        // 「すべて」フィルターがアクティブでない場合は処理しない
-        if (!isFilterAllActive()) {
-            return;
-        }
+        const isAllActive = isFilterAllActive();
 
         column.querySelectorAll('article').forEach(article => {
             try {
@@ -42,7 +39,7 @@
                 );
 
                 if (shouldRemove) {
-                    article.style.display = 'none';
+                    article.style.display = isAllActive ? 'none' : '';
                 }
             } catch (error) {
                 console.error('通知カラムの投稿処理中にエラー:', error);
