@@ -69,7 +69,7 @@
     const getSavedTag = (videoId) => {
         try {
             const tags = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-            return tags[videoId] || null;
+            return tags[videoId] !== undefined ? tags[videoId] : null;
         } catch (e) {
             console.warn('タグの読み取りに失敗しました:', e);
             return null;
@@ -126,7 +126,7 @@
             : TAG_COLORS.length - 1; // 無効な場合は未設定のインデックス
     };
 
-    const createStyledTagButton = (videoId, currentTag = null) => {
+    const createStyledTagButton = (currentTag = null) => {
         const tagButton = document.createElement('button');
         const currentIndex = getTagIndexByTag(currentTag);
         const tagData = TAG_COLORS[currentIndex];
@@ -184,7 +184,7 @@
     };
 
     const createTagButton = (videoId, currentTag = null) => {
-        const tagButton = createStyledTagButton(videoId, currentTag);
+        const tagButton = createStyledTagButton(currentTag);
         handleTagButtonClick(tagButton, videoId);
         return tagButton;
     };
