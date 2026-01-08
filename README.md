@@ -17,6 +17,7 @@ userscripts/
 │   ├── campaign_sorter/               # キャンペーン商品抽出
 │   ├── deleted_item_checker/          # 削除商品チェッカー
 │   ├── reader_key_remap/              # Amazon Kindle Reader統合スクリプト
+│   ├── reader_title_changer/          # Kindle Reader タイトル変更
 │   └── library_volume_filter/         # 本棚巻数フィルター
 ├── amazon/                             # Amazon関連スクリプト
 │   ├── README.md                      # Amazonスクリプトの詳細説明
@@ -96,6 +97,7 @@ userscripts/
   - **Z/Xキー**: ページナビゲーション（前/次のページ）
   - **Aキー**: 次の巻を開く（続巻がある場合）
   - **0キー**: 最初のページに移動
+- **Kindle Reader Title Changer**: Kindleマンガリーダーのページタイトルを書き換え
 - **本棚巻数フィルター**: Kindle本棚（シリーズビュー）で巻数による絞り込み機能
   - **最小/最大モード切り替え**: 指定巻数以上/以下のシリーズを表示
   - **トップバー統合**: 既存UIに自然に統合されたフィルター入力フィールド

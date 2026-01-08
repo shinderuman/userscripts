@@ -151,7 +151,7 @@ Amazon Kindle Readerでの包括的なキーボードショートカット機能
 
 **キーボードショートカット:**
 - **Zキー**: 前のページ
-- **Xキー**: 次のページ  
+- **Xキー**: 次のページ
 - **Aキー**: 次の巻を開く（続巻がある場合）
 - **0キー**: 最初のページに移動
 
@@ -188,6 +188,16 @@ const KEY_BINDINGS = {
     FIRST_PAGE: 'Digit9'    // 9キー → 最初のページ
 };
 ```
+
+### 📖 Kindle Reader Title Changer (`reader_title_changer/`)
+Kindleマンガリーダーのページタイトルを書き換えるスクリプト。
+
+**機能:**
+- `id="readerChromeTitle"`の要素のテキスト内容でページタイトル（document.title）を書き換え
+- ページ読み込み時に自動実行
+
+**対応サイト:**
+- `https://read.amazon.co.jp/manga/*` - Kindleマンガリーダー
 
 ## 🔧 共通ライブラリ (`common.js`)
 
@@ -232,6 +242,7 @@ const KEY_BINDINGS = {
 4. **Deleted Item Checker**: `deleted_item_checker/wrapper.js`
 5. **本棚巻数フィルター**: `library_volume_filter/wrapper.js`
 6. **Amazon Kindle Reader統合スクリプト**: `reader_key_remap/wrapper.js`
+7. **Kindle Reader Title Changer**: `reader_title_changer/wrapper.js`
 
 ### 3. パスの設定
 `wrapper.js`ファイル内の`@require`パスを環境に合わせて調整:
