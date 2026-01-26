@@ -38,7 +38,7 @@ unsafeWindow.KindleCommon = (function () {
         POINTS_RATE_THRESHOLD: 20,
         AVERAGE_PRICE_THRESHOLD: 350,
         MIN_PRICE: 221,
-        PAPER_BOOK_MAX_REASONABLE_PRICE: 2000,
+        PAPER_BOOK_MAX_REASONABLE_PRICE: 1800,
         YOUNG_JUMP_MAX_REASONABLE_PRICE: 600,
 
         // 新刊チェック設定
