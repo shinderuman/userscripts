@@ -26,7 +26,9 @@ userscripts/
 │   ├── affiliate_tag_adder/           # アフィリエイトタグ自動追加
 │   └── asin_link_generator/           # ASINリンク生成
 ├── dmm/                               # DMM関連スクリプト
+│   ├── README.md                      # DMMスクリプトの詳細説明
 │   ├── common.js                      # 共通ライブラリ
+│   ├── video_player_title_changer/    # 動画プレイヤータイトル変更
 │   └── video_tab_opener/              # 動画タブオープナー
 ├── universal/                          # 汎用スクリプト
 │   ├── common.js                      # 共通ライブラリ
@@ -68,7 +70,7 @@ userscripts/
 ### 現在対応済み
 - **Amazon Kindle** (`kindle/`) - 書籍の新刊・セール・利用可能性チェック
 - **Amazon** (`amazon/`) - ウィッシュリストハイライト・アフィリエイトタグ自動追加・ASINリンク生成
-- **DMM** (`dmm/`) - 動画プレイヤーの新しいタブ表示
+- **DMM** (`dmm/`) - 動画プレイヤーのタイトル変更・新しいタブ表示
 - **Universal** (`universal/`) - 汎用的な機能（要素ぼかし・キーバインド管理）
 - **ニコニコ動画** (`niconico/`) - 漫画横読み変換・シリーズナビゲーション・キャンペーン自動処理
 - **Twitter/X** (`twitter/`) - インテントコピー・ユーザーフィルター
@@ -111,6 +113,9 @@ userscripts/
 
 ### DMM (`dmm/`)
 
+- **Video Player Title Changer**: DMM動画プレイヤーのページタイトルを書き換え
+  - `#header > div > p`要素のテキスト内容でページタイトルを変更
+  - MutationObserverで動的に読み込まれるタイトルにも対応
 - **動画タブオープナー**: DMM動画を新しいウィンドウではなく別タブで開く
 
 ### Universal (`universal/`)
