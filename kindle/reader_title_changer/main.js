@@ -2,7 +2,9 @@
     'use strict';
 
     const CONFIG = {
-        TARGET_ID: 'readerChromeTitle'
+        TARGET_ID: 'readerChromeTitle',
+        MAX_ATTEMPTS: 10,
+        RETRY_INTERVAL_MS: 1000
     };
 
     const changeReaderTitle = () => {
@@ -14,7 +16,18 @@
 
     const init = () => {
         console.log('🚀 Kindle Reader Title Changer を初期化');
-        changeReaderTitle();
+
+        let count = 0;
+
+        const tryChangeTitle = () => {
+            changeReaderTitle();
+            if (document.title === 'Kindle' && count < CONFIG.MAX_ATTEMPTS) {
+                count++;
+                setTimeout(tryChangeTitle, CONFIG.RETRY_INTERVAL_MS);
+            }
+        };
+
+        tryChangeTitle();
     };
 
     init();
