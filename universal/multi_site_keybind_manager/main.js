@@ -199,12 +199,6 @@
             return;
         }
 
-        if (event.metaKey && event.code === 'KeyT') {
-            event.preventDefault();
-            openInTab('vivaldi://startpage/', CONFIG.TAB_OPTIONS);
-            return;
-        }
-
         if (!event.altKey || event.metaKey || event.ctrlKey) return;
         preventDefaultKeys(event, ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']);
 
