@@ -119,6 +119,32 @@ const CONFIG = {
 };
 ```
 
+### ⏩ Auto Ad Skipper (`auto_ad_skipper/`)
+ニコニコ動画の動画広告のスキップボタンを自動クリックするスクリプト。
+
+**機能:**
+- ページ読み込み後4秒待機してから監視開始
+- MutationObserverでスキップボタンの出現を検知
+- 20秒経過してもスキップできなかった場合は自動で中断
+
+**対象サイト:**
+- `https://www.nicovideo.jp/watch/*`
+
+**動作:**
+1. ページ読み込み後4秒待機
+2. 広告コンテナ内のスキップボタンを監視
+3. スキップ可能状態を検知したら自動クリック
+4. 20秒以内にスキップできなければ中断
+
+**設定項目:**
+```javascript
+const CONFIG = {
+    INITIAL_WAIT_MS: 4000,   // 監視開始までの待機時間（ミリ秒）
+    TIMEOUT_MS: 20000,       // 監視タイムアウト（ミリ秒）
+    AD_CONTAINER_ID: 'nv_watch_VideoAdContainer'
+};
+```
+
 ### 🎬 Yuzuki Movie Series Enhancer (`yuzuki_movie_series_enhancer/`)
 「結月さん映画を鑑賞する」シリーズに映画配信サイト検索機能を追加するスクリプト。
 
@@ -191,6 +217,7 @@ const videoId = extractVideoId(linkElement);
 2. **Video Series Navigation**: `video_series_navigation/wrapper.js`
 3. **Auto Campaign Navigator**: `auto_campaign_navigator/wrapper.js`
 4. **Yuzuki Movie Series Enhancer**: `yuzuki_movie_series_enhancer/wrapper.js`
+5. **Auto Ad Skipper**: `auto_ad_skipper/wrapper.js`
 
 ### 3. パスの設定
 `wrapper.js`ファイル内の`@require`パスを環境に合わせて調整:
@@ -226,6 +253,10 @@ const videoId = extractVideoId(linkElement);
 3. ボタンクリックで前後の動画に移動
 4. 時間制御ボタンで±60秒移動
 5. Z/X/Cキーで動画操作（10秒戻る/一時停止/10秒送る）
+
+### Auto Ad Skipper
+1. ニコニコ動画のページを開く
+2. 広告が表示された場合、自動的にスキップ
 
 ### Auto Campaign Navigator
 1. ニコニコキャンペーンページを開く
@@ -265,6 +296,7 @@ initializeYuzukiMovieSeriesEnhancer()
 - 📖 漫画変換処理状況
 - 🎬 動画ナビゲーション状況
 - 🎯 キャンペーンリンク処理状況
+- ⏩ 広告スキップ状況
 - 🎬 映画タイトル抽出・アイコン追加状況
 
 ## 🛠️ 開発・カスタマイズ
