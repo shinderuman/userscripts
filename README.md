@@ -60,6 +60,9 @@ userscripts/
 │   ├── common.js                      # 共通ライブラリ
 │   ├── sale_wishlist_opener/          # セールウィッシュリストオープナー
 │   └── new_release_checker/           # 新刊リリースチェッカー
+├── atx/                               # AT-X関連スクリプト
+│   ├── common.js                      # 共通ライブラリ
+│   └── program_time_indicator/        # 番組表 現在時刻ライン
 └── aws/                               # AWS関連スクリプト
     ├── README.md                      # AWSスクリプトの詳細説明
     ├── common.js                      # 共通ライブラリ
@@ -78,6 +81,7 @@ userscripts/
 - **YouTube** (`youtube/`) - 登録チャンネルレイアウト最適化
 - **Mastodon** (`mastodon/`) - カラム管理・投稿編集・AI投稿ぼかし・UI改善
 - **GitHub** (`github/`) - Gistページでのセール本・新刊チェック用リンク一括開き
+- **AT-X** (`atx/`) - 番組表に現在時刻のインジケーターを表示
 - **AWS** (`aws/`) - CloudWatchダッシュボードのキーボードショートカット
 
 ## 🚀 使用方法
@@ -152,6 +156,10 @@ userscripts/
 
 - **セールウィッシュリストオープナー**: セールになってほしい本.mdのリンクを日付フィルタリングで一括開き
 - **新刊リリースチェッカー**: 新刊チェック中の作者.mdのリンクを基準日付で一括開き（日付入力フィールド付き）
+
+### AT-X (`atx/`)
+
+- **Program Time Indicator**: 週間番組表の現在時刻の時間セルと本日の曜日のヘッダーをハイライト
 
 ### AWS (`aws/`)
 
