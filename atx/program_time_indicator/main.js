@@ -32,6 +32,19 @@
         return day === 0 ? 6 : day - 1;
     };
 
+    const shouldRedirectToPreviousWeek = () => {
+        if (window.location.pathname !== '/program') return false;
+        const now = new Date();
+        return now.getDay() === 1 && now.getHours() < 6;
+    };
+
+    const redirectToPreviousWeek = () => {
+        const prevLink = document.querySelector('li.prev > a');
+        if (prevLink) {
+            window.location.href = prevLink.href;
+        }
+    };
+
     const highlightDayHeader = () => {
         const header = document.querySelector(CONFIG.TIME_HEAD_SELECTOR);
         if (!header) return;
@@ -83,6 +96,10 @@
     };
 
     const init = () => {
+        if (shouldRedirectToPreviousWeek()) {
+            redirectToPreviousWeek();
+            return;
+        }
         drawTimeLine();
         console.log('🚀 AT-X 現在時刻ライン が初期化されました');
     };
