@@ -95,12 +95,31 @@
         highlightCells(timeCells, targetTime);
     };
 
-    const init = () => {
-        if (shouldRedirectToPreviousWeek()) {
-            redirectToPreviousWeek();
+    const waitForDom = (callback) => {
+        if (document.querySelector(CONFIG.TABLE_SELECTOR)) {
+            callback();
             return;
         }
-        drawTimeLine();
+
+        const observer = new MutationObserver(() => {
+            if (document.querySelector(CONFIG.TABLE_SELECTOR)) {
+                observer.disconnect();
+                callback();
+            }
+        });
+
+        const content = document.getElementById('content');
+        if (content) {
+            observer.observe(content, { childList: true, subtree: true });
+        }
+    };
+
+    const init = () => {
+        if (shouldRedirectToPreviousWeek()) {
+            waitForDom(redirectToPreviousWeek);
+            return;
+        }
+        waitForDom(drawTimeLine);
         console.log('🚀 AT-X 現在時刻ライン が初期化されました');
     };
 
