@@ -19,13 +19,91 @@
         'ふかふかダンジョン攻略記'
     ];
 
+    const STORAGE_KEY = 'sale_wishlist_priority:' + location.pathname;
+
+    const PRIORITY_MAX = 3;
+
+    const STYLES = {
+        priorityPanel: {
+            backgroundColor: '#161b22',
+            border: '1px solid #30363d',
+            borderRadius: '6px',
+            padding: '16px',
+            marginBottom: '16px',
+            color: '#c9d1d9'
+        },
+        priorityTitle: {
+            margin: '0 0 12px 0',
+            fontSize: '16px',
+            color: '#f0883e'
+        },
+        priorityList: {
+            listStyle: 'none',
+            padding: '0',
+            margin: '0'
+        },
+        priorityItem: {
+            padding: '4px 0'
+        },
+        priorityLink: {
+            color: '#58a6ff',
+            textDecoration: 'none'
+        },
+        priorityButton: {
+            backgroundColor: '#f0883e'
+        },
+        scrollButton: {
+            backgroundColor: '#28a745'
+        },
+        highlight: {
+            backgroundColor: '#ffffcc',
+            transition: 'background-color 0.3s'
+        }
+    };
+
+    const priorityCache = (() => {
+        try {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        } catch {
+            return {};
+        }
+    })();
+
+    const savePriorityCache = () => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(priorityCache));
+    };
+
+    const applyPriorityStyle = (link, level) => {
+        link.isPriority = true;
+        link.priorityLevel = level;
+        link.textContent = '🌟'.repeat(level) + ' ' + link.textContent.replace(/^🌟+ /u, '');
+    };
+
+    const removePriorityStyle = (link) => {
+        link.isPriority = false;
+        link.priorityLevel = 0;
+        link.textContent = link.textContent.replace(/^🌟+ /u, '');
+    };
+
+    const shouldSkipLink = (linkText) => {
+        return skipList.some(keyword => linkText.includes(keyword));
+    };
+
     const initializeSaleWishlistOpener = () => {
         setupUI();
+        setupPriorityToggle();
         console.log('🚀 Sale Wishlist Opener が初期化されました');
     };
 
     const setupUI = () => {
         const container = createContainer();
+
+        // 優先のみ表示トグルボタン
+        const priorityButton = createButton('優先パネル表示', function () {
+            togglePriorityFilter(this);
+        }, STYLES.priorityButton);
+        priorityButton.isFiltering = false;
+        container.appendChild(priorityButton);
 
         // 過去のリンクを開くボタン
         container.appendChild(createButton('過去のリンクを開く', () => {
@@ -45,9 +123,7 @@
         // 現在日時にスクロールするボタン
         container.appendChild(createButton('現在日時にスクロール', () => {
             scrollToCurrentDate();
-        }, {
-            backgroundColor: '#28a745'
-        }));
+        }, STYLES.scrollButton));
 
         document.body.appendChild(container);
     };
@@ -129,8 +205,7 @@
 
             // 視覚的なハイライトを追加
             const originalBackground = closestLink.style.backgroundColor;
-            closestLink.style.backgroundColor = '#ffffcc';
-            closestLink.style.transition = 'background-color 0.3s';
+            Object.assign(closestLink.style, STYLES.highlight);
 
             setTimeout(() => {
                 closestLink.style.backgroundColor = originalBackground;
@@ -140,8 +215,77 @@
         }
     };
 
-    const shouldSkipLink = (linkText) => {
-        return skipList.some(keyword => linkText.includes(keyword));
+    const buildPriorityPanel = () => {
+        const panel = document.createElement('div');
+        panel.id = 'priority-panel';
+        Object.assign(panel.style, STYLES.priorityPanel);
+
+        const title = document.createElement('h2');
+        title.textContent = '🌟 優先リスト';
+        Object.assign(title.style, STYLES.priorityTitle);
+        panel.appendChild(title);
+
+        const list = document.createElement('ul');
+        Object.assign(list.style, STYLES.priorityList);
+
+        Array.from(document.querySelectorAll(SELECTORS.WISHLIST_LINKS))
+            .filter(link => link.isPriority)
+            .sort((a, b) => (b.priorityLevel || 0) - (a.priorityLevel || 0))
+            .forEach(link => {
+                const li = document.createElement('li');
+                Object.assign(li.style, STYLES.priorityItem);
+                const a = document.createElement('a');
+                a.href = link.href;
+                a.textContent = link.textContent;
+                a.target = '_blank';
+                Object.assign(a.style, STYLES.priorityLink);
+                li.appendChild(a);
+                list.appendChild(li);
+            });
+
+        panel.appendChild(list);
+        return panel;
+    };
+
+    const setupPriorityToggle = () => {
+        document.querySelectorAll(SELECTORS.WISHLIST_LINKS).forEach(link => {
+            if (link.href in priorityCache) {
+                applyPriorityStyle(link, priorityCache[link.href]);
+            }
+
+            link.addEventListener('click', (e) => {
+                if (!e.shiftKey) return;
+                e.preventDefault();
+
+                const currentLevel = link.priorityLevel || 0;
+
+                if (currentLevel >= PRIORITY_MAX) {
+                    delete priorityCache[link.href];
+                    removePriorityStyle(link);
+                } else {
+                    const nextLevel = currentLevel + 1;
+                    priorityCache[link.href] = nextLevel;
+                    applyPriorityStyle(link, nextLevel);
+                }
+
+                savePriorityCache();
+            });
+        });
+    };
+
+    const togglePriorityFilter = (button) => {
+        button.isFiltering = !button.isFiltering;
+
+        document.getElementById('priority-panel')?.remove();
+
+        if (button.isFiltering) {
+            const article = document.querySelector('#file-md-readme > article');
+            if (article) {
+                article.insertBefore(buildPriorityPanel(), article.firstChild);
+            }
+        }
+
+        button.textContent = button.isFiltering ? 'パネルを閉じる' : '優先パネル表示';
     };
 
     // 自動初期化
