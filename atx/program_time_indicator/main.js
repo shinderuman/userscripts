@@ -33,9 +33,10 @@
     };
 
     const shouldRedirectToPreviousWeek = () => {
-        if (window.location.pathname !== '/program') return false;
         const now = new Date();
-        return now.getDay() === 1 && now.getHours() < 6;
+        return now.getDay() === 1
+            && now.getHours() < 6
+            && !window.location.search.includes('id=');
     };
 
     const redirectToPreviousWeek = () => {
