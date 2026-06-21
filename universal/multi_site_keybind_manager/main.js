@@ -63,12 +63,31 @@
             url = cleanUrl(url);
         }
 
+        // ニコニコ動画の再生ページでシリーズの場合、playlistパラメータを付与
+        if (window.location.href.startsWith('https://www.nicovideo.jp/watch/')) {
+            const playlistParam = getNicoSeriesPlaylistParam();
+            if (playlistParam) {
+                const urlObj = new URL(url);
+                urlObj.searchParams.set('playlist', playlistParam);
+                url = urlObj.toString();
+            }
+        }
+
         const content = `${title}\n${url}`;
 
         const success = await copyToClipboard(content);
         if (success) {
             showNotification('Copied to Clipboard', `${title}\n${url}`, 3000);
         }
+    };
+
+    const getNicoSeriesPlaylistParam = () => {
+        // シリーズ再生ページのリンクからplaylistパラメータを取得
+        const seriesLink = document.querySelector('a[data-anchor-area="series"][href*="playlist="]');
+        if (!seriesLink) return null;
+
+        const linkUrl = new URL(seriesLink.href, window.location.origin);
+        return linkUrl.searchParams.get('playlist');
     };
 
     const filterSearchTitle = (title) => {
