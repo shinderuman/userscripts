@@ -45,7 +45,7 @@
 
             console.log('📖 作者データを取得中...');
             const authors = await fetchAuthors();
-            console.log(`📚 ${authors.length}人をチェックします`);
+            console.log(`${authors.length}人をチェックします`);
 
             console.log('📖 除外キーワードを取得中...');
             const excludedKeywords = await fetchExcludedKeywords();
@@ -83,7 +83,7 @@
     };
 
     const checkPagesInBatches = async (authors, excludedKeywords, isbnMode) => {
-        console.log(`📚 ${authors.length}人の作者の新刊をチェック開始...`);
+        console.log(`${authors.length}人の作者の新刊をチェック開始...`);
 
         let newReleaseCount = 0;
         let processedCount = 0;
@@ -191,7 +191,7 @@
 
         // 最初の数冊のみチェック（検索結果は日付順でソートされている）
         const booksToCheck = Array.from(searchResults).slice(0, 10);
-        console.log(`📚 チェック対象: ${booksToCheck.length}冊`);
+        console.log(`チェック対象: ${booksToCheck.length}冊`);
 
         for (let i = 0; i < booksToCheck.length; i++) {
             const item = booksToCheck[i];
@@ -280,7 +280,7 @@
             console.log(`✅ タイトル取得成功: "${title}"`);
         }
 
-        console.log(`📚 タイトル: "${title}"`);
+        console.log(`タイトル: "${title}"`);
         console.log(`🔗 URL: ${bookUrl}`);
 
         return { title, bookUrl, isValid: !!(title && bookUrl) };
@@ -289,7 +289,7 @@
     const checkISBNFiltering = (asin, isbnMode) => {
         const isBookISBN = isISBN(asin);
 
-        console.log(`📚 ASIN: ${asin}, ISBN判定: ${isBookISBN}, モード: ${isbnMode}`);
+        console.log(`ASIN: ${asin}, ISBN判定: ${isBookISBN}, モード: ${isbnMode}`);
 
         switch (isbnMode) {
         case 0: // ISBNをスキップ
