@@ -17,23 +17,8 @@
         }
     ];
 
-    const combineColumns = (topColumn, bottomColumn) => {
-        const container = document.createElement('div');
-        container.style.display = 'flex';
-        container.style.flexDirection = 'column';
-        container.style.height = '100%';
-
-        topColumn.style.flex = '1';
-        topColumn.style.overflow = 'auto';
-        topColumn.style.width = '365px';
-        
-        bottomColumn.style.flex = '1';
-        bottomColumn.style.overflow = 'auto';
-        bottomColumn.style.width = '365px';
-
-        topColumn.parentElement.insertBefore(container, topColumn);
-        container.appendChild(topColumn);
-        container.appendChild(bottomColumn);
+    const initializeColumnCombiner = () => {
+        moveColumns();
     };
 
     const moveColumns = () => {
@@ -52,8 +37,41 @@
         });
     };
 
-    const initializeColumnCombiner = () => {
-        moveColumns();
+    const combineColumns = (topColumn, bottomColumn) => {
+        const container = document.createElement('div');
+        const parent = topColumn.parentElement;
+
+        applyContainerStyles(container, parent);
+        applyColumnStyles(topColumn);
+        applyColumnStyles(bottomColumn);
+
+        parent.insertBefore(container, topColumn);
+        container.appendChild(topColumn);
+        container.appendChild(bottomColumn);
+    };
+
+    const applyContainerStyles = (container, parent) => {
+        container.style.display = 'flex';
+        container.style.flexDirection = 'column';
+        container.style.overflow = 'hidden';
+
+        if (parent.classList.contains('drawer')) {
+            container.style.flex = '1 1 auto';
+            container.style.minHeight = '0';
+            container.style.width = '100%';
+            return;
+        }
+
+        container.style.flex = '0 0 auto';
+        container.style.height = '100%';
+        container.style.width = '365px';
+    };
+
+    const applyColumnStyles = (column) => {
+        column.style.flex = '1';
+        column.style.overflowX = 'hidden';
+        column.style.overflowY = 'auto';
+        column.style.width = '100%';
     };
 
     // 自動初期化
