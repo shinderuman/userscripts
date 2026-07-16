@@ -100,6 +100,11 @@
         priorityButton.isFiltering = false;
         container.appendChild(priorityButton);
 
+        // 現在日時にスクロールするボタン
+        container.appendChild(createButton('現在日時にスクロール', () => {
+            scrollToCurrentDate();
+        }, STYLES.scrollButton));
+
         // 過去のリンクを開くボタン
         container.appendChild(createButton('過去のリンクを開く', () => {
             filterLinks((linkDate, today) => linkDate < today);
@@ -114,11 +119,6 @@
         container.appendChild(createButton('すべてのリンクを開く', () => {
             filterLinks(() => true);
         }));
-
-        // 現在日時にスクロールするボタン
-        container.appendChild(createButton('現在日時にスクロール', () => {
-            scrollToCurrentDate();
-        }, STYLES.scrollButton));
 
         document.body.appendChild(container);
     };
