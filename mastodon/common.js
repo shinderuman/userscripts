@@ -14,11 +14,15 @@ unsafeWindow.MastodonCommon = (function () {
 
     // IndexedDBを使用した画像キャッシュクラス
     class ImageCache {
-        constructor(dbName = 'ImageCacheDB', storeName = 'images', expirationTime = 24 * 60 * 60 * 1000 * 7) {
+        constructor(
+            dbName = 'ImageCacheDB',
+            storeName = 'images',
+            expirationTime = 24 * 60 * 60 * 1000 * 7
+        ) {
             this.dbName = dbName;
             this.storeName = storeName;
             this.expirationTime = expirationTime;
-            this.deleteExpiredData().catch(error => {
+            this.deleteExpiredData().catch((error) => {
                 console.error('Error deleting expired data:', error);
             });
         }
@@ -74,7 +78,10 @@ unsafeWindow.MastodonCommon = (function () {
                     const cursor = event.target.result;
                     if (cursor) {
                         const record = cursor.value;
-                        if (Date.now() - record.timestamp > this.expirationTime) {
+                        if (
+                            Date.now() - record.timestamp >
+                            this.expirationTime
+                        ) {
                             store.delete(cursor.key);
                         }
                         cursor.continue();
@@ -123,7 +130,10 @@ unsafeWindow.MastodonCommon = (function () {
                 }
             };
 
-            document.addEventListener('visibilitychange', handleVisibilityChange);
+            document.addEventListener(
+                'visibilitychange',
+                handleVisibilityChange
+            );
         }
     }
 
@@ -148,14 +158,20 @@ unsafeWindow.MastodonCommon = (function () {
 
             setTimeout(() => {
                 observer.disconnect();
-                reject(new Error(`Element ${selector} not found within ${timeout}ms`));
+                reject(
+                    new Error(
+                        `Element ${selector} not found within ${timeout}ms`
+                    )
+                );
             }, timeout);
         });
     };
 
     // 複数の要素を待機
     const waitForElements = (selectors, timeout = 10000) => {
-        return Promise.all(selectors.map(selector => waitForElement(selector, timeout)));
+        return Promise.all(
+            selectors.map((selector) => waitForElement(selector, timeout))
+        );
     };
 
     // APIリクエスト共通関数

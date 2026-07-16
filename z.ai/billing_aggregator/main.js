@@ -4,11 +4,11 @@
     const CONFIG = {
         // 集計対象の列インデックス（theadのnth-childをベース）
         TARGET_COLUMNS: {
-            API_KEY: 3,       // nth-child(3): API Key
-            BILLING_DATE: 2,  // nth-child(2): Billing Date
-            CHARGE_TYPE: 7,   // nth-child(7): Charge Type
-            LISTED_PRICE: 8,  // nth-child(8): Listed Price
-            CODE: 6           // nth-child(6): Model (Code)
+            API_KEY: 3, // nth-child(3): API Key
+            BILLING_DATE: 2, // nth-child(2): Billing Date
+            CHARGE_TYPE: 7, // nth-child(7): Charge Type
+            LISTED_PRICE: 8, // nth-child(8): Listed Price
+            CODE: 6 // nth-child(6): Model (Code)
         }
     };
 
@@ -34,7 +34,10 @@
                 }
             }
         } catch (error) {
-            console.warn('LocalStorageからのデータ読み込みに失敗しました:', error);
+            console.warn(
+                'LocalStorageからのデータ読み込みに失敗しました:',
+                error
+            );
         }
         return false;
     };
@@ -74,7 +77,10 @@
     // API Keyマッピングを保存
     const saveApiKeyMapping = () => {
         try {
-            localStorage.setItem(API_KEY_MAPPING_KEY, JSON.stringify(apiKeyMapping));
+            localStorage.setItem(
+                API_KEY_MAPPING_KEY,
+                JSON.stringify(apiKeyMapping)
+            );
         } catch (error) {
             console.warn('API Keyマッピングの保存に失敗しました:', error);
         }
@@ -134,11 +140,26 @@
                     return;
                 }
 
-                const originalApiKey = cells[CONFIG.TARGET_COLUMNS.API_KEY - 1]?.textContent?.trim() || '';
-                const billingDate = cells[CONFIG.TARGET_COLUMNS.BILLING_DATE - 1]?.textContent?.trim() || '';
-                const chargeType = cells[CONFIG.TARGET_COLUMNS.CHARGE_TYPE - 1]?.textContent?.trim() || '';
-                const listedPriceText = cells[CONFIG.TARGET_COLUMNS.LISTED_PRICE - 1]?.textContent?.trim() || '';
-                const code = cells[CONFIG.TARGET_COLUMNS.CODE - 1]?.textContent?.trim() || '';
+                const originalApiKey =
+                    cells[
+                        CONFIG.TARGET_COLUMNS.API_KEY - 1
+                    ]?.textContent?.trim() || '';
+                const billingDate =
+                    cells[
+                        CONFIG.TARGET_COLUMNS.BILLING_DATE - 1
+                    ]?.textContent?.trim() || '';
+                const chargeType =
+                    cells[
+                        CONFIG.TARGET_COLUMNS.CHARGE_TYPE - 1
+                    ]?.textContent?.trim() || '';
+                const listedPriceText =
+                    cells[
+                        CONFIG.TARGET_COLUMNS.LISTED_PRICE - 1
+                    ]?.textContent?.trim() || '';
+                const code =
+                    cells[
+                        CONFIG.TARGET_COLUMNS.CODE - 1
+                    ]?.textContent?.trim() || '';
 
                 // 使用量の列（USAGE）を取得 - 10番目の列
                 const usageText = cells[9]?.textContent?.trim() || '0 token';
@@ -238,12 +259,22 @@
     };
 
     // データを集計
+    // rawDataプロパティを除外したクリーンなアイテムを返す
+    const removeRawData = (item) => {
+        const cleanItem = { ...item };
+        delete cleanItem.rawData;
+        return cleanItem;
+    };
+
     const aggregateData = () => {
         // 保存されたデータがあれば読み込む
         if (aggregatedData.length === 0) {
             const loaded = loadStoredData();
             if (loaded && aggregatedData.length > 0) {
-                showNotification(`${aggregatedData.length}件の保存データを読み込みました`, 'info');
+                showNotification(
+                    `${aggregatedData.length}件の保存データを読み込みました`,
+                    'info'
+                );
             }
         }
 
@@ -255,9 +286,10 @@
         }
 
         // 既存データとマージ
-        currentPageData.forEach(item => {
+        currentPageData.forEach((item) => {
             const existingIndex = aggregatedData.findIndex(
-                existing => existing.apiKey === item.apiKey &&
+                (existing) =>
+                    existing.apiKey === item.apiKey &&
                     existing.chargeType === item.chargeType &&
                     existing.billingDate === item.billingDate &&
                     existing.code === item.code
@@ -265,12 +297,10 @@
 
             if (existingIndex >= 0) {
                 // 既存データを新しいデータで置き換え（rawDataを除外）
-                const { rawData, ...cleanItem } = item;
-                aggregatedData[existingIndex] = cleanItem;
+                aggregatedData[existingIndex] = removeRawData(item);
             } else {
                 // 新規データを追加（rawDataプロパティを除外）
-                const { rawData, ...cleanItem } = item;
-                aggregatedData.push(cleanItem);
+                aggregatedData.push(removeRawData(item));
             }
         });
 
@@ -278,8 +308,10 @@
         saveStoredData();
         saveApiKeyMapping();
 
-        showNotification(`${currentPageData.length}件のデータを集計しました`, 'success');
-
+        showNotification(
+            `${currentPageData.length}件のデータを集計しました`,
+            'success'
+        );
     };
 
     // TOTAL行を追加したデータを生成
@@ -287,7 +319,7 @@
         const groupedByApiKeyAndDate = {};
 
         // API Key、請求日、コードでグループ化
-        data.forEach(item => {
+        data.forEach((item) => {
             const key = `${item.apiKey}_${item.billingDate}_${item.code}`;
             if (!groupedByApiKeyAndDate[key]) {
                 groupedByApiKeyAndDate[key] = [];
@@ -297,7 +329,7 @@
 
         const result = [];
 
-        Object.keys(groupedByApiKeyAndDate).forEach(key => {
+        Object.keys(groupedByApiKeyAndDate).forEach((key) => {
             const items = groupedByApiKeyAndDate[key];
             const totalItem = {
                 apiKey: items[0].apiKey,
@@ -395,10 +427,13 @@
                 if (globalCtx.Chart) {
                     resolve(globalCtx.Chart);
                 } else {
-                    reject(new Error('Chart object not found in global context'));
+                    reject(
+                        new Error('Chart object not found in global context')
+                    );
                 }
             };
-            script.onerror = () => reject(new Error('Chart.jsの読み込みに失敗しました'));
+            script.onerror = () =>
+                reject(new Error('Chart.jsの読み込みに失敗しました'));
             document.head.appendChild(script);
         });
     };
@@ -409,7 +444,7 @@
         for (let i = 0; i < str.length; i++) {
             hash = str.charCodeAt(i) + ((hash << 5) - hash);
         }
-        const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
+        const c = (hash & 0x00ffffff).toString(16).toUpperCase();
         return '#' + '00000'.substring(0, 6 - c.length) + c;
     };
 
@@ -418,7 +453,7 @@
         const groupedData = {};
         const allDates = new Set();
 
-        data.forEach(item => {
+        data.forEach((item) => {
             if (item.billingDate) {
                 allDates.add(item.billingDate);
 
@@ -438,27 +473,33 @@
         });
 
         // 日付でソート
-        const sortedDates = Array.from(allDates).sort((a, b) => new Date(a) - new Date(b));
+        const sortedDates = Array.from(allDates).sort(
+            (a, b) => new Date(a) - new Date(b)
+        );
 
         // データセット生成
-        const datasets = Object.keys(groupedData).map(key => {
-            const dataPoints = sortedDates.map(date => groupedData[key][date] || 0);
-            const color = stringToColor(key);
+        const datasets = Object.keys(groupedData)
+            .map((key) => {
+                const dataPoints = sortedDates.map(
+                    (date) => groupedData[key][date] || 0
+                );
+                const color = stringToColor(key);
 
-            return {
-                label: key,
-                data: dataPoints,
-                borderColor: color,
-                backgroundColor: color, // 凡例用
-                borderWidth: 2,
-                fill: false, // 塗りつぶしなしで線のみ
-                tension: 0.1
-            };
-        }).filter(dataset => {
-            // トークン使用量が全て0のデータセットを除外
-            const total = dataset.data.reduce((sum, val) => sum + val, 0);
-            return total > 0;
-        });
+                return {
+                    label: key,
+                    data: dataPoints,
+                    borderColor: color,
+                    backgroundColor: color, // 凡例用
+                    borderWidth: 2,
+                    fill: false, // 塗りつぶしなしで線のみ
+                    tension: 0.1
+                };
+            })
+            .filter((dataset) => {
+                // トークン使用量が全て0のデータセットを除外
+                const total = dataset.data.reduce((sum, val) => sum + val, 0);
+                return total > 0;
+            });
 
         return {
             labels: sortedDates,
@@ -488,7 +529,7 @@
                 maintainAspectRatio: false,
                 interaction: {
                     mode: 'index',
-                    intersect: false,
+                    intersect: false
                 },
                 scales: {
                     y: {
@@ -514,7 +555,9 @@
                                     label += ': ';
                                 }
                                 if (context.parsed.y !== null) {
-                                    label += context.parsed.y.toLocaleString() + ' token';
+                                    label +=
+                                        context.parsed.y.toLocaleString() +
+                                        ' token';
                                 }
                                 return label;
                             }
@@ -539,22 +582,35 @@
             const loaded = loadStoredData();
             loadApiKeyMapping();
             if (!loaded || aggregatedData.length === 0) {
-                showNotification('表示できる集計データがありません。まず「集計」ボタンを押してください。', 'error');
+                showNotification(
+                    '表示できる集計データがありません。まず「集計」ボタンを押してください。',
+                    'error'
+                );
                 return;
             }
-            showNotification(`${aggregatedData.length}件の保存データを読み込みました`, 'info');
+            showNotification(
+                `${aggregatedData.length}件の保存データを読み込みました`,
+                'info'
+            );
         }
 
         try {
             await loadChartJs();
         } catch (e) {
             console.error('Chart load failed', e);
-            showNotification('グラフの読み込みに失敗しました: ' + e.message, 'error');
+            showNotification(
+                'グラフの読み込みに失敗しました: ' + e.message,
+                'error'
+            );
         }
 
         // TOTAL行を追加してソート実行
         const dataWithTotal = addTotalRows(aggregatedData);
-        const sortedData = sortData(dataWithTotal, currentSortBy, currentSortOrder);
+        const sortedData = sortData(
+            dataWithTotal,
+            currentSortBy,
+            currentSortOrder
+        );
 
         // オーバーレイ作成
         const overlay = document.createElement('div');
@@ -589,9 +645,18 @@
         `;
 
         // 総計を計算
-        const totalUsage = aggregatedData.reduce((sum, item) => sum + item.usage, 0);
-        const totalAmount = aggregatedData.reduce((sum, item) => sum + item.amount, 0);
-        const totalApiCalls = aggregatedData.reduce((sum, item) => sum + item.apiCalls, 0);
+        const totalUsage = aggregatedData.reduce(
+            (sum, item) => sum + item.usage,
+            0
+        );
+        const totalAmount = aggregatedData.reduce(
+            (sum, item) => sum + item.amount,
+            0
+        );
+        const totalApiCalls = aggregatedData.reduce(
+            (sum, item) => sum + item.apiCalls,
+            0
+        );
 
         // ヘッダー部分
         const header = document.createElement('div');
@@ -609,7 +674,8 @@
 
         // テーブル作成
         const table = document.createElement('table');
-        table.style.cssText = 'width: 100%; border-collapse: collapse; margin-bottom: 20px;';
+        table.style.cssText =
+            'width: 100%; border-collapse: collapse; margin-bottom: 20px;';
 
         // テーブルヘッダー
         const thead = document.createElement('thead');
@@ -626,13 +692,15 @@
             { key: 'apiCalls', text: 'API Calls' }
         ];
 
-        headers.forEach(headerInfo => {
+        headers.forEach((headerInfo) => {
             const th = document.createElement('th');
-            th.style.cssText = 'padding: 10px; text-align: left; border: 1px solid #ddd; cursor: pointer; font-weight: bold; background-color: #f0f0f0; color: black;';
+            th.style.cssText =
+                'padding: 10px; text-align: left; border: 1px solid #ddd; cursor: pointer; font-weight: bold; background-color: #f0f0f0; color: black;';
             th.textContent = headerInfo.text;
             th.onclick = () => {
                 if (currentSortBy === headerInfo.key) {
-                    currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+                    currentSortOrder =
+                        currentSortOrder === 'asc' ? 'desc' : 'asc';
                 } else {
                     currentSortBy = headerInfo.key;
                     currentSortOrder = 'asc';
@@ -647,7 +715,7 @@
 
         // テーブルボディー
         const tbody = document.createElement('tbody');
-        sortedData.forEach(item => {
+        sortedData.forEach((item) => {
             const row = document.createElement('tr');
             const isTotalRow = item.chargeType === 'TOTAL';
             row.style.cssText = `border-bottom: 1px solid #eee; color: black; ${isTotalRow ? 'background-color: #f8f9fa; font-weight: bold; border-top: 2px solid #333;' : ''}`;
@@ -672,7 +740,9 @@
             apiKeyCell.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const filterValue = item.apiKey;
-                const isCurrentlyFiltered = currentFilter === filterValue && currentFilterColumn === 'apiKey';
+                const isCurrentlyFiltered =
+                    currentFilter === filterValue &&
+                    currentFilterColumn === 'apiKey';
 
                 if (isCurrentlyFiltered) {
                     // フィルター解除
@@ -685,14 +755,19 @@
                     currentFilter = filterValue;
                     currentFilterColumn = 'apiKey';
                     filterTableRows(tbody, filterValue, 'apiKey');
-                    showNotification(`API Key "${filterValue}" でフィルタリングしました`, 'info');
+                    showNotification(
+                        `API Key "${filterValue}" でフィルタリングしました`,
+                        'info'
+                    );
                 }
             });
 
             billingDateCell.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const filterValue = item.billingDate;
-                const isCurrentlyFiltered = currentFilter === filterValue && currentFilterColumn === 'billingDate';
+                const isCurrentlyFiltered =
+                    currentFilter === filterValue &&
+                    currentFilterColumn === 'billingDate';
 
                 if (isCurrentlyFiltered) {
                     // フィルター解除
@@ -705,27 +780,38 @@
                     currentFilter = filterValue;
                     currentFilterColumn = 'billingDate';
                     filterTableRows(tbody, filterValue, 'billingDate');
-                    showNotification(`請求日 "${filterValue}" でフィルタリングしました`, 'info');
+                    showNotification(
+                        `請求日 "${filterValue}" でフィルタリングしました`,
+                        'info'
+                    );
                 }
             });
 
             chargeTypeCell.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const filterValue = item.chargeType;
-                const isCurrentlyFiltered = currentFilter === filterValue && currentFilterColumn === 'chargeType';
+                const isCurrentlyFiltered =
+                    currentFilter === filterValue &&
+                    currentFilterColumn === 'chargeType';
 
                 if (isCurrentlyFiltered) {
                     // フィルター解除
                     currentFilter = null;
                     currentFilterColumn = null;
                     filterTableRows(tbody, null, null);
-                    showNotification('課金タイプフィルターを解除しました', 'info');
+                    showNotification(
+                        '課金タイプフィルターを解除しました',
+                        'info'
+                    );
                 } else {
                     // フィルター適用
                     currentFilter = filterValue;
                     currentFilterColumn = 'chargeType';
                     filterTableRows(tbody, filterValue, 'chargeType');
-                    showNotification(`課金タイプ "${filterValue}" でフィルタリングしました`, 'info');
+                    showNotification(
+                        `課金タイプ "${filterValue}" でフィルタリングしました`,
+                        'info'
+                    );
                 }
             });
 
@@ -772,7 +858,8 @@
 
         // チャートコンテナ作成
         const chartContainer = document.createElement('div');
-        chartContainer.style.cssText = 'height: 300px; width: 100%; margin-bottom: 20px;';
+        chartContainer.style.cssText =
+            'height: 300px; width: 100%; margin-bottom: 20px;';
         const canvas = document.createElement('canvas');
         chartContainer.appendChild(canvas);
 
@@ -833,7 +920,7 @@
     // テーブルボディーの行をフィルタリング
     const filterTableRows = (tbody, filterValue, columnKey) => {
         const rows = tbody.querySelectorAll('tr');
-        rows.forEach(row => {
+        rows.forEach((row) => {
             const cells = row.querySelectorAll('td');
             let shouldShow = true;
 
@@ -889,14 +976,26 @@
         `;
 
         // 集計ボタン
-        const aggregateButton = createButton('📊 集計', aggregateData, '#10b981');
+        const aggregateButton = createButton(
+            '📊 集計',
+            aggregateData,
+            '#10b981'
+        );
 
         // 結果表示ボタン
-        const showResultsButton = createButton('📋 結果表示', showResults, '#6366f1');
+        const showResultsButton = createButton(
+            '📋 結果表示',
+            showResults,
+            '#6366f1'
+        );
 
         // リセットボタン
         const resetData = () => {
-            if (confirm('保存されている集計データと表示中のデータをすべてクリアしますか？')) {
+            if (
+                confirm(
+                    '保存されている集計データと表示中のデータをすべてクリアしますか？'
+                )
+            ) {
                 aggregatedData = [];
                 clearStoredData();
                 showNotification('データをリセットしました', 'success');
@@ -936,7 +1035,6 @@
         // コンテナに属性を設定してDOMに追加
         buttonContainer.setAttribute('data-billing-container', 'true');
         document.body.appendChild(buttonContainer);
-
     };
 
     init();

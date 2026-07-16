@@ -90,5 +90,4 @@
         parseDate,
         getTodayStart
     };
-
 })();

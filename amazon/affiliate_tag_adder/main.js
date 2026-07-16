@@ -2,14 +2,14 @@
     'use strict';
 
     // 共通ライブラリから関数を取得
-    const {
-    } = unsafeWindow.AmazonCommon;
+    const {} = unsafeWindow.AmazonCommon;
 
     const CONFIG = {
         AFFILIATE_PARAMS: {
             tag: 'shinderuman03-22'
         },
-        AMAZON_URL_PATTERN: /https?:\/\/(amzn\.asia|www\.amazon\.[a-z.]+)\/[^\s]+/g
+        AMAZON_URL_PATTERN:
+            /https?:\/\/(amzn\.asia|www\.amazon\.[a-z.]+)\/[^\s]+/g
     };
 
     const addAffiliateTag = (url) => {
@@ -25,7 +25,10 @@
 
     const handlePaste = (event) => {
         const clipboardText = event.clipboardData.getData('text');
-        const modifiedText = clipboardText.replace(CONFIG.AMAZON_URL_PATTERN, (url) => addAffiliateTag(url));
+        const modifiedText = clipboardText.replace(
+            CONFIG.AMAZON_URL_PATTERN,
+            (url) => addAffiliateTag(url)
+        );
 
         if (modifiedText === clipboardText) return;
 
@@ -33,7 +36,11 @@
         event.preventDefault();
 
         const activeElement = document.activeElement;
-        if (activeElement && 'value' in activeElement && 'selectionStart' in activeElement) {
+        if (
+            activeElement &&
+            'value' in activeElement &&
+            'selectionStart' in activeElement
+        ) {
             const inputElement = activeElement;
             const { selectionStart: start, selectionEnd: end } = inputElement;
             const newText =
@@ -52,7 +59,9 @@
     const initializeAffiliateTagAdder = () => {
         document.addEventListener('paste', handlePaste);
         console.log('🚀 Amazon Affiliate Tag Adder が初期化されました');
-        console.log('💡 Amazonリンクをペーストすると自動的にアフィリエイトタグが追加されます');
+        console.log(
+            '💡 Amazonリンクをペーストすると自動的にアフィリエイトタグが追加されます'
+        );
     };
 
     // 自動初期化

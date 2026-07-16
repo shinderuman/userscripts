@@ -34,9 +34,11 @@
 
     const shouldRedirectToPreviousWeek = () => {
         const now = new Date();
-        return now.getDay() === 1
-            && now.getHours() < 6
-            && !window.location.search.includes('id=');
+        return (
+            now.getDay() === 1 &&
+            now.getHours() < 6 &&
+            !window.location.search.includes('id=')
+        );
     };
 
     const redirectToPreviousWeek = () => {
@@ -69,7 +71,7 @@
     };
 
     const highlightCells = (timeCells, targetTime) => {
-        timeCells.forEach(cell => {
+        timeCells.forEach((cell) => {
             const time = parseTime(cell.textContent);
             if (time === null) return;
             if (time === targetTime) {

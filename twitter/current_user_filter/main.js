@@ -1,11 +1,8 @@
-(function() {
+(function () {
     'use strict';
 
     // 共通ライブラリから関数を取得
-    const {
-        getCurrentUser,
-        createButton
-    } = unsafeWindow.TwitterCommon;
+    const { getCurrentUser, createButton } = unsafeWindow.TwitterCommon;
 
     let isFiltered = false;
 
@@ -14,19 +11,27 @@
         if (!currentUser) return;
 
         Array.from(document.querySelectorAll('article'))
-            .filter(tweet => tweet.querySelector('div[data-testid="User-Name"] div div div a div span')?.textContent.trim() !== currentUser)
-            .forEach(tweet => {
+            .filter(
+                (tweet) =>
+                    tweet
+                        .querySelector(
+                            'div[data-testid="User-Name"] div div div a div span'
+                        )
+                        ?.textContent.trim() !== currentUser
+            )
+            .forEach((tweet) => {
                 tweet.style.display = 'none';
             });
     };
 
     const showAllTweets = () => {
-        Array.from(document.querySelectorAll('article')).forEach(tweet => {
+        Array.from(document.querySelectorAll('article')).forEach((tweet) => {
             tweet.style.display = '';
         });
     };
 
-    const toggleTweets = () => isFiltered ? showOnlyCurrentUserTweets() : showAllTweets();
+    const toggleTweets = () =>
+        isFiltered ? showOnlyCurrentUserTweets() : showAllTweets();
 
     const createToggleButton = () => {
         const button = createButton('このアカウントのみ表示');
@@ -35,7 +40,9 @@
         button.addEventListener('click', () => {
             isFiltered = !isFiltered;
             toggleTweets();
-            button.innerText = isFiltered ? 'すべて表示' : 'このアカウントのみ表示';
+            button.innerText = isFiltered
+                ? 'すべて表示'
+                : 'このアカウントのみ表示';
         });
 
         return button;

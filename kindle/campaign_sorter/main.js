@@ -2,8 +2,7 @@
     'use strict';
 
     // 共通ライブラリから関数を取得
-    const {
-    } = unsafeWindow.KindleCommon;
+    const {} = unsafeWindow.KindleCommon;
 
     const CONFIG = {
         MAX_PAGES: 20,
@@ -37,20 +36,27 @@
         const items = doc.querySelectorAll('[data-cy="price-recipe"]');
         const matchedItems = [];
 
-        items.forEach(item => {
-            const tag = item.querySelector('span[id^="KINDLE_PROMOTION_TAGS_"]');
+        items.forEach((item) => {
+            const tag = item.querySelector(
+                'span[id^="KINDLE_PROMOTION_TAGS_"]'
+            );
             if (!tag) return;
 
             const priceWhole = item.querySelector('.a-price-whole');
             if (!priceWhole) return;
 
-            const price = parseInt(priceWhole.textContent.replace(/[^\d]/g, ''), 10);
+            const price = parseInt(
+                priceWhole.textContent.replace(/[^\d]/g, ''),
+                10
+            );
             if (price < CONFIG.MIN_PRICE) return;
 
             const parent = item.closest('.s-result-item');
             if (!parent) return;
 
-            const titleAnchor = parent.querySelector('[data-cy="title-recipe"] a');
+            const titleAnchor = parent.querySelector(
+                '[data-cy="title-recipe"] a'
+            );
             const h2 = titleAnchor?.querySelector('h2');
             if (!titleAnchor || !h2) return;
 
@@ -81,7 +87,7 @@
 
     const collectAllPages = async (button) => {
         results = [];
-        
+
         for (let i = 1; i <= CONFIG.MAX_PAGES; i++) {
             try {
                 const newItems = await fetchNextPage(i);
@@ -112,7 +118,7 @@
         list.style.listStyle = 'none';
         list.style.padding = '0';
 
-        results.forEach(item => {
+        results.forEach((item) => {
             const searchUrl = new URL(location.href);
             searchUrl.searchParams.set('page', item.pageNum);
 
@@ -130,7 +136,7 @@
         const button = document.createElement('button');
         button.textContent = '📘 キャンペーン商品を抽出';
         Object.assign(button.style, CONFIG.BUTTON_STYLES);
-        
+
         button.onclick = () => {
             if (resultContainer) {
                 resultContainer.remove();
@@ -142,14 +148,16 @@
 
             button.disabled = true;
             button.textContent = '読み込み中...';
-            collectAllPages(button).then(() => {
-                button.textContent = '完了（もう一度押すと閉じます）';
-                button.disabled = false;
-            }).catch((error) => {
-                console.error('キャンペーン商品抽出エラー:', error);
-                button.textContent = 'エラーが発生しました';
-                button.disabled = false;
-            });
+            collectAllPages(button)
+                .then(() => {
+                    button.textContent = '完了（もう一度押すと閉じます）';
+                    button.disabled = false;
+                })
+                .catch((error) => {
+                    console.error('キャンペーン商品抽出エラー:', error);
+                    button.textContent = 'エラーが発生しました';
+                    button.disabled = false;
+                });
         };
 
         document.body.appendChild(button);

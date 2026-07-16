@@ -1,10 +1,9 @@
-(function() {
+(function () {
     'use strict';
 
     // 共通ライブラリから関数を取得
     // 共通ライブラリから関数を取得
-    const {
-    } = unsafeWindow.MastodonCommon;
+    const {} = unsafeWindow.MastodonCommon;
 
     const CONFIG = {
         TARGET_IMAGE_SELECTOR: 'div.drawer__inner__mastodon > img',
@@ -13,14 +12,20 @@
     };
 
     const blurAIPosts = () => {
-        document.querySelectorAll(CONFIG.AI_POSTS_SELECTOR).forEach(element => {
-            element.style.filter = element.style.filter ? '' : CONFIG.BLUR_FILTER;
-        });
+        document
+            .querySelectorAll(CONFIG.AI_POSTS_SELECTOR)
+            .forEach((element) => {
+                element.style.filter = element.style.filter
+                    ? ''
+                    : CONFIG.BLUR_FILTER;
+            });
     };
 
     const initializeBlurSensitiveContents = () => {
         const observer = new MutationObserver(() => {
-            const targetImage = document.querySelector(CONFIG.TARGET_IMAGE_SELECTOR);
+            const targetImage = document.querySelector(
+                CONFIG.TARGET_IMAGE_SELECTOR
+            );
             if (targetImage) {
                 targetImage.parentNode.addEventListener('click', blurAIPosts);
                 observer.disconnect();

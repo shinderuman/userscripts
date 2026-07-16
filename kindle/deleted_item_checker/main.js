@@ -2,10 +2,8 @@
     'use strict';
 
     // 共通ライブラリから関数を取得
-    const {
-        sendCompletionNotification,
-        sendErrorNotification
-    } = unsafeWindow.KindleCommon;
+    const { sendCompletionNotification, sendErrorNotification } =
+        unsafeWindow.KindleCommon;
 
     const CONFIG = {
         DEFAULTS: {
@@ -140,7 +138,11 @@
     };
 
     const findProductTitle = (item) => {
-        const selectors = ['._cDEzb_asin-title_zOxXw a .p13n-sc-truncate', '.p13n-sc-truncate', '._cDEzb_asin-title_zOxXw a'];
+        const selectors = [
+            '._cDEzb_asin-title_zOxXw a .p13n-sc-truncate',
+            '.p13n-sc-truncate',
+            '._cDEzb_asin-title_zOxXw a'
+        ];
         for (const selector of selectors) {
             const element = item.querySelector(selector);
             if (element) return element;
@@ -149,8 +151,10 @@
     };
 
     const findSurroundingProduct = (allItems, deletedIndex, direction) => {
-        const start = direction === 'prev' ? deletedIndex - 1 : deletedIndex + 1;
-        const condition = direction === 'prev' ? (i) => i >= 0 : (i) => i < allItems.length;
+        const start =
+            direction === 'prev' ? deletedIndex - 1 : deletedIndex + 1;
+        const condition =
+            direction === 'prev' ? (i) => i >= 0 : (i) => i < allItems.length;
         const step = direction === 'prev' ? -1 : 1;
 
         for (let i = start; condition(i); i += step) {
@@ -161,7 +165,9 @@
                     return {
                         type: direction === 'prev' ? '前の商品' : '後の商品',
                         title: titleElement.textContent.trim(),
-                        searchLink: createSearchLink(titleElement.textContent.trim())
+                        searchLink: createSearchLink(
+                            titleElement.textContent.trim()
+                        )
                     };
                 }
             }
@@ -180,24 +186,32 @@
             const doc = parser.parseFromString(html, 'text/html');
 
             const orderItems = [];
-            const orderElements = doc.querySelectorAll('div.a-section.a-spacing-large.a-spacing-top-large');
+            const orderElements = doc.querySelectorAll(
+                'div.a-section.a-spacing-large.a-spacing-top-large'
+            );
 
             orderElements.forEach((element) => {
                 const titleElement = element.querySelector('a[title] p');
 
                 // 注文日を含むテキストを要素全体から検索
                 const elementText = element.textContent;
-                const dateMatch = elementText.match(/注文日(\d{4}年\d{1,2}月\d{1,2}日)/);
+                const dateMatch = elementText.match(
+                    /注文日(\d{4}年\d{1,2}月\d{1,2}日)/
+                );
 
                 if (titleElement && dateMatch) {
                     const title = titleElement.textContent.trim();
                     const orderDate = dateMatch[1];
 
                     // 注文詳細ページのURLを抽出
-                    const orderDetailLink = element.querySelector('a[href*="/your-orders/order-details"]');
+                    const orderDetailLink = element.querySelector(
+                        'a[href*="/your-orders/order-details"]'
+                    );
                     let orderDetailUrl = '';
                     if (orderDetailLink) {
-                        orderDetailUrl = 'https://www.amazon.co.jp' + orderDetailLink.getAttribute('href');
+                        orderDetailUrl =
+                            'https://www.amazon.co.jp' +
+                            orderDetailLink.getAttribute('href');
                     }
 
                     orderItems.push({
@@ -215,21 +229,29 @@
         }
     };
 
-    const fetchOrderHistory = async (searchTerm, startPage = 2, endPage = 3) => {
+    const fetchOrderHistory = async (
+        searchTerm,
+        startPage = 2,
+        endPage = 3
+    ) => {
         const allOrderItems = [];
 
-        console.log(`📚 注文履歴検索開始: ${searchTerm} (ページ${startPage}-${endPage}を取得)`);
+        console.log(
+            `📚 注文履歴検索開始: ${searchTerm} (ページ${startPage}-${endPage}を取得)`
+        );
 
         for (let page = startPage; page <= endPage; page++) {
             try {
                 console.log(`📄 ページ${page}を取得中...`);
                 const pageItems = await fetchOrderHistoryPage(searchTerm, page);
                 allOrderItems.push(...pageItems);
-                console.log(`✅ ページ${page}完了: ${pageItems.length}件の注文を発見`);
+                console.log(
+                    `✅ ページ${page}完了: ${pageItems.length}件の注文を発見`
+                );
 
                 // ページ間で少し待機
                 if (page < endPage) {
-                    await new Promise(resolve => setTimeout(resolve, 300));
+                    await new Promise((resolve) => setTimeout(resolve, 300));
                 }
             } catch (error) {
                 console.warn(`❌ ページ${page}の取得をスキップ:`, error);
@@ -237,7 +259,9 @@
             }
         }
 
-        console.log(`📊 注文履歴検索完了: 合計${allOrderItems.length}件の注文を取得`);
+        console.log(
+            `📊 注文履歴検索完了: 合計${allOrderItems.length}件の注文を取得`
+        );
         return allOrderItems;
     };
 
@@ -245,14 +269,18 @@
         const deletedItems = [];
 
         // 削除メッセージを含む要素を直接検索
-        const deletedMessageElements = doc.querySelectorAll('._cDEzb_no-product-msg_2MQ8w');
+        const deletedMessageElements = doc.querySelectorAll(
+            '._cDEzb_no-product-msg_2MQ8w'
+        );
 
         if (deletedMessageElements.length === 0) {
             return deletedItems; // 削除商品がない場合は空配列を返す
         }
 
         // メインの商品リストを取得（複数のセレクターを試行）
-        let productList = doc.querySelector('ul.a-unordered-list.a-nostyle.a-vertical');
+        let productList = doc.querySelector(
+            'ul.a-unordered-list.a-nostyle.a-vertical'
+        );
         if (!productList) {
             productList = doc.querySelector('ul.a-unordered-list');
         }
@@ -262,7 +290,9 @@
 
         if (productList) {
             // 商品アイテムを取得（複数のセレクターを試行）
-            let allItems = Array.from(productList.querySelectorAll('li.a-spacing-medium'));
+            let allItems = Array.from(
+                productList.querySelectorAll('li.a-spacing-medium')
+            );
             if (allItems.length === 0) {
                 allItems = Array.from(productList.querySelectorAll('li'));
             }
@@ -270,8 +300,13 @@
             // 削除された商品のインデックスをすべて見つける
             const deletedIndices = [];
             allItems.forEach((item, index) => {
-                const deletedMsg = item.querySelector('._cDEzb_no-product-msg_2MQ8w');
-                if (deletedMsg && deletedMsg.textContent.includes(CONFIG.MESSAGES.DELETED)) {
+                const deletedMsg = item.querySelector(
+                    '._cDEzb_no-product-msg_2MQ8w'
+                );
+                if (
+                    deletedMsg &&
+                    deletedMsg.textContent.includes(CONFIG.MESSAGES.DELETED)
+                ) {
                     deletedIndices.push(index);
                 }
             });
@@ -281,8 +316,16 @@
                 const surroundingProducts = [];
 
                 // 前後の商品を取得
-                const prevProduct = findSurroundingProduct(allItems, deletedIndex, 'prev');
-                const nextProduct = findSurroundingProduct(allItems, deletedIndex, 'next');
+                const prevProduct = findSurroundingProduct(
+                    allItems,
+                    deletedIndex,
+                    'prev'
+                );
+                const nextProduct = findSurroundingProduct(
+                    allItems,
+                    deletedIndex,
+                    'next'
+                );
 
                 if (prevProduct) surroundingProducts.push(prevProduct);
                 if (nextProduct) surroundingProducts.push(nextProduct);
@@ -322,16 +365,20 @@
 
                 // 削除商品が検出できない場合はエラー（フォールバックは行わない）
                 if (deletedItems.length === 0) {
-                    console.warn(`ページ${pageNum}: 削除メッセージは検出されたが、商品の詳細抽出に失敗`);
+                    console.warn(
+                        `ページ${pageNum}: 削除メッセージは検出されたが、商品の詳細抽出に失敗`
+                    );
                     return {
                         pageNum,
                         url,
                         hasDeletedItem: true,
-                        deletedItems: [{
-                            itemNumber: 1,
-                            position: '不明',
-                            surroundingProducts: []
-                        }],
+                        deletedItems: [
+                            {
+                                itemNumber: 1,
+                                position: '不明',
+                                surroundingProducts: []
+                            }
+                        ],
                         deletedCount: 1
                     };
                 }
@@ -366,11 +413,12 @@
                 }
 
                 button.textContent = `ページ${i}をチェック中... (${foundCount}件発見)`;
-                console.log(`ページ${i}をチェック完了 - 削除商品: ${result.hasDeletedItem ? 'あり' : 'なし'}`);
+                console.log(
+                    `ページ${i}をチェック完了 - 削除商品: ${result.hasDeletedItem ? 'あり' : 'なし'}`
+                );
 
                 // レート制限対策で少し待機
-                await new Promise(resolve => setTimeout(resolve, 500));
-
+                await new Promise((resolve) => setTimeout(resolve, 500));
             } catch (e) {
                 console.warn(`ページ${i}の取得に失敗しました`, e);
                 break;
@@ -378,9 +426,16 @@
         }
 
         displayDeletedResults();
-        const totalDeletedItems = results.reduce((sum, item) => sum + (item.deletedCount || 1), 0);
+        const totalDeletedItems = results.reduce(
+            (sum, item) => sum + (item.deletedCount || 1),
+            0
+        );
         const totalPages = endPage - startPage + 1;
-        sendCompletionNotification('削除商品チェック', totalPages, `${foundCount}ページ（${totalDeletedItems}件の削除商品）`);
+        sendCompletionNotification(
+            '削除商品チェック',
+            totalPages,
+            `${foundCount}ページ（${totalDeletedItems}件の削除商品）`
+        );
     };
 
     const displayOrderResults = (orderItems = []) => {
@@ -403,9 +458,9 @@
                 const li = document.createElement('li');
                 Object.assign(li.style, CONFIG.STYLES.ORDER_ITEM);
 
-                const titleLink = item.orderDetailUrl ?
-                    `<a href="${item.orderDetailUrl}" target="_blank">${item.title}</a>` :
-                    item.title;
+                const titleLink = item.orderDetailUrl
+                    ? `<a href="${item.orderDetailUrl}" target="_blank">${item.title}</a>`
+                    : item.title;
 
                 li.innerHTML = `<strong>${titleLink}</strong> <span style="color: #666; font-size: 0.9em;">(${item.orderDate})</span>`;
                 orderList.appendChild(li);
@@ -415,12 +470,16 @@
             orderHistorySection.style.marginBottom = '2em';
             orderResultContainer.appendChild(orderHistorySection);
         } else {
-            orderResultContainer.innerHTML = '<h2>ヤングジャンプの注文履歴が見つかりませんでした</h2>';
+            orderResultContainer.innerHTML =
+                '<h2>ヤングジャンプの注文履歴が見つかりませんでした</h2>';
         }
 
         // 注文履歴は常に上に表示
         if (deletedResultContainer && deletedResultContainer.parentNode) {
-            document.body.insertBefore(orderResultContainer, deletedResultContainer);
+            document.body.insertBefore(
+                orderResultContainer,
+                deletedResultContainer
+            );
         } else {
             document.body.prepend(orderResultContainer);
         }
@@ -432,15 +491,22 @@
         }
 
         deletedResultContainer = document.createElement('div');
-        Object.assign(deletedResultContainer.style, CONFIG.STYLES.DELETED_RESULT);
+        Object.assign(
+            deletedResultContainer.style,
+            CONFIG.STYLES.DELETED_RESULT
+        );
 
         // 削除商品セクション
         if (results.length === 0) {
             const deletedSection = document.createElement('div');
-            deletedSection.innerHTML = '<h2>削除された商品は見つかりませんでした</h2>';
+            deletedSection.innerHTML =
+                '<h2>削除された商品は見つかりませんでした</h2>';
             deletedResultContainer.appendChild(deletedSection);
         } else {
-            const totalDeletedItems = results.reduce((sum, item) => sum + (item.deletedCount || 1), 0);
+            const totalDeletedItems = results.reduce(
+                (sum, item) => sum + (item.deletedCount || 1),
+                0
+            );
             const deletedSection = document.createElement('div');
             deletedSection.innerHTML = `<h2>削除された商品が含まれるページ（${results.length}ページ、合計${totalDeletedItems}件の削除商品）</h2>`;
 
@@ -472,21 +538,32 @@
                         if (item.deletedItems.length > 1) {
                             content += `<div style="margin-top: 0.5em;"><strong>削除商品 ${deletedItem.itemNumber} (位置: ${deletedItem.position}):</strong></div>`;
                         } else {
-                            content += '<div style="margin-top: 0.5em;"><strong>前後の商品:</strong></div>';
+                            content +=
+                                '<div style="margin-top: 0.5em;"><strong>前後の商品:</strong></div>';
                         }
 
-                        if (deletedItem.surroundingProducts && deletedItem.surroundingProducts.length > 0) {
-                            content += '<ul style="margin: 0.25em 0; padding-left: 1.5em;">';
-                            deletedItem.surroundingProducts.forEach(product => {
-                                if (typeof product === 'object' && product.title) {
-                                    content += `<li style="margin-bottom: 0.25em;">${product.type}: <a href="${product.searchLink}" target="_blank">${product.title}</a></li>`;
-                                } else {
-                                    content += `<li style="margin-bottom: 0.25em;">${product}</li>`;
+                        if (
+                            deletedItem.surroundingProducts &&
+                            deletedItem.surroundingProducts.length > 0
+                        ) {
+                            content +=
+                                '<ul style="margin: 0.25em 0; padding-left: 1.5em;">';
+                            deletedItem.surroundingProducts.forEach(
+                                (product) => {
+                                    if (
+                                        typeof product === 'object' &&
+                                        product.title
+                                    ) {
+                                        content += `<li style="margin-bottom: 0.25em;">${product.type}: <a href="${product.searchLink}" target="_blank">${product.title}</a></li>`;
+                                    } else {
+                                        content += `<li style="margin-bottom: 0.25em;">${product}</li>`;
+                                    }
                                 }
-                            });
+                            );
                             content += '</ul>';
                         } else {
-                            content += '<div style="margin-left: 1.5em; color: #666;">前後の商品情報を取得できませんでした</div>';
+                            content +=
+                                '<div style="margin-left: 1.5em; color: #666;">前後の商品情報を取得できませんでした</div>';
                         }
                     });
                 }
@@ -507,7 +584,10 @@
 
         // 削除商品は常に下に表示（注文履歴の後）
         if (orderResultContainer && orderResultContainer.parentNode) {
-            orderResultContainer.parentNode.insertBefore(deletedResultContainer, orderResultContainer.nextSibling);
+            orderResultContainer.parentNode.insertBefore(
+                deletedResultContainer,
+                orderResultContainer.nextSibling
+            );
         } else {
             document.body.prepend(deletedResultContainer);
         }
@@ -518,18 +598,33 @@
         const controlContainer = document.createElement('div');
         Object.assign(controlContainer.style, CONFIG.STYLES.CONTROL_PANEL);
 
-        controlContainer.innerHTML = CONFIG.HTML.CONTROL_PANEL
-            .replace('{{ORDER_HISTORY_START_PAGE}}', CONFIG.DEFAULTS.ORDER_HISTORY_START_PAGE)
-            .replace('{{ORDER_HISTORY_END_PAGE}}', CONFIG.DEFAULTS.ORDER_HISTORY_END_PAGE)
-            .replace('{{DELETED_ITEMS_START_PAGE}}', CONFIG.DEFAULTS.DELETED_ITEMS_START_PAGE)
-            .replace('{{DELETED_ITEMS_END_PAGE}}', CONFIG.DEFAULTS.DELETED_ITEMS_END_PAGE);
+        controlContainer.innerHTML = CONFIG.HTML.CONTROL_PANEL.replace(
+            '{{ORDER_HISTORY_START_PAGE}}',
+            CONFIG.DEFAULTS.ORDER_HISTORY_START_PAGE
+        )
+            .replace(
+                '{{ORDER_HISTORY_END_PAGE}}',
+                CONFIG.DEFAULTS.ORDER_HISTORY_END_PAGE
+            )
+            .replace(
+                '{{DELETED_ITEMS_START_PAGE}}',
+                CONFIG.DEFAULTS.DELETED_ITEMS_START_PAGE
+            )
+            .replace(
+                '{{DELETED_ITEMS_END_PAGE}}',
+                CONFIG.DEFAULTS.DELETED_ITEMS_END_PAGE
+            );
 
         // スタイルを適用
         const inputs = controlContainer.querySelectorAll('input');
-        inputs.forEach(input => Object.assign(input.style, CONFIG.STYLES.INPUT));
+        inputs.forEach((input) =>
+            Object.assign(input.style, CONFIG.STYLES.INPUT)
+        );
 
         const buttons = controlContainer.querySelectorAll('button');
-        buttons.forEach(button => Object.assign(button.style, CONFIG.STYLES.BUTTON_INLINE));
+        buttons.forEach((button) =>
+            Object.assign(button.style, CONFIG.STYLES.BUTTON_INLINE)
+        );
 
         document.body.appendChild(controlContainer);
 
@@ -551,14 +646,14 @@
             }
 
             // 注文履歴のページ範囲を取得
-            const orderStartPageInput = document.getElementById('orderStartPage');
+            const orderStartPageInput =
+                document.getElementById('orderStartPage');
             const orderEndPageInput = document.getElementById('orderEndPage');
             const orderStartPage = parseInt(orderStartPageInput.value);
             const orderEndPage = parseInt(orderEndPageInput.value);
 
             // 入力値の検証
             if (orderStartPage > orderEndPage) {
-                // eslint-disable-next-line no-undef
                 alert('開始ページは終了ページより小さい値を入力してください。');
                 return;
             }
@@ -566,18 +661,24 @@
             button.disabled = true;
             button.textContent = '注文履歴を取得中...';
 
-            fetchOrderHistory('ヤングジャンプ', orderStartPage, orderEndPage).then((orderItems) => {
-                displayOrderResults(orderItems);
-                const totalPages = orderEndPage - orderStartPage + 1;
-                sendCompletionNotification('注文履歴検索', totalPages, `${orderItems.length}件の注文履歴`);
-                button.textContent = '完了（もう一度押すと閉じます）';
-                button.disabled = false;
-            }).catch((error) => {
-                console.error('注文履歴取得エラー:', error);
-                sendErrorNotification('注文履歴検索', error.message);
-                button.textContent = 'エラーが発生しました';
-                button.disabled = false;
-            });
+            fetchOrderHistory('ヤングジャンプ', orderStartPage, orderEndPage)
+                .then((orderItems) => {
+                    displayOrderResults(orderItems);
+                    const totalPages = orderEndPage - orderStartPage + 1;
+                    sendCompletionNotification(
+                        '注文履歴検索',
+                        totalPages,
+                        `${orderItems.length}件の注文履歴`
+                    );
+                    button.textContent = '完了（もう一度押すと閉じます）';
+                    button.disabled = false;
+                })
+                .catch((error) => {
+                    console.error('注文履歴取得エラー:', error);
+                    sendErrorNotification('注文履歴検索', error.message);
+                    button.textContent = 'エラーが発生しました';
+                    button.disabled = false;
+                });
         };
     };
 
@@ -601,22 +702,23 @@
 
             // 入力値の検証
             if (startPage > endPage) {
-                // eslint-disable-next-line no-undef
                 alert('開始ページは終了ページより小さい値を入力してください。');
                 return;
             }
 
             button.disabled = true;
             button.textContent = '読み込み中...';
-            scanAllPages(button, startPage, endPage).then(() => {
-                button.textContent = '完了（もう一度押すと閉じます）';
-                button.disabled = false;
-            }).catch((error) => {
-                console.error('削除商品チェックエラー:', error);
-                sendErrorNotification('削除商品チェック', error.message);
-                button.textContent = 'エラーが発生しました';
-                button.disabled = false;
-            });
+            scanAllPages(button, startPage, endPage)
+                .then(() => {
+                    button.textContent = '完了（もう一度押すと閉じます）';
+                    button.disabled = false;
+                })
+                .catch((error) => {
+                    console.error('削除商品チェックエラー:', error);
+                    sendErrorNotification('削除商品チェック', error.message);
+                    button.textContent = 'エラーが発生しました';
+                    button.disabled = false;
+                });
         };
     };
 

@@ -121,7 +121,9 @@
     };
 
     const getTagIndexByTag = (tagIndex) => {
-        return typeof tagIndex === 'number' && tagIndex >= 0 && tagIndex < TAG_COLORS.length
+        return typeof tagIndex === 'number' &&
+            tagIndex >= 0 &&
+            tagIndex < TAG_COLORS.length
             ? tagIndex
             : TAG_COLORS.length - 1; // 無効な場合は未設定のインデックス
     };
@@ -191,13 +193,19 @@
 
     const updateVideoPageTag = (tag, h1Element) => {
         // 既存のタグ表示を削除
-        const existingTag = h1Element.querySelector(`.${CLASS_NAMES.MOVIE_TAG_DISPLAY}`);
+        const existingTag = h1Element.querySelector(
+            `.${CLASS_NAMES.MOVIE_TAG_DISPLAY}`
+        );
         if (existingTag) {
             existingTag.remove();
         }
 
         // 新しいタグを表示
-        if (tag !== null && tag !== undefined && tag !== TAG_COLORS.length - 1) {
+        if (
+            tag !== null &&
+            tag !== undefined &&
+            tag !== TAG_COLORS.length - 1
+        ) {
             const tagIndex = getTagIndexByTag(tag);
             const tagData = TAG_COLORS[tagIndex];
             const tagDisplay = document.createElement('span');
@@ -223,7 +231,9 @@
             if (h1Element) {
                 updateVideoPageTag(savedTag, h1Element);
 
-                const existingButton = h1Element.parentElement.querySelector(`.${CLASS_NAMES.MOVIE_TAG_BUTTON}`);
+                const existingButton = h1Element.parentElement.querySelector(
+                    `.${CLASS_NAMES.MOVIE_TAG_BUTTON}`
+                );
                 if (existingButton) {
                     existingButton.remove();
                 }
@@ -247,14 +257,13 @@
             childList: true,
             subtree: true
         });
-
     };
 
     const addSearchIcons = () => {
         // 「」『』を含むタイトル要素のみを対象にする
         const titleElements = document.querySelectorAll(SELECTORS.SERIES_TITLE);
 
-        titleElements.forEach(titleElement => {
+        titleElements.forEach((titleElement) => {
             // 既にアイコンが追加されているかチェック
             if (titleElement.dataset[CLASS_NAMES.MOVIE_SEARCH_ENHANCED]) return;
 
@@ -266,7 +275,9 @@
 
             // videoIdを取得
             const videoLink = titleElement.closest('a');
-            const videoId = videoLink ? videoLink.href.match(/(sm\d+)/)?.[1] : null;
+            const videoId = videoLink
+                ? videoLink.href.match(/(sm\d+)/)?.[1]
+                : null;
 
             if (!videoId) return;
 
@@ -283,7 +294,6 @@
             titleElement.appendChild(searchIcon);
             titleElement.prepend(tagButton);
             titleElement.dataset[CLASS_NAMES.MOVIE_SEARCH_ENHANCED] = 'true';
-
         });
     };
 
@@ -291,10 +301,14 @@
         // 特定の動画ページ（結月さん映画シリーズ）の場合は動画ページ用のセットアップを実行
         if (window.location.href.includes('/watch/')) {
             const observer = new MutationObserver(() => {
-                const seriesLink = document.querySelector(SELECTORS.SERIES_LINK);
+                const seriesLink = document.querySelector(
+                    SELECTORS.SERIES_LINK
+                );
                 if (seriesLink) {
                     setupVideoPage();
-                    console.log('🚀 結月さん映画シリーズエンハンサーが初期化されました（動画ページ）');
+                    console.log(
+                        '🚀 結月さん映画シリーズエンハンサーが初期化されました（動画ページ）'
+                    );
                     console.log('💡 動画ページに🏷️タグ機能を追加しました');
                     observer.disconnect();
                 }
@@ -308,8 +322,12 @@
             addSearchIcons();
             const observer = new MutationObserver(addSearchIcons);
             observer.observe(document.body, { childList: true, subtree: true });
-            console.log('🚀 結月さん映画シリーズエンハンサーが初期化されました（シリーズページ）');
-            console.log('💡 「結月さん映画を鑑賞する」シリーズに🎬アイコンで配信サイト検索機能と🏷️タグ機能を追加しました');
+            console.log(
+                '🚀 結月さん映画シリーズエンハンサーが初期化されました（シリーズページ）'
+            );
+            console.log(
+                '💡 「結月さん映画を鑑賞する」シリーズに🎬アイコンで配信サイト検索機能と🏷️タグ機能を追加しました'
+            );
         }
     };
 

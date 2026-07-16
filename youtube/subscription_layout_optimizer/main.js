@@ -2,11 +2,8 @@
     'use strict';
 
     // 共通ライブラリから関数を取得
-    const {
-        observeDOM,
-        setGridColumns,
-        removePastStreams
-    } = unsafeWindow.YouTubeCommon;
+    const { observeDOM, setGridColumns, removePastStreams } =
+        unsafeWindow.YouTubeCommon;
 
     const CONFIG = {
         COLUMN_COUNT: 5 // 表示する列数
@@ -25,7 +22,9 @@
         observeDOM(applyModifications);
 
         console.log('🚀 YouTube Subscription Modifier が初期化されました');
-        console.log(`💡 ${CONFIG.COLUMN_COUNT}列表示に設定し、配信済み動画を非表示にします`);
+        console.log(
+            `💡 ${CONFIG.COLUMN_COUNT}列表示に設定し、配信済み動画を非表示にします`
+        );
     };
 
     // 自動初期化

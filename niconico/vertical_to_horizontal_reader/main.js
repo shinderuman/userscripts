@@ -2,12 +2,8 @@
     'use strict';
 
     // 共通ライブラリから関数を取得
-    const {
-        showNotification,
-        scrollToElement,
-        createCanvas,
-        applyStyles
-    } = unsafeWindow.NiconicoCommon;
+    const { showNotification, scrollToElement, createCanvas, applyStyles } =
+        unsafeWindow.NiconicoCommon;
 
     const CONFIG = {
         SELECTORS: {
@@ -59,12 +55,17 @@
     let nextEpisodeURL = null;
 
     const collectPageCanvases = async () => {
-        const liElements = document.querySelectorAll(CONFIG.SELECTORS.PAGE_CONTENTS);
+        const liElements = document.querySelectorAll(
+            CONFIG.SELECTORS.PAGE_CONTENTS
+        );
         const pages = [];
 
         for (const li of liElements) {
             if (abort) {
-                showNotification('横読み変換', 'ESC キーにより処理を中断しました');
+                showNotification(
+                    '横読み変換',
+                    'ESC キーにより処理を中断しました'
+                );
                 return [];
             }
             await scrollToElement(li);
@@ -73,7 +74,10 @@
             const isSpread = li.classList.contains('spread');
 
             if (isSpread && canvases.length >= 2) {
-                pages.push({ canvases: [canvases[1], canvases[0]], isSpread: true });
+                pages.push({
+                    canvases: [canvases[1], canvases[0]],
+                    isSpread: true
+                });
             } else if (canvases.length >= 1) {
                 pages.push({ canvases: [canvases[0]], isSpread: false });
             }
@@ -106,9 +110,13 @@
 
         const render = () => {
             const pages = displayUnits[currentUnit];
-            const totalWidth = pages.reduce((sum, p) =>
-                sum + p.canvases.reduce((w, c) => w + c.width, 0), 0);
-            const maxHeight = Math.max(...pages.flatMap(p => p.canvases.map(c => c.height)));
+            const totalWidth = pages.reduce(
+                (sum, p) => sum + p.canvases.reduce((w, c) => w + c.width, 0),
+                0
+            );
+            const maxHeight = Math.max(
+                ...pages.flatMap((p) => p.canvases.map((c) => c.height))
+            );
 
             canvas.width = totalWidth;
             canvas.height = maxHeight;
@@ -116,7 +124,9 @@
 
             let offsetX = totalWidth;
             for (const p of pages) {
-                const drawOrder = p.isSpread ? p.canvases : [...p.canvases].reverse();
+                const drawOrder = p.isSpread
+                    ? p.canvases
+                    : [...p.canvases].reverse();
                 for (const c of drawOrder) {
                     offsetX -= c.width;
                     ctx.drawImage(c, offsetX, 0);
@@ -124,7 +134,7 @@
             }
         };
 
-        const handleKeydown = e => {
+        const handleKeydown = (e) => {
             if (CONFIG.KEY_MAPPING.PREV_PAGE.includes(e.key)) {
                 if (currentUnit > 0) {
                     currentUnit--;
@@ -178,7 +188,7 @@
         document.body.append(canvas, nav);
     };
 
-    const handleAbortKey = e => {
+    const handleAbortKey = (e) => {
         if (e.key === 'Escape') {
             abort = true;
             console.log('[横読み変換] 処理が中断されました（ESC キー）。');

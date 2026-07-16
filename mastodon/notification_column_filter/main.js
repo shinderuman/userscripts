@@ -1,10 +1,8 @@
-(function() {
+(function () {
     'use strict';
 
     // 共通ライブラリから関数を取得
-    const {
-        DeferredMutationObserver
-    } = unsafeWindow.MastodonCommon;
+    const { DeferredMutationObserver } = unsafeWindow.MastodonCommon;
 
     const CONFIG = {
         MUTED_USERS: [
@@ -19,7 +17,9 @@
     };
 
     const isFilterAllActive = () => {
-        const filterBar = document.querySelector('div[aria-label="通知"]').querySelector('div.notification__filter-bar');
+        const filterBar = document
+            .querySelector('div[aria-label="通知"]')
+            .querySelector('div.notification__filter-bar');
         if (!filterBar) return true; // フィルターバーがない場合はデフォルトで有効
 
         const firstButton = filterBar.querySelector('button');
@@ -29,12 +29,16 @@
     const removeUserPosts = (column) => {
         const isAllActive = isFilterAllActive();
 
-        column.querySelectorAll('article').forEach(article => {
+        column.querySelectorAll('article').forEach((article) => {
             try {
-                const displayNameLinks = article.querySelectorAll('a.status__display-name > span > span');
-                const userNames = Array.from(displayNameLinks).map(span => span.textContent.trim());
+                const displayNameLinks = article.querySelectorAll(
+                    'a.status__display-name > span > span'
+                );
+                const userNames = Array.from(displayNameLinks).map((span) =>
+                    span.textContent.trim()
+                );
 
-                const shouldRemove = userNames.some(userName =>
+                const shouldRemove = userNames.some((userName) =>
                     CONFIG.MUTED_USERS.includes(userName)
                 );
 
@@ -49,7 +53,9 @@
 
     const monitorNotificationColumn = () => {
         const observer = new DeferredMutationObserver(() => {
-            const notificationColumn = document.querySelector(`div[aria-label="${CONFIG.TARGET_COLUMN_LABEL}"]`);
+            const notificationColumn = document.querySelector(
+                `div[aria-label="${CONFIG.TARGET_COLUMN_LABEL}"]`
+            );
 
             if (notificationColumn) {
                 removeUserPosts(notificationColumn);
@@ -65,7 +71,9 @@
     const init = () => {
         console.log('🚀 Mastodon Notification Column Filter を初期化');
 
-        const notificationColumn = document.querySelector(`div[aria-label="${CONFIG.TARGET_COLUMN_LABEL}"]`);
+        const notificationColumn = document.querySelector(
+            `div[aria-label="${CONFIG.TARGET_COLUMN_LABEL}"]`
+        );
         if (notificationColumn) {
             removeUserPosts(notificationColumn);
         }

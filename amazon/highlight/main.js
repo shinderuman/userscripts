@@ -1,11 +1,8 @@
-(function() {
+(function () {
     'use strict';
 
     // 共通ライブラリから関数を取得
-    const {
-        applyStyles,
-        addBadgeToFavicon
-    } = unsafeWindow.AmazonCommon;
+    const { applyStyles, addBadgeToFavicon } = unsafeWindow.AmazonCommon;
 
     const CONFIG = {
         HIGHLIGHT_CONFIGS: [
@@ -50,13 +47,16 @@
     const highlightItems = () => {
         let firstHighlightedItem = null;
 
-        document.querySelectorAll(CONFIG.SELECTORS.items).forEach(item => {
+        document.querySelectorAll(CONFIG.SELECTORS.items).forEach((item) => {
             const titleElement = item.querySelector(CONFIG.SELECTORS.title);
             if (!titleElement) return;
 
-            CONFIG.HIGHLIGHT_CONFIGS.forEach(config => {
+            CONFIG.HIGHLIGHT_CONFIGS.forEach((config) => {
                 const itemPrice = parseFloat(item.getAttribute('data-price'));
-                if (titleElement.textContent.trim().startsWith(config.title) && itemPrice <= config.priceThreshold) {
+                if (
+                    titleElement.textContent.trim().startsWith(config.title) &&
+                    itemPrice <= config.priceThreshold
+                ) {
                     applyStyles(titleElement, CONFIG.STYLES.highlightedItem);
                     if (!firstHighlightedItem) {
                         firstHighlightedItem = item;
@@ -66,7 +66,10 @@
         });
 
         if (firstHighlightedItem) {
-            firstHighlightedItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            firstHighlightedItem.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
         }
 
         return firstHighlightedItem;
@@ -81,13 +84,13 @@
 
     const initializeHighlight = () => {
         const hasHighlightedItems = highlightItems();
-        
+
         if (hasHighlightedItems) {
             highlightNavbar();
             addBadgeToFavicon(CONFIG.BADGE_COLOR);
             console.log('🎯 アイテムがハイライトされました');
         }
-        
+
         console.log('🚀 Amazon Highlight が初期化されました');
     };
 

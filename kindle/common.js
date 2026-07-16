@@ -6,7 +6,7 @@ unsafeWindow.KindleCommon = (function () {
     const COMMON_SELECTORS = {
         title: '#productTitle',
         kindleBookAvailable: '#tmm-grid-swatch-KINDLE',
-        paperBookAvailable: '[id^=\'tmm-grid-swatch\']:not([id$=\'KINDLE\'])',
+        paperBookAvailable: "[id^='tmm-grid-swatch']:not([id$='KINDLE'])",
         couponBadge: 'i.a-icon.a-icon-addon.newCouponBadge',
         kindlePrice: [
             '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span',
@@ -15,7 +15,8 @@ unsafeWindow.KindleCommon = (function () {
             '#a-autoid-2-announce > span.slot-price > span',
             '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-extraMessage .kindleExtraMessage .a-color-price'
         ].join(', '),
-        paperPrice: '[id^=\'tmm-grid-swatch\']:not([id$=\'KINDLE\']) > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span',
+        paperPrice:
+            "[id^='tmm-grid-swatch']:not([id$='KINDLE']) > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span",
         points: '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span, #tmm-grid-swatch-OTHER > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span'
     };
 
@@ -28,10 +29,14 @@ unsafeWindow.KindleCommon = (function () {
     // 共通設定
     const COMMON_CONFIG = {
         // S3 URLs
-        AUTHORS_URL: 'https://kindle-asins.s3.ap-northeast-1.amazonaws.com/authors.json',
-        EXCLUDED_KEYWORDS_URL: 'https://kindle-asins.s3.ap-northeast-1.amazonaws.com/excluded_title_keywords.json',
-        PAPER_BOOKS_URL: 'https://kindle-asins.s3.ap-northeast-1.amazonaws.com/paper_books_asins.json',
-        UNPROCESSED_BOOKS_URL: 'https://kindle-asins.s3.ap-northeast-1.amazonaws.com/unprocessed_asins.json',
+        AUTHORS_URL:
+            'https://kindle-asins.s3.ap-northeast-1.amazonaws.com/authors.json',
+        EXCLUDED_KEYWORDS_URL:
+            'https://kindle-asins.s3.ap-northeast-1.amazonaws.com/excluded_title_keywords.json',
+        PAPER_BOOKS_URL:
+            'https://kindle-asins.s3.ap-northeast-1.amazonaws.com/paper_books_asins.json',
+        UNPROCESSED_BOOKS_URL:
+            'https://kindle-asins.s3.ap-northeast-1.amazonaws.com/unprocessed_asins.json',
 
         // 共通閾値
         POINT_THRESHOLD: 170,
@@ -66,20 +71,30 @@ unsafeWindow.KindleCommon = (function () {
                 url: urlWithCacheBuster,
                 headers: {
                     'Cache-Control': 'no-cache, no-store, must-revalidate',
-                    'Pragma': 'no-cache',
-                    'Expires': '0'
+                    Pragma: 'no-cache',
+                    Expires: '0'
                 },
                 onload: (response) => {
                     if (response.status === 200) {
                         try {
                             const data = JSON.parse(response.responseText);
-                            console.log(`📥 S3データ取得成功: ${dataType} (${data.length || Object.keys(data).length}件)`);
+                            console.log(
+                                `📥 S3データ取得成功: ${dataType} (${data.length || Object.keys(data).length}件)`
+                            );
                             resolve(data);
                         } catch (error) {
-                            reject(new Error(`Failed to parse ${dataType} JSON: ${error.message}`));
+                            reject(
+                                new Error(
+                                    `Failed to parse ${dataType} JSON: ${error.message}`
+                                )
+                            );
                         }
                     } else {
-                        reject(new Error(`Failed to fetch ${dataType}: ${response.status}`));
+                        reject(
+                            new Error(
+                                `Failed to fetch ${dataType}: ${response.status}`
+                            )
+                        );
                     }
                 },
                 onerror: (error) => reject(error)
@@ -98,12 +113,17 @@ unsafeWindow.KindleCommon = (function () {
                 onload: (response) => {
                     if (response.status === 200) {
                         const parser = new DOMParser();
-                        const doc = parser.parseFromString(response.responseText, 'text/html');
+                        const doc = parser.parseFromString(
+                            response.responseText,
+                            'text/html'
+                        );
                         const info = extractorFunction(doc, cleanUrl);
                         resolve(info);
                     } else {
                         // HTTPエラーの場合に通知を送信
-                        const error = new Error(`Failed to fetch page: ${response.status}`);
+                        const error = new Error(
+                            `Failed to fetch page: ${response.status}`
+                        );
                         error.status = response.status;
                         sendPageFetchErrorNotification(cleanUrl, bookTitle);
                         reject(error);
@@ -130,7 +150,11 @@ unsafeWindow.KindleCommon = (function () {
     };
 
     // 完了通知の共通関数
-    const sendCompletionNotification = (scriptName, totalCount, resultCount) => {
+    const sendCompletionNotification = (
+        scriptName,
+        totalCount,
+        resultCount
+    ) => {
         sendNotification(
             `📚 ${scriptName}完了`,
             `${totalCount}件中 ${resultCount}件を発見`,
@@ -152,12 +176,7 @@ unsafeWindow.KindleCommon = (function () {
     // ページ取得エラー通知関数
     const sendPageFetchErrorNotification = (url, title) => {
         const message = `${title}のページ取得に失敗しました`;
-        sendNotification(
-            '⚠️ ページ取得エラー',
-            message,
-            url,
-            0
-        );
+        sendNotification('⚠️ ページ取得エラー', message, url, 0);
     };
 
     // URLからASINを抽出
@@ -169,13 +188,15 @@ unsafeWindow.KindleCommon = (function () {
     // 共通のDOM要素値取得関数
     const getElementValue = (doc, selector, regex) => {
         // 複数のセレクターがカンマ区切りで渡された場合、順番に試す
-        const selectors = selector.split(',').map(s => s.trim());
+        const selectors = selector.split(',').map((s) => s.trim());
 
         for (const sel of selectors) {
             const element = doc.querySelector(sel);
             if (element) {
                 const match = element.innerText.match(regex);
-                const value = match ? parseInt(match[1].replace(/,/g, ''), 10) : 0;
+                const value = match
+                    ? parseInt(match[1].replace(/,/g, ''), 10)
+                    : 0;
                 if (value > 0) {
                     return value;
                 }
@@ -211,10 +232,14 @@ unsafeWindow.KindleCommon = (function () {
         return items.some(checkFunction);
     };
 
-    const cleanupOldStorageItems = (storageKey, cutoffDate, dateField = 'releaseDate') => {
+    const cleanupOldStorageItems = (
+        storageKey,
+        cutoffDate,
+        dateField = 'releaseDate'
+    ) => {
         try {
             const items = getStorageItems(storageKey);
-            const validItems = items.filter(item => {
+            const validItems = items.filter((item) => {
                 const itemDate = new Date(item[dateField]);
                 return itemDate >= cutoffDate;
             });
@@ -229,32 +254,55 @@ unsafeWindow.KindleCommon = (function () {
         }
     };
 
-      // Amazon商品情報抽出
+    // Amazon商品情報抽出
     const extractAmazonProductInfo = (doc, logContext = '') => {
-        const title = doc.querySelector(COMMON_SELECTORS.title)?.innerText.trim();
-        const points = getElementValue(doc, COMMON_SELECTORS.points, COMMON_PATTERNS.POINTS);
-        const kindlePrice = getElementValue(doc, COMMON_SELECTORS.kindlePrice, COMMON_PATTERNS.PRICE);
-        const paperPrice = getElementValue(doc, COMMON_SELECTORS.paperPrice, COMMON_PATTERNS.PRICE);
+        const title = doc
+            .querySelector(COMMON_SELECTORS.title)
+            ?.innerText.trim();
+        const points = getElementValue(
+            doc,
+            COMMON_SELECTORS.points,
+            COMMON_PATTERNS.POINTS
+        );
+        const kindlePrice = getElementValue(
+            doc,
+            COMMON_SELECTORS.kindlePrice,
+            COMMON_PATTERNS.PRICE
+        );
+        const paperPrice = getElementValue(
+            doc,
+            COMMON_SELECTORS.paperPrice,
+            COMMON_PATTERNS.PRICE
+        );
         const couponBadge = doc.querySelector(COMMON_SELECTORS.couponBadge);
-        const hasCoupon = couponBadge?.textContent?.includes('クーポン:') || false;
+        const hasCoupon =
+            couponBadge?.textContent?.includes('クーポン:') || false;
 
         // 取得できなかった値についてログを出力
         if (points === 0) {
-            console.warn(`⚠️ ポイント情報を取得できませんでした - ${title} ${logContext}`);
+            console.warn(
+                `⚠️ ポイント情報を取得できませんでした - ${title} ${logContext}`
+            );
             console.warn('セレクタ:', COMMON_SELECTORS.points);
         }
         if (kindlePrice === 0) {
-            console.warn(`⚠️ Kindle価格情報を取得できませんでした - ${title} ${logContext}`);
+            console.warn(
+                `⚠️ Kindle価格情報を取得できませんでした - ${title} ${logContext}`
+            );
             console.warn('セレクタ:', COMMON_SELECTORS.kindlePrice);
         }
         if (paperPrice === 0) {
-            console.log(`📖 紙書籍価格情報を取得できませんでした - ${title} ${logContext}`);
+            console.log(
+                `📖 紙書籍価格情報を取得できませんでした - ${title} ${logContext}`
+            );
             console.log('セレクタ:', COMMON_SELECTORS.paperPrice);
         }
 
         return {
             title,
-            asin: extractAsinFromUrl(doc.location?.href || window.location.href),
+            asin: extractAsinFromUrl(
+                doc.location?.href || window.location.href
+            ),
             points,
             kindlePrice,
             paperPrice,
@@ -264,7 +312,8 @@ unsafeWindow.KindleCommon = (function () {
 
     // セール条件評価
     const evaluateSaleConditions = (productInfo) => {
-        const { points, kindlePrice, paperPrice, hasCoupon, title } = productInfo;
+        const { points, kindlePrice, paperPrice, hasCoupon, title } =
+            productInfo;
         const conditions = [];
 
         if (hasCoupon) {
@@ -273,8 +322,13 @@ unsafeWindow.KindleCommon = (function () {
         if (points >= COMMON_CONFIG.POINT_THRESHOLD) {
             conditions.push(`✅ポイント ${points}pt`);
         }
-        if (kindlePrice && (points / kindlePrice) * 100 >= COMMON_CONFIG.POINTS_RATE_THRESHOLD) {
-            conditions.push(`✅ポイント還元 ${(points / kindlePrice * 100).toFixed(2)}%`);
+        if (
+            kindlePrice &&
+            (points / kindlePrice) * 100 >= COMMON_CONFIG.POINTS_RATE_THRESHOLD
+        ) {
+            conditions.push(
+                `✅ポイント還元 ${((points / kindlePrice) * 100).toFixed(2)}%`
+            );
         }
         if (shouldAddPriceDifference(paperPrice, kindlePrice, title)) {
             conditions.push(`✅価格差 ${paperPrice - kindlePrice}円`);
@@ -289,11 +343,15 @@ unsafeWindow.KindleCommon = (function () {
             return false;
         }
         if (!isValidYoungJumpPrice(title, paperPrice)) {
-            console.warn(`⚠️ ヤングジャンプ価格が高すぎます (${paperPrice}円)。定価ではないと思われるため価格差比較を除外します。`);
+            console.warn(
+                `⚠️ ヤングジャンプ価格が高すぎます (${paperPrice}円)。定価ではないと思われるため価格差比較を除外します。`
+            );
             return false;
         }
         if (paperPrice >= COMMON_CONFIG.PAPER_BOOK_MAX_REASONABLE_PRICE) {
-            console.warn(`⚠️ 紙書籍価格が高すぎます (${paperPrice}円)。定価ではないと思われるため価格差比較を除外します。`);
+            console.warn(
+                `⚠️ 紙書籍価格が高すぎます (${paperPrice}円)。定価ではないと思われるため価格差比較を除外します。`
+            );
             return false;
         }
         if (kindlePrice <= 0) {

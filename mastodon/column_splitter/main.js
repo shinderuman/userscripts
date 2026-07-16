@@ -2,99 +2,128 @@
     'use strict';
 
     // 共通ライブラリから関数を取得
-    const {
-        ImageCache,
-        DeferredMutationObserver
-    } = unsafeWindow.MastodonCommon;
+    const { ImageCache, DeferredMutationObserver } =
+        unsafeWindow.MastodonCommon;
 
     const CONFIG = {
         TARGET_COLUMN_LABEL: '#StabilityAI',
         INSERT_BEFORE_LABEL: 'ホーム',
         COLUMN_SPLIT_COUNT: 3,
         COLUMN_CLASS: 'split-column',
-        KENJI_API_ENDPOINT: 'https://kenji.asmodeus.jp/proxy/api/v1/image/info/',
+        KENJI_API_ENDPOINT:
+            'https://kenji.asmodeus.jp/proxy/api/v1/image/info/',
         KENJI_IMAGE_BASE_URL: 'https://kenji.asmodeus.jp/proxy_image/post/t/',
         OURT_IMAGE_BASE_URL: 'https://img.ourt-ai.work/post/t/',
         EXPIRATION_TIME: 24 * 60 * 60 * 1000 * 7
     };
 
-    const preCloneRules = [{
-        'expandPosts': {
-            'accounts': [],
-            'func': (article) => {
-                const button = article.querySelector('button.link-button');
-                if (button && button.textContent.trim() === '続きを表示') {
-                    button.click();
+    const preCloneRules = [
+        {
+            expandPosts: {
+                accounts: [],
+                func: (article) => {
+                    const button = article.querySelector('button.link-button');
+                    if (button && button.textContent.trim() === '続きを表示') {
+                        button.click();
+                    }
                 }
             }
         }
-    }];
+    ];
 
-    const postCloneRules = [{
-        'removeHideButtons': {
-            'accounts': [],
-            'func': (article) => {
-                const button = article.querySelector('button.media-gallery__actions__pill');
-                if (button && button.textContent.trim() === '隠す') {
-                    button.remove();
+    const postCloneRules = [
+        {
+            removeHideButtons: {
+                accounts: [],
+                func: (article) => {
+                    const button = article.querySelector(
+                        'button.media-gallery__actions__pill'
+                    );
+                    if (button && button.textContent.trim() === '隠す') {
+                        button.remove();
+                    }
                 }
-            }
-        },
-        'removeAltLabels': {
-            'accounts': [],
-            'func': (article) => {
-                article.querySelectorAll('.media-gallery__alt__label').forEach(label => label.remove());
-            }
-        },
-        'removeLongText': {
-            'accounts': [],
-            'func': (article) => {
-                const contentElement = article.querySelector('div.status__content.status__content--with-action > div > p > span:nth-child(1)');
-                if (contentElement && contentElement.textContent.length >= 120) {
-                    contentElement.remove();
+            },
+            removeAltLabels: {
+                accounts: [],
+                func: (article) => {
+                    article
+                        .querySelectorAll('.media-gallery__alt__label')
+                        .forEach((label) => label.remove());
                 }
-            }
-        },
-        'removeArticle': {
-            'accounts': [],
-            'func': (article) => {
-                if (article.querySelector('div.media-gallery')) return;
-                if (article.querySelector('a[href^="https://ourt-ai.work/image/"]')) return;
-                article.remove();
-            }
-        },
-        'fetchOurtAI': {
-            'accounts': [
-            ],
-            'func': (article) => {
-                if (article.querySelector('div.media-gallery')) return;
+            },
+            removeLongText: {
+                accounts: [],
+                func: (article) => {
+                    const contentElement = article.querySelector(
+                        'div.status__content.status__content--with-action > div > p > span:nth-child(1)'
+                    );
+                    if (
+                        contentElement &&
+                        contentElement.textContent.length >= 120
+                    ) {
+                        contentElement.remove();
+                    }
+                }
+            },
+            removeArticle: {
+                accounts: [],
+                func: (article) => {
+                    if (article.querySelector('div.media-gallery')) return;
+                    if (
+                        article.querySelector(
+                            'a[href^="https://ourt-ai.work/image/"]'
+                        )
+                    )
+                        return;
+                    article.remove();
+                }
+            },
+            fetchOurtAI: {
+                accounts: [],
+                func: (article) => {
+                    if (article.querySelector('div.media-gallery')) return;
 
-                const link = article.querySelector('a[href^="https://ourt-ai.work/image/"]');
-                if (!link) return;
+                    const link = article.querySelector(
+                        'a[href^="https://ourt-ai.work/image/"]'
+                    );
+                    if (!link) return;
 
-                const match = link.href.match(/https:\/\/ourt-ai\.work\/image\/(.+)/);
-                if (!match) return;
+                    const match = link.href.match(
+                        /https:\/\/ourt-ai\.work\/image\/(.+)/
+                    );
+                    if (!match) return;
 
-                fetchOurtAI(match[1]).then((json) => {
-                    appendMediaGallery(article, json.detail);
-                });
+                    fetchOurtAI(match[1]).then((json) => {
+                        appendMediaGallery(article, json.detail);
+                    });
+                }
             }
         }
-    }];
+    ];
 
     const updateSplitColumns = (sourceColumn) => {
-        document.querySelectorAll(`.${CONFIG.COLUMN_CLASS}`).forEach(column => column.remove());
+        document
+            .querySelectorAll(`.${CONFIG.COLUMN_CLASS}`)
+            .forEach((column) => column.remove());
 
         for (let i = CONFIG.COLUMN_SPLIT_COUNT - 1; i >= 0; i--) {
-            processArticles(sourceColumn, i, preCloneRules, () => { });
+            processArticles(sourceColumn, i, preCloneRules, () => {});
 
             const newColumn = sourceColumn.cloneNode(true);
             newColumn.classList.add(CONFIG.COLUMN_CLASS);
             newColumn.ariaLabel = '';
 
-            processArticles(newColumn, i, postCloneRules, (article) => article.remove());
+            processArticles(newColumn, i, postCloneRules, (article) =>
+                article.remove()
+            );
 
-            sourceColumn.parentElement.insertBefore(newColumn, document.querySelector(`div[aria-label="${CONFIG.INSERT_BEFORE_LABEL}"]`).nextSibling);
+            sourceColumn.parentElement.insertBefore(
+                newColumn,
+                document.querySelector(
+                    `div[aria-label="${CONFIG.INSERT_BEFORE_LABEL}"]`
+                ).nextSibling
+            );
         }
 
         sourceColumn.parentElement.appendChild(sourceColumn);
@@ -108,7 +137,14 @@
             }
             rules.forEach((ruleSet) => {
                 Object.values(ruleSet).forEach((rule) => {
-                    if (rule.accounts.length === 0 || rule.accounts.includes(article.querySelector('span.display-name__account')?.textContent.trim())) {
+                    if (
+                        rule.accounts.length === 0 ||
+                        rule.accounts.includes(
+                            article
+                                .querySelector('span.display-name__account')
+                                ?.textContent.trim()
+                        )
+                    ) {
                         rule.func(article);
                     }
                 });
@@ -123,7 +159,8 @@
 
         try {
             const response = await fetch(`${CONFIG.KENJI_API_ENDPOINT}${id}`);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            if (!response.ok)
+                throw new Error(`HTTP error! status: ${response.status}`);
 
             const jsonData = await response.json();
             await imageCache.saveToIndexedDB(id, jsonData);
@@ -151,22 +188,31 @@
                     blobImage = await response.blob();
                     await imageCache.saveToIndexedDB(kenjiImageUrl, blobImage);
                 } catch (error) {
-                    console.error('Error fetching image or saving to IndexedDB:', error);
+                    console.error(
+                        'Error fetching image or saving to IndexedDB:',
+                        error
+                    );
                     continue;
                 }
             }
 
-            const mediaGalleryItem = createMediaGalleryItem(blobImage, ourtImageUrl);
+            const mediaGalleryItem = createMediaGalleryItem(
+                blobImage,
+                ourtImageUrl
+            );
             mediaGallery.appendChild(mediaGalleryItem);
         }
 
-        articleElement.querySelector('div.status__content.status__content--with-action')?.insertAdjacentElement('afterend', mediaGallery);
+        articleElement
+            .querySelector('div.status__content.status__content--with-action')
+            ?.insertAdjacentElement('afterend', mediaGallery);
         articleElement.querySelector('a.status-card')?.remove();
     };
 
     const createMediaGalleryItem = (blobImage, ourtImageUrl) => {
         const mediaGalleryItem = document.createElement('div');
-        mediaGalleryItem.className = 'media-gallery__item media-gallery__item--tall';
+        mediaGalleryItem.className =
+            'media-gallery__item media-gallery__item--tall';
 
         const canvas = document.createElement('canvas');
         canvas.className = 'media-gallery__preview';
@@ -194,18 +240,28 @@
 
     const initializeColumnSplitter = () => {
         const mainMutationObserver = new MutationObserver(() => {
-            const sourceColumn = document.querySelector(`div[aria-label="${CONFIG.TARGET_COLUMN_LABEL}"]`);
+            const sourceColumn = document.querySelector(
+                `div[aria-label="${CONFIG.TARGET_COLUMN_LABEL}"]`
+            );
             if (sourceColumn) {
                 mainMutationObserver.disconnect();
 
-                const columnMutationObserver = new DeferredMutationObserver(() => {
-                    updateSplitColumns(sourceColumn);
+                const columnMutationObserver = new DeferredMutationObserver(
+                    () => {
+                        updateSplitColumns(sourceColumn);
+                    }
+                );
+                columnMutationObserver.observe(sourceColumn, {
+                    childList: true,
+                    subtree: true
                 });
-                columnMutationObserver.observe(sourceColumn, { childList: true, subtree: true });
             }
         });
 
-        mainMutationObserver.observe(document.body, { childList: true, subtree: true });
+        mainMutationObserver.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
     };
 
     // 自動初期化

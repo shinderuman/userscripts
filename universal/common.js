@@ -17,7 +17,13 @@ unsafeWindow.UniversalCommon = (function () {
     };
 
     // トースト通知表示
-    const showToast = (headerText, message, url = null, backgroundColor = '#333', headerBackgroundColor = '#444') => {
+    const showToast = (
+        headerText,
+        message,
+        url = null,
+        backgroundColor = '#333',
+        headerBackgroundColor = '#444'
+    ) => {
         const toast = document.createElement('div');
         toast.style.position = 'fixed';
         toast.style.top = '20px';
@@ -115,7 +121,9 @@ unsafeWindow.UniversalCommon = (function () {
     const cleanUrl = (url, paramsToRemove = ['fbclid']) => {
         try {
             const urlObj = new URL(url);
-            paramsToRemove.forEach(param => urlObj.searchParams.delete(param));
+            paramsToRemove.forEach((param) =>
+                urlObj.searchParams.delete(param)
+            );
             return urlObj.href;
         } catch (error) {
             console.error('URL cleaning error:', error);
@@ -144,7 +152,11 @@ unsafeWindow.UniversalCommon = (function () {
 
             setTimeout(() => {
                 observer.disconnect();
-                reject(new Error(`Element ${selector} not found within ${timeout}ms`));
+                reject(
+                    new Error(
+                        `Element ${selector} not found within ${timeout}ms`
+                    )
+                );
             }, timeout);
         });
     };

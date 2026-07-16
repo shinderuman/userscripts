@@ -17,14 +17,24 @@
 
     // 個別ページの情報を取得
     const fetchBookPageInfo = (bookInfo) => {
-        return fetchPageInfo(`https://www.amazon.co.jp/dp/${bookInfo.ASIN}`, (doc, cleanUrl) => extractPageInfo(doc, bookInfo, cleanUrl), bookInfo.Title);
+        return fetchPageInfo(
+            `https://www.amazon.co.jp/dp/${bookInfo.ASIN}`,
+            (doc, cleanUrl) => extractPageInfo(doc, bookInfo, cleanUrl),
+            bookInfo.Title
+        );
     };
 
     // ページから利用可能性情報を抽出
     const extractPageInfo = (doc, bookInfo, cleanUrl) => {
-        const title = doc.querySelector(COMMON_SELECTORS.title)?.innerText.trim() || bookInfo.Title;
-        const paperBookAvailable = doc.querySelector(COMMON_SELECTORS.paperBookAvailable);
-        const kindleBookAvailable = doc.querySelector(COMMON_SELECTORS.kindleBookAvailable);
+        const title =
+            doc.querySelector(COMMON_SELECTORS.title)?.innerText.trim() ||
+            bookInfo.Title;
+        const paperBookAvailable = doc.querySelector(
+            COMMON_SELECTORS.paperBookAvailable
+        );
+        const kindleBookAvailable = doc.querySelector(
+            COMMON_SELECTORS.kindleBookAvailable
+        );
 
         return {
             ...bookInfo,
@@ -48,7 +58,11 @@
         let processedCount = 0;
         const availableBooks = [];
 
-        for (let i = 0; i < books.length; i += COMMON_CONFIG.CONCURRENT_REQUESTS) {
+        for (
+            let i = 0;
+            i < books.length;
+            i += COMMON_CONFIG.CONCURRENT_REQUESTS
+        ) {
             const batch = books.slice(i, i + COMMON_CONFIG.CONCURRENT_REQUESTS);
 
             const promises = batch.map(async (bookInfo) => {
@@ -57,8 +71,12 @@
                     const isAvailable = checkAvailabilityConditions(pageInfo);
 
                     processedCount++;
-                    console.log(`進捗: ${processedCount}/${books.length} - ${pageInfo.title}`);
-                    console.log(`  紙書籍: ${pageInfo.paperBookAvailable ? '✅' : '❌'}, Kindle: ${pageInfo.kindleBookAvailable ? '✅' : '❌'}`);
+                    console.log(
+                        `進捗: ${processedCount}/${books.length} - ${pageInfo.title}`
+                    );
+                    console.log(
+                        `  紙書籍: ${pageInfo.paperBookAvailable ? '✅' : '❌'}, Kindle: ${pageInfo.kindleBookAvailable ? '✅' : '❌'}`
+                    );
 
                     if (isAvailable) {
                         availableCount++;
@@ -77,22 +95,30 @@
 
             // 次のバッチまで待機（レート制限対策）
             if (i + COMMON_CONFIG.CONCURRENT_REQUESTS < books.length) {
-                await new Promise(resolve => setTimeout(resolve, COMMON_CONFIG.REQUEST_DELAY));
+                await new Promise((resolve) =>
+                    setTimeout(resolve, COMMON_CONFIG.REQUEST_DELAY)
+                );
             }
         }
 
         const now = new Date().toLocaleString('ja-JP');
-        console.log(`✅ チェック完了: ${availableCount}件が両方利用可能でした (${now})`);
+        console.log(
+            `✅ チェック完了: ${availableCount}件が両方利用可能でした (${now})`
+        );
 
         // 見つかった書籍をすべて新しいタブで開く
         if (availableBooks.length > 0) {
-            availableBooks.forEach(pageInfo => {
+            availableBooks.forEach((pageInfo) => {
                 GM_openInTab(pageInfo.cleanUrl, { active: false });
             });
         }
 
         // 完了通知
-        sendCompletionNotification('利用可能性チェック', books.length, availableCount);
+        sendCompletionNotification(
+            '利用可能性チェック',
+            books.length,
+            availableCount
+        );
     };
 
     // メイン関数
@@ -119,5 +145,7 @@
     unsafeWindow.checkPaperToKindle = checkPaperToKindle;
 
     console.log('🚀 Paper to Kindle Checker が読み込まれました');
-    console.log('💡 デベロッパーツールで checkPaperToKindle() を実行してください');
+    console.log(
+        '💡 デベロッパーツールで checkPaperToKindle() を実行してください'
+    );
 })();

@@ -1,10 +1,9 @@
-(function() {
+(function () {
     'use strict';
 
     // 共通ライブラリから関数を取得
     // 共通ライブラリから関数を取得
-    const {
-    } = unsafeWindow.MastodonCommon;
+    const {} = unsafeWindow.MastodonCommon;
 
     const COLUMN_PAIRS = [
         {
@@ -22,10 +21,14 @@
     };
 
     const moveColumns = () => {
-        COLUMN_PAIRS.forEach(pair => {
+        COLUMN_PAIRS.forEach((pair) => {
             const observer = new MutationObserver(() => {
-                const topColumn = document.querySelector(`div[aria-label="${pair.topColumnName}"]`);
-                const bottomColumn = document.querySelector(`div[aria-label="${pair.bottomColumnName}"]`);
+                const topColumn = document.querySelector(
+                    `div[aria-label="${pair.topColumnName}"]`
+                );
+                const bottomColumn = document.querySelector(
+                    `div[aria-label="${pair.bottomColumnName}"]`
+                );
 
                 if (topColumn && bottomColumn) {
                     combineColumns(topColumn, bottomColumn);

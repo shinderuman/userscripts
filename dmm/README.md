@@ -5,35 +5,43 @@ DMMサービスのユーザーエクスペリエンスを向上させるTampermo
 ## 📋 スクリプト一覧
 
 ### 🎬 Video Tab Opener (`video_tab_opener/`)
+
 DMM動画を新しいウィンドウではなく別タブで開くように変更するスクリプト。
 
 **機能:**
+
 - `javascript:void(0)`リンクを通常のリンクに変換
 - `window.open`呼び出しからURLを抽出
 - 新しいタブでの動画再生
 - 自動的なリンク処理
 
 **対象サイト:**
+
 - `https://www.dmm.co.jp/digital/-/mylibrary/search/*`
 
 **動作:**
+
 1. ページ上の動画リンクを自動検出
 2. `onclick`属性からURLを抽出
 3. リンクを通常のhrefリンクに変換
 4. クリック時に新しいタブで開く
 
 ### 🎬 Video Player Title Changer (`video_player_title_changer/`)
+
 DMM動画プレイヤーのページタイトルを書き換えるスクリプト。
 
 **機能:**
+
 - `#header > div > p`要素のテキスト内容でページタイトル（document.title）を書き換え
 - ページ読み込み時にtextContentが空の場合、MutationObserverで値がセットされるまで待機
 - 自動実行と監視機能
 
 **対象サイト:**
+
 - `https://www.dmm.co.jp/digital/-/player/*`
 
 **動作:**
+
 1. ページ読み込み時に即時実行
 2. textContentが空の場合、要素の変化を監視
 3. 値がセットされたらタイトルを更新して監視を終了
@@ -45,6 +53,7 @@ DMM関連スクリプトで共有される汎用機能を提供します。
 ### 主要機能
 
 #### DOM監視・操作
+
 - `observeDOM(callback)`: DOM変更の監視
 - `modifyLink(link, url)`: リンクの変更処理
 - `extractUrlFromOnclick(onclick)`: onclick属性からURLを抽出
@@ -52,7 +61,8 @@ DMM関連スクリプトで共有される汎用機能を提供します。
 - `isProcessed(element)`: 処理済み確認
 
 ```javascript
-const { observeDOM, modifyLink, extractUrlFromOnclick } = unsafeWindow.DMMCommon;
+const { observeDOM, modifyLink, extractUrlFromOnclick } =
+    unsafeWindow.DMMCommon;
 
 // DOM変更を監視
 observeDOM(() => {
@@ -69,14 +79,17 @@ if (url) {
 ## 🚀 インストール方法
 
 ### 1. Tampermonkeyの準備
+
 1. ブラウザにTampermonkey拡張機能をインストール
 2. Tampermonkey Dashboardを開く
 
 ### 2. スクリプトのインストール
+
 1. **Video Tab Opener**: `video_tab_opener/wrapper.js`
 2. **Video Player Title Changer**: `video_player_title_changer/wrapper.js`
 
 ### 3. パスの設定
+
 `wrapper.js`ファイル内の`@require`パスを環境に合わせて調整:
 
 ```javascript
@@ -87,10 +100,12 @@ if (url) {
 ## ⚙️ 設定
 
 ### 対象サイト
+
 - **DMM.co.jp**: デジタルライブラリの検索ページ
 - 他のDMMページで使用する場合は`@match`を変更
 
 ### カスタマイズ
+
 `main.js`内の`CONFIG`オブジェクトで設定を変更できます:
 
 ```javascript
@@ -102,19 +117,22 @@ const CONFIG = {
 ## 🔍 使用方法
 
 ### 自動実行
+
 スクリプトは自動的に初期化され、バックグラウンドで動作します。
 
 ### 手動実行（デバッグ用）
+
 デベロッパーツールのコンソールで以下の関数を実行可能:
 
 ```javascript
 // Video Tab Opener
-initializePlayerOpenTab()
+initializePlayerOpenTab();
 ```
 
 ## 📊 ログ出力
 
 スクリプトは詳細なログを出力します:
+
 - 🚀 スクリプト読み込み状況
 - 💡 初期化完了通知
 - 🎬 動画リンク処理状況
@@ -122,11 +140,13 @@ initializePlayerOpenTab()
 ## 🛠️ 開発・カスタマイズ
 
 ### アーキテクチャ
+
 - **共通ライブラリ**: 再利用可能な機能を`common.js`に集約
 - **スクリプト固有ロジック**: `main.js`に特化した処理を実装
 - **Tampermonkey統合**: `wrapper.js`でUserScriptヘッダーを管理
 
 ### 新しいスクリプトの追加
+
 1. 新しいディレクトリを作成
 2. `main.js`でメインロジックを実装
 3. `wrapper.js`でTampermonkeyヘッダーを設定

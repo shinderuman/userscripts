@@ -27,26 +27,25 @@
             ArrowDown: 'https://www.at-x.com/program',
             ArrowRight: 'https://koken.nicovideo.jp/campaign'
         },
-        UNDESIRABLE_CHARS: [
-            '(', ')', '（', '）', '【', '】', '〔', '〕'
-        ],
+        UNDESIRABLE_CHARS: ['(', ')', '（', '）', '【', '】', '〔', '〕'],
         TAB_OPTIONS: {
             active: true,
             insert: true,
             setParent: true
         },
-        GET_PARAM_DISPOSAL_SITES: [
-            'https://ja.aliexpress.com'
-        ],
-        INPUT_FIELD_EXCEPTION_SITES: [
-            'kenji.asmodeus.jp'
-        ]
+        GET_PARAM_DISPOSAL_SITES: ['https://ja.aliexpress.com'],
+        INPUT_FIELD_EXCEPTION_SITES: ['kenji.asmodeus.jp']
     };
 
     const getPageInfo = () => {
-        const asin = document.querySelector('#ASIN, input[name=\'idx.asin\'], input[name=\'ASIN.0\'], input[name=\'titleID\']')?.value;
-        const title = document.querySelector('#productTitle')?.textContent.trim() ??
-            document.querySelector('#collection-masthead__title')?.textContent.trim();
+        const asin = document.querySelector(
+            "#ASIN, input[name='idx.asin'], input[name='ASIN.0'], input[name='titleID']"
+        )?.value;
+        const title =
+            document.querySelector('#productTitle')?.textContent.trim() ??
+            document
+                .querySelector('#collection-masthead__title')
+                ?.textContent.trim();
         return { asin, title };
     };
 
@@ -55,7 +54,11 @@
         let url = window.location.href;
 
         // GETパラメータを破棄するサイトの場合
-        if (CONFIG.GET_PARAM_DISPOSAL_SITES.some(site => window.location.href.startsWith(site))) {
+        if (
+            CONFIG.GET_PARAM_DISPOSAL_SITES.some((site) =>
+                window.location.href.startsWith(site)
+            )
+        ) {
             const urlObj = new URL(url);
             urlObj.search = '';
             url = urlObj.toString();
@@ -64,7 +67,9 @@
         }
 
         // ニコニコ動画の再生ページでシリーズの場合、playlistパラメータを付与
-        if (window.location.href.startsWith('https://www.nicovideo.jp/watch/')) {
+        if (
+            window.location.href.startsWith('https://www.nicovideo.jp/watch/')
+        ) {
             const playlistParam = getNicoSeriesPlaylistParam();
             if (playlistParam) {
                 const urlObj = new URL(url);
@@ -83,7 +88,9 @@
 
     const getNicoSeriesPlaylistParam = () => {
         // シリーズ再生ページのリンクからplaylistパラメータを取得
-        const seriesLink = document.querySelector('a[data-anchor-area="series"][href*="playlist="]');
+        const seriesLink = document.querySelector(
+            'a[data-anchor-area="series"][href*="playlist="]'
+        );
         if (!seriesLink) return null;
 
         const linkUrl = new URL(seriesLink.href, window.location.origin);
@@ -91,14 +98,19 @@
     };
 
     const filterSearchTitle = (title) => {
-        const unwantedPatterns = [...Array(10).keys()].map(String)
+        const unwantedPatterns = [...Array(10).keys()]
+            .map(String)
             .concat(CONFIG.UNDESIRABLE_CHARS)
             .concat(getFullWidthDigits());
 
         let filteredTitle = title;
 
         // タイトルがunwantedPatternsで始まっていない場合のみフィルタリング
-        if (!unwantedPatterns.some(pattern => filteredTitle.startsWith(pattern))) {
+        if (
+            !unwantedPatterns.some((pattern) =>
+                filteredTitle.startsWith(pattern)
+            )
+        ) {
             filteredTitle = unwantedPatterns.reduce(
                 (title, pattern) => title.split(pattern)[0].trim(),
                 title
@@ -113,7 +125,10 @@
         if (!title) return;
 
         const filteredTitle = filterSearchTitle(title);
-        openInTab(`${CONFIG.SEARCH_ENGINE}${encodeURIComponent(filteredTitle)}`, CONFIG.TAB_OPTIONS);
+        openInTab(
+            `${CONFIG.SEARCH_ENGINE}${encodeURIComponent(filteredTitle)}`,
+            CONFIG.TAB_OPTIONS
+        );
     };
 
     const normalizeToUTCDate = (date) => {
@@ -126,41 +141,65 @@
         const { asin, title } = getPageInfo();
         if (!asin || !title) return;
 
-        const releaseDate = normalizeToUTCDate(new Date(
-            document.querySelector('#rpi-attribute-book_details-publication_date > div.a-section.a-spacing-none.a-text-center.rpi-attribute-value > span')
-                ?.textContent.trim()
-        ));
+        const releaseDate = normalizeToUTCDate(
+            new Date(
+                document
+                    .querySelector(
+                        '#rpi-attribute-book_details-publication_date > div.a-section.a-spacing-none.a-text-center.rpi-attribute-value > span'
+                    )
+                    ?.textContent.trim()
+            )
+        );
 
-        const currentPrice = Number(
-            document.querySelector('#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span')
-                ?.textContent.replace(/[^\d]/g, '')
-        ) || 0;
+        const currentPrice =
+            Number(
+                document
+                    .querySelector(
+                        '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span'
+                    )
+                    ?.textContent.replace(/[^\d]/g, '')
+            ) || 0;
 
-        const maxPrice = Number(
-            document.querySelector('[id^=\'tmm-grid-swatch\']:not([id$=\'KINDLE\']) > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span')
-                ?.textContent.replace(/[^\d]/g, '')
-        ) || currentPrice;
+        const maxPrice =
+            Number(
+                document
+                    .querySelector(
+                        "[id^='tmm-grid-swatch']:not([id$='KINDLE']) > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span"
+                    )
+                    ?.textContent.replace(/[^\d]/g, '')
+            ) || currentPrice;
 
         const url = `https://www.amazon.co.jp/dp/${asin}?tag=shinderuman03-22`;
 
-        const productInfo = JSON.stringify({
-            ASIN: asin,
-            Title: title,
-            ReleaseDate: releaseDate.toISOString(),
-            CurrentPrice: currentPrice,
-            MaxPrice: maxPrice,
-            URL: url,
-            CreatedAt: normalizeToUTCDate(new Date()).toISOString()
-        }, null, 4) + ',';
+        const productInfo =
+            JSON.stringify(
+                {
+                    ASIN: asin,
+                    Title: title,
+                    ReleaseDate: releaseDate.toISOString(),
+                    CurrentPrice: currentPrice,
+                    MaxPrice: maxPrice,
+                    URL: url,
+                    CreatedAt: normalizeToUTCDate(new Date()).toISOString()
+                },
+                null,
+                4
+            ) + ',';
 
         const success = await copyToClipboard(productInfo);
         if (success) {
-            showNotification('Copied Product Info to Clipboard', `${asin}\n${title}`, 3000);
+            showNotification(
+                'Copied Product Info to Clipboard',
+                `${asin}\n${title}`,
+                3000
+            );
         }
     };
 
     const copyCollectionInfo = async () => {
-        const match = location.href.match(/\/(?:dp|gp\/product|product)\/([A-Z0-9]{10})/);
+        const match = location.href.match(
+            /\/(?:dp|gp\/product|product)\/([A-Z0-9]{10})/
+        );
         if (!match) return;
 
         const asin = match[1];
@@ -175,23 +214,36 @@
 
         const success = await copyToClipboard(lines.join('\n'));
         if (success) {
-            showNotification('Copied Collection Info to Clipboard', `${asin}\n${authors}`, 3000);
+            showNotification(
+                'Copied Collection Info to Clipboard',
+                `${asin}\n${authors}`,
+                3000
+            );
         }
     };
 
     const getAuthors = () => {
-        const rawData = document.querySelector('#collection-masthead__author > span.a-declarative')?.getAttribute('data-a-popover');
+        const rawData = document
+            .querySelector('#collection-masthead__author > span.a-declarative')
+            ?.getAttribute('data-a-popover');
 
         if (rawData) {
             const dataObj = JSON.parse(rawData);
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = dataObj.inlineContent;
-            return Array.from(tempDiv.querySelectorAll('a')).map(a =>
-                a.textContent.replace('(著)', '').replace(',', '').replace('Other', '').trim()
+            return Array.from(tempDiv.querySelectorAll('a')).map((a) =>
+                a.textContent
+                    .replace('(著)', '')
+                    .replace(',', '')
+                    .replace('Other', '')
+                    .trim()
             );
         } else {
             return [
-                document.querySelector('#collection-masthead__author > a')?.textContent.replace('(著)', '').trim()
+                document
+                    .querySelector('#collection-masthead__author > a')
+                    ?.textContent.replace('(著)', '')
+                    .trim()
             ];
         }
     };
@@ -199,64 +251,81 @@
     const getFullWidthDigits = () => {
         const digits = [];
         for (let i = 0; i <= 9; i++) {
-            digits.push(String.fromCharCode(i + 0xFF10));
+            digits.push(String.fromCharCode(i + 0xff10));
         }
         return digits;
     };
 
     const handleKeyEvents = (event) => {
         // 入力フィールド例外サイトの判定
-        const isExceptionSite = CONFIG.INPUT_FIELD_EXCEPTION_SITES.some(site =>
-            window.location.hostname.includes(site)
+        const isExceptionSite = CONFIG.INPUT_FIELD_EXCEPTION_SITES.some(
+            (site) => window.location.hostname.includes(site)
         );
 
         // 入力フィールドにフォーカスがある場合は無効化（例外サイトを除く）
-        if (!isExceptionSite && (
-            event.target.tagName === 'INPUT' ||
-            event.target.tagName === 'TEXTAREA' ||
-            event.target.isContentEditable)) {
+        if (
+            !isExceptionSite &&
+            (event.target.tagName === 'INPUT' ||
+                event.target.tagName === 'TEXTAREA' ||
+                event.target.isContentEditable)
+        ) {
             return;
         }
 
         if (!event.altKey || event.metaKey || event.ctrlKey) return;
-        preventDefaultKeys(event, ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']);
+        preventDefaultKeys(event, [
+            'ArrowUp',
+            'ArrowDown',
+            'ArrowLeft',
+            'ArrowRight'
+        ]);
 
         switch (event.key) {
-        case 'ArrowUp': {
-            const button = document.querySelector(
-                CONFIG.INTENT_URL_PATTERNS.map(pattern => `a[href*="${pattern}"]`).join(', ')
-            );
-            if (event.shiftKey) {
-                copyPageInfo();
-            } else if (button) {
-                button.click();
-            } else if (window.location.href.startsWith('https://www.amazon.co.jp/')) {
-                const { asin } = getPageInfo();
-                if (asin) {
-                    copyProductInfo();
+            case 'ArrowUp': {
+                const button = document.querySelector(
+                    CONFIG.INTENT_URL_PATTERNS.map(
+                        (pattern) => `a[href*="${pattern}"]`
+                    ).join(', ')
+                );
+                if (event.shiftKey) {
+                    copyPageInfo();
+                } else if (button) {
+                    button.click();
+                } else if (
+                    window.location.href.startsWith('https://www.amazon.co.jp/')
+                ) {
+                    const { asin } = getPageInfo();
+                    if (asin) {
+                        copyProductInfo();
+                    } else {
+                        copyCollectionInfo();
+                    }
                 } else {
-                    copyCollectionInfo();
+                    copyPageInfo();
                 }
-            } else {
-                copyPageInfo();
+                break;
             }
-            break;
-        }
-        case 'ArrowDown':
-            openInTab(CONFIG.NAVIGATION_URLS.ArrowDown, CONFIG.TAB_OPTIONS);
-            break;
-        case 'ArrowLeft':
-            openInTab(CONFIG.NAVIGATION_URLS.ArrowLeft, CONFIG.TAB_OPTIONS);
-            break;
-        case 'ArrowRight':
-            if (window.location.href.startsWith('https://www.amazon.co.jp/')) {
-                handleAmazonSearch();
-            } else {
-                window.open(CONFIG.NAVIGATION_URLS.ArrowRight, '_blank', 'width=580,height=1200,noopener,noreferrer');
-            }
-            break;
-        default:
-            break;
+            case 'ArrowDown':
+                openInTab(CONFIG.NAVIGATION_URLS.ArrowDown, CONFIG.TAB_OPTIONS);
+                break;
+            case 'ArrowLeft':
+                openInTab(CONFIG.NAVIGATION_URLS.ArrowLeft, CONFIG.TAB_OPTIONS);
+                break;
+            case 'ArrowRight':
+                if (
+                    window.location.href.startsWith('https://www.amazon.co.jp/')
+                ) {
+                    handleAmazonSearch();
+                } else {
+                    window.open(
+                        CONFIG.NAVIGATION_URLS.ArrowRight,
+                        '_blank',
+                        'width=580,height=1200,noopener,noreferrer'
+                    );
+                }
+                break;
+            default:
+                break;
         }
     };
 

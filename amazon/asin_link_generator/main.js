@@ -54,7 +54,9 @@
         text.replace(CONFIG.KINDLE_ASIN_PATTERN, (match, index) => {
             // マッチ前のテキストを追加
             if (index > lastIndex) {
-                fragment.appendChild(document.createTextNode(text.slice(lastIndex, index)));
+                fragment.appendChild(
+                    document.createTextNode(text.slice(lastIndex, index))
+                );
             }
 
             // ASINリンクを作成して追加
@@ -66,7 +68,9 @@
 
         // 残りのテキストを追加
         if (lastIndex < text.length) {
-            fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+            fragment.appendChild(
+                document.createTextNode(text.slice(lastIndex))
+            );
         }
 
         parent.replaceChild(fragment, textNode);
@@ -75,28 +79,28 @@
     const scanForAsins = () => {
         const walker = document.createTreeWalker(
             document.body,
-            NodeFilter.SHOW_TEXT, // eslint-disable-line no-undef
+            NodeFilter.SHOW_TEXT,
             {
                 acceptNode: (node) => {
                     // 既にリンク内にあるテキストはスキップ
                     let parent = node.parentNode;
                     while (parent) {
                         if (parent.tagName === 'A') {
-                            return NodeFilter.FILTER_REJECT; // eslint-disable-line no-undef
+                            return NodeFilter.FILTER_REJECT;
                         }
                         parent = parent.parentNode;
                     }
                     // ASINパターンを含むテキストのみ処理
                     return CONFIG.KINDLE_ASIN_PATTERN.test(node.textContent)
-                        ? NodeFilter.FILTER_ACCEPT // eslint-disable-line no-undef
-                        : NodeFilter.FILTER_REJECT; // eslint-disable-line no-undef
+                        ? NodeFilter.FILTER_ACCEPT
+                        : NodeFilter.FILTER_REJECT;
                 }
             }
         );
 
         const textNodes = [];
         let node;
-        while (node = walker.nextNode()) {
+        while ((node = walker.nextNode())) {
             textNodes.push(node);
         }
 
@@ -108,7 +112,10 @@
             let shouldScan = false;
 
             mutations.forEach((mutation) => {
-                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                if (
+                    mutation.type === 'childList' &&
+                    mutation.addedNodes.length > 0
+                ) {
                     shouldScan = true;
                 }
             });
@@ -135,7 +142,9 @@
         observeChanges();
 
         console.log('🚀 Amazon ASIN Link Generator が初期化されました');
-        console.log('💡 BからはじまるKindleのASIN（10文字）を自動的にリンクに変換します');
+        console.log(
+            '💡 BからはじまるKindleのASIN（10文字）を自動的にリンクに変換します'
+        );
     };
 
     // 自動初期化

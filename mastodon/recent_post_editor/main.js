@@ -1,10 +1,8 @@
-(function() {
+(function () {
     'use strict';
 
     // 共通ライブラリから関数を取得
-    const {
-        COMMON_SELECTORS
-    } = unsafeWindow.MastodonCommon;
+    const { COMMON_SELECTORS } = unsafeWindow.MastodonCommon;
 
     const CONFIG = {
         USERNAME: 'asmodeus',
@@ -13,8 +11,14 @@
     };
 
     const getRecentTootElement = () => {
-        for (const article of document.querySelectorAll(`${CONFIG.HOME_COLUMN_SELECTOR} article`)) {
-            if (article.querySelector('span.display-name__account')?.textContent.trim() === `@${CONFIG.USERNAME}`) {
+        for (const article of document.querySelectorAll(
+            `${CONFIG.HOME_COLUMN_SELECTOR} article`
+        )) {
+            if (
+                article
+                    .querySelector('span.display-name__account')
+                    ?.textContent.trim() === `@${CONFIG.USERNAME}`
+            ) {
                 return article;
             }
         }
@@ -29,7 +33,9 @@
     };
 
     const editRecentToot = (recentToot) => {
-        const menuButton = recentToot.querySelector('button[title="もっと見る"]');
+        const menuButton = recentToot.querySelector(
+            'button[title="もっと見る"]'
+        );
         if (menuButton) {
             menuButton.click();
             observeDropdownMenuForEdit();
@@ -38,7 +44,11 @@
 
     const observeDropdownMenuForEdit = () => {
         const observer = new MutationObserver(() => {
-            const editButton = Array.from(document.querySelectorAll('div.dropdown-menu__container > ul > li.dropdown-menu__item > button')).find(a => a.textContent.trim() === '編集');
+            const editButton = Array.from(
+                document.querySelectorAll(
+                    'div.dropdown-menu__container > ul > li.dropdown-menu__item > button'
+                )
+            ).find((a) => a.textContent.trim() === '編集');
 
             if (editButton) {
                 editButton.click();
@@ -49,7 +59,9 @@
     };
 
     const isTextareaEmpty = () => {
-        const textarea = document.querySelector(CONFIG.COMPOSE_TEXTAREA_SELECTOR);
+        const textarea = document.querySelector(
+            CONFIG.COMPOSE_TEXTAREA_SELECTOR
+        );
         return textarea?.value.trim() === '';
     };
 

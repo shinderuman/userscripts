@@ -1,11 +1,8 @@
-(function() {
+(function () {
     'use strict';
 
     // 共通ライブラリから関数を取得
-    const {
-        COMMON_SELECTORS,
-        COMMON_ENDPOINTS
-    } = unsafeWindow.MastodonCommon;
+    const { COMMON_SELECTORS, COMMON_ENDPOINTS } = unsafeWindow.MastodonCommon;
 
     let isShiftCommandPressed = false;
 
@@ -16,12 +13,17 @@
 
     // オリジナルのfetchとXMLHttpRequestを保存
     const originalFetch = window.fetch;
-    const originalXHROpen = XMLHttpRequest.prototype.open; // eslint-disable-line no-undef
-    const originalXHRSend = XMLHttpRequest.prototype.send; // eslint-disable-line no-undef
+    const originalXHROpen = XMLHttpRequest.prototype.open;
+    const originalXHRSend = XMLHttpRequest.prototype.send;
 
     // fetchをフック
-    window.fetch = function(url, options) {
-        if (url === CONFIG.API_ENDPOINT && options && options.method === 'POST' && isShiftCommandPressed) {
+    window.fetch = function (url, options) {
+        if (
+            url === CONFIG.API_ENDPOINT &&
+            options &&
+            options.method === 'POST' &&
+            isShiftCommandPressed
+        ) {
             try {
                 const payload = JSON.parse(options.body);
                 payload.visibility = 'private';
@@ -32,19 +34,24 @@
                 console.error('❌ payload書き換えエラー:', error);
             }
         }
-        
+
         return originalFetch.apply(this, arguments);
     };
 
     // XMLHttpRequestをフック
-    XMLHttpRequest.prototype.open = function(method, url) { // eslint-disable-line no-undef
+    XMLHttpRequest.prototype.open = function (method, url) {
         this._method = method;
         this._url = url;
         return originalXHROpen.apply(this, arguments);
     };
 
-    XMLHttpRequest.prototype.send = function(data) { // eslint-disable-line no-undef
-        if (this._url === CONFIG.API_ENDPOINT && this._method === 'POST' && isShiftCommandPressed && data) {
+    XMLHttpRequest.prototype.send = function (data) {
+        if (
+            this._url === CONFIG.API_ENDPOINT &&
+            this._method === 'POST' &&
+            isShiftCommandPressed &&
+            data
+        ) {
             try {
                 const payload = JSON.parse(data);
                 payload.visibility = 'private';
@@ -55,7 +62,7 @@
                 console.error('❌ payload書き換えエラー (XHR):', error);
             }
         }
-        
+
         return originalXHRSend.call(this, data);
     };
 
@@ -77,7 +84,7 @@
         // キャプチャフェーズとバブリングフェーズの両方で監視
         document.addEventListener('keydown', handleKeyDownCapture, true); // キャプチャフェーズ
         document.addEventListener('keydown', handleKeyDown, false); // バブリングフェーズ
-        
+
         console.log('🚀 Mastodon Visibility Modifier が初期化されました');
         console.log('⌨️ Shift+Command+Enter: プライベート投稿として送信');
         console.log('⌨️ Command+Enter: 通常の投稿として送信');

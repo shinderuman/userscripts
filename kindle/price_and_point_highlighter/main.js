@@ -24,16 +24,17 @@
 
     const SELECTORS = {
         ...COMMON_SELECTORS,
-        favicon: 'link[rel*=\'icon\'], link[rel=\'shortcut icon\']',
+        favicon: "link[rel*='icon'], link[rel='shortcut icon']",
         navbar: '#nav-belt',
         postTrigger: '#nav-logo',
         seriesTitle: '#collection-masthead__title',
-        asin: '#ASIN, input[name=\'idx.asin\'], input[name=\'ASIN.0\'], input[name=\'titleID\']',
+        asin: "#ASIN, input[name='idx.asin'], input[name='ASIN.0'], input[name='titleID']",
         offerButtons: 'button[id^="offer-tab-button_offer_"]',
         offerButtonTotal: 'div > span',
         offerButtonPrice: 'div > div > span',
         offerBuyBox: '[data-offer-id="offer_{OFFER_NUMBER}"] #buy-box',
-        buyBoxPoints: 'div.a-row.a-spacing-mini > div.a-column.a-span7.a-text-right.a-span-last > span',
+        buyBoxPoints:
+            'div.a-row.a-spacing-mini > div.a-column.a-span7.a-text-right.a-span-last > span',
         accordionRow: '[data-a-accordion-row-name], [data-accordion-id]',
         accordionHeader: '.a-heading-text, h3'
     };
@@ -50,7 +51,8 @@
         seriesPoints: /(\d+(?:,\d+)*)\s*pt/,
         points: /(\d+)pt/,
         price: /([\d,]+)/,
-        asinFromUrl: /\/(?:dp|gp\/product|kindle-dbs\/product)\/([A-Z0-9]{10})[/?]?/
+        asinFromUrl:
+            /\/(?:dp|gp\/product|kindle-dbs\/product)\/([A-Z0-9]{10})[/?]?/
     };
 
     let asin = null;
@@ -64,7 +66,10 @@
         const asins = getMarkedASINs();
         if (asins[asin]) return;
         asins[asin] = timestamp;
-        localStorage.setItem(CONFIG.LOCAL_STORAGE_KEYS.MARKED, JSON.stringify(asins));
+        localStorage.setItem(
+            CONFIG.LOCAL_STORAGE_KEYS.MARKED,
+            JSON.stringify(asins)
+        );
     };
 
     const isBadgeExpired = (timestamp) => {
@@ -83,7 +88,10 @@ ${productUrl}
     };
 
     const getASIN = () => {
-        return document.querySelector(SELECTORS.asin)?.value || extractASINFromURL();
+        return (
+            document.querySelector(SELECTORS.asin)?.value ||
+            extractASINFromURL()
+        );
     };
 
     const extractASINFromURL = () => {
@@ -92,29 +100,43 @@ ${productUrl}
     };
 
     const isNotified = () => {
-        return JSON.parse(localStorage.getItem(CONFIG.LOCAL_STORAGE_KEYS.NOTIFIED) || '[]').includes(asin);
+        return JSON.parse(
+            localStorage.getItem(CONFIG.LOCAL_STORAGE_KEYS.NOTIFIED) || '[]'
+        ).includes(asin);
     };
 
     const markAsNotified = () => {
-        const notifiedASINs = JSON.parse(localStorage.getItem(CONFIG.LOCAL_STORAGE_KEYS.NOTIFIED) || '[]');
+        const notifiedASINs = JSON.parse(
+            localStorage.getItem(CONFIG.LOCAL_STORAGE_KEYS.NOTIFIED) || '[]'
+        );
         if (!notifiedASINs.includes(asin)) {
             notifiedASINs.push(asin);
-            localStorage.setItem(CONFIG.LOCAL_STORAGE_KEYS.NOTIFIED, JSON.stringify(notifiedASINs));
+            localStorage.setItem(
+                CONFIG.LOCAL_STORAGE_KEYS.NOTIFIED,
+                JSON.stringify(notifiedASINs)
+            );
         }
     };
 
     const clearNotifiedASINsDaily = () => {
-        const lastClearDate = localStorage.getItem(CONFIG.LOCAL_STORAGE_KEYS.LAST_CLEAR_DATE);
+        const lastClearDate = localStorage.getItem(
+            CONFIG.LOCAL_STORAGE_KEYS.LAST_CLEAR_DATE
+        );
         const today = new Date().toISOString().split('T')[0];
 
         if (lastClearDate !== today) {
             localStorage.removeItem(CONFIG.LOCAL_STORAGE_KEYS.NOTIFIED);
-            localStorage.setItem(CONFIG.LOCAL_STORAGE_KEYS.LAST_CLEAR_DATE, today);
+            localStorage.setItem(
+                CONFIG.LOCAL_STORAGE_KEYS.LAST_CLEAR_DATE,
+                today
+            );
         }
     };
 
     const clearExpiredMarkedASINs = () => {
-        const lastCleanupDate = localStorage.getItem(CONFIG.LOCAL_STORAGE_KEYS.LAST_MARKED_CLEANUP_DATE);
+        const lastCleanupDate = localStorage.getItem(
+            CONFIG.LOCAL_STORAGE_KEYS.LAST_MARKED_CLEANUP_DATE
+        );
         const today = new Date().toISOString().split('T')[0];
 
         if (lastCleanupDate !== today) {
@@ -128,8 +150,14 @@ ${productUrl}
                 }
             }
 
-            localStorage.setItem(CONFIG.LOCAL_STORAGE_KEYS.MARKED, JSON.stringify(validAsins));
-            localStorage.setItem(CONFIG.LOCAL_STORAGE_KEYS.LAST_MARKED_CLEANUP_DATE, today);
+            localStorage.setItem(
+                CONFIG.LOCAL_STORAGE_KEYS.MARKED,
+                JSON.stringify(validAsins)
+            );
+            localStorage.setItem(
+                CONFIG.LOCAL_STORAGE_KEYS.LAST_MARKED_CLEANUP_DATE,
+                today
+            );
         }
     };
 
@@ -148,7 +176,9 @@ ${productUrl}
         const ctx = canvas.getContext('2d');
 
         const img = new Image();
-        img.src = document.querySelector(SELECTORS.favicon)?.href || 'https://www.amazon.co.jp/favicon.ico';
+        img.src =
+            document.querySelector(SELECTORS.favicon)?.href ||
+            'https://www.amazon.co.jp/favicon.ico';
         img.onload = () => {
             ctx.drawImage(img, 0, 0, 32, 32);
             ctx.fillStyle = color;
@@ -202,7 +232,7 @@ ${productUrl}
             url: 'https://slack.com/api/chat.postMessage',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${globalConfig.slack.token}`
+                Authorization: `Bearer ${globalConfig.slack.token}`
             },
             data: JSON.stringify({
                 channel: globalConfig.slack.channelId,
@@ -226,7 +256,7 @@ ${productUrl}
             method: 'POST',
             url: globalConfig.mastodon.apiEndpoint,
             headers: {
-                'Authorization': `Bearer ${globalConfig.mastodon.accessToken}`,
+                Authorization: `Bearer ${globalConfig.mastodon.accessToken}`,
                 'Content-Type': 'application/json'
             },
             data: JSON.stringify({
@@ -235,7 +265,10 @@ ${productUrl}
             }),
             onload: (response) => {
                 if (response.status === 200 || response.status === 202) {
-                    console.log('投稿に成功しました:', JSON.parse(response.responseText));
+                    console.log(
+                        '投稿に成功しました:',
+                        JSON.parse(response.responseText)
+                    );
                 } else {
                     console.error('投稿に失敗しました:', response);
                 }
@@ -253,7 +286,10 @@ ${productUrl}
         // 共通関数ではクーポン詳細テキストが含まれないので、別途追加
         const couponInfo = getCouponInfo();
         if (couponInfo.hasCoupon && couponInfo.couponText) {
-            return conditions.replace('✅クーポンあり', `✅クーポンあり (${couponInfo.couponText})`);
+            return conditions.replace(
+                '✅クーポンあり',
+                `✅クーポンあり (${couponInfo.couponText})`
+            );
         }
 
         return conditions || '';
@@ -262,8 +298,14 @@ ${productUrl}
     // クーポン情報を取得する関数
     const getCouponInfo = () => {
         return {
-            hasCoupon: document.querySelector(SELECTORS.couponBadge)?.textContent?.includes('クーポン:') || false,
-            couponText: document.querySelector('.couponLabelText')?.firstChild?.textContent?.trim() || ''
+            hasCoupon:
+                document
+                    .querySelector(SELECTORS.couponBadge)
+                    ?.textContent?.includes('クーポン:') || false,
+            couponText:
+                document
+                    .querySelector('.couponLabelText')
+                    ?.firstChild?.textContent?.trim() || ''
         };
     };
 
@@ -278,11 +320,22 @@ ${productUrl}
         const seriesPoints = getSeriesPoints(maxOfferButton);
         const seriesCouponInfo = getSeriesCouponInfo(maxOfferButton);
 
-        console.log('📊 シリーズ情報 - 冊数:', bookCount, '価格:', seriesPrice, 'ポイント:', seriesPoints, 'シリーズクーポン:', seriesCouponInfo.hasSeriesCoupon);
+        console.log(
+            '📊 シリーズ情報 - 冊数:',
+            bookCount,
+            '価格:',
+            seriesPrice,
+            'ポイント:',
+            seriesPoints,
+            'シリーズクーポン:',
+            seriesCouponInfo.hasSeriesCoupon
+        );
 
         const conditions = [];
         if (seriesCouponInfo.hasSeriesCoupon) {
-            conditions.push(`✅シリーズクーポンあり (${seriesCouponInfo.seriesCouponText})`);
+            conditions.push(
+                `✅シリーズクーポンあり (${seriesCouponInfo.seriesCouponText})`
+            );
         }
         if (seriesPoints >= COMMON_CONFIG.POINT_THRESHOLD) {
             conditions.push(`✅シリーズのポイントが ${seriesPoints}pt です。`);
@@ -291,7 +344,9 @@ ${productUrl}
         if (bookCount > 0 && seriesPrice > 0) {
             const averagePrice = seriesPrice / bookCount;
             if (averagePrice <= COMMON_CONFIG.AVERAGE_PRICE_THRESHOLD) {
-                conditions.push(`${bookCount}冊が平均 ${averagePrice.toFixed(2)}円 で購入可能です。`);
+                conditions.push(
+                    `${bookCount}冊が平均 ${averagePrice.toFixed(2)}円 で購入可能です。`
+                );
             }
         }
 
@@ -303,11 +358,16 @@ ${productUrl}
         let maxOfferButton = null;
         let maxOfferNumber = -1;
 
-        offerButtons.forEach(button => {
+        offerButtons.forEach((button) => {
             const accordionRow = button.closest(SELECTORS.accordionRow);
             if (accordionRow) {
-                const headerText = accordionRow.querySelector(SELECTORS.accordionHeader);
-                if (headerText && headerText.textContent.includes('まとめ買い (話)')) {
+                const headerText = accordionRow.querySelector(
+                    SELECTORS.accordionHeader
+                );
+                if (
+                    headerText &&
+                    headerText.textContent.includes('まとめ買い (話)')
+                ) {
                     return;
                 }
             }
@@ -358,7 +418,10 @@ ${productUrl}
         if (!match) return 0;
 
         // 対応するbuy-boxを探す
-        const buyBoxSelector = SELECTORS.offerBuyBox.replace('{OFFER_NUMBER}', match[1]);
+        const buyBoxSelector = SELECTORS.offerBuyBox.replace(
+            '{OFFER_NUMBER}',
+            match[1]
+        );
         const buyBox = document.querySelector(buyBoxSelector);
         if (!buyBox) return 0;
 
@@ -388,14 +451,19 @@ ${productUrl}
         const offerNumber = match[1];
 
         // 対応するbuy-box内のクーポン情報を取得
-        const buyBoxSelector = SELECTORS.offerBuyBox.replace('{OFFER_NUMBER}', offerNumber);
+        const buyBoxSelector = SELECTORS.offerBuyBox.replace(
+            '{OFFER_NUMBER}',
+            offerNumber
+        );
         const buyBox = document.querySelector(buyBoxSelector);
 
         if (!buyBox) {
             return { hasSeriesCoupon: false, seriesCouponText: '' };
         }
 
-        const couponElement = buyBox.querySelector('._hulk-buy-card_buyBox_coupon-message__3BUsi');
+        const couponElement = buyBox.querySelector(
+            '._hulk-buy-card_buyBox_coupon-message__3BUsi'
+        );
         const hasSeriesCoupon = !!couponElement;
         const seriesCouponText = couponElement?.textContent?.trim() || '';
 
@@ -417,7 +485,10 @@ ${productUrl}
 
     const checkConditions = () => {
         const productInfo = extractAmazonProductInfo(document);
-        const title = productInfo.title || document.querySelector(SELECTORS.seriesTitle)?.innerText.trim() || '商品タイトル不明';
+        const title =
+            productInfo.title ||
+            document.querySelector(SELECTORS.seriesTitle)?.innerText.trim() ||
+            '商品タイトル不明';
         const detail = evaluateConditions() || checkSeriesConditions();
 
         if (detail) {
@@ -434,8 +505,12 @@ ${productUrl}
     };
 
     const checkAndApplyBadgeForKindleAvailability = () => {
-        const paperBookAvailable = document.querySelector(SELECTORS.paperBookAvailable);
-        const kindleBookAvailable = document.querySelector(SELECTORS.kindleBookAvailable);
+        const paperBookAvailable = document.querySelector(
+            SELECTORS.paperBookAvailable
+        );
+        const kindleBookAvailable = document.querySelector(
+            SELECTORS.kindleBookAvailable
+        );
         const markedASINs = getMarkedASINs();
 
         if (isBadgeExpired(markedASINs[asin])) {

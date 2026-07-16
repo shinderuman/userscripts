@@ -17,14 +17,15 @@ unsafeWindow.TwitterCommon = (function () {
     // Intent URLかどうかを判定
     const isIntentUrl = (url) => {
         if (!url) return false;
-        
+
         // 既存のパターンマッチング
-        if (INTENT_PATTERNS.some(pattern => url.includes(pattern))) {
+        if (INTENT_PATTERNS.some((pattern) => url.includes(pattern))) {
             return true;
         }
-        
+
         // 正規表現による柔軟なマッチング
-        const intentRegex = /(twitter|x)\.com\/(intent\/(tweet|post)|share)|twitter:\/\/intent\/(tweet|post)/i;
+        const intentRegex =
+            /(twitter|x)\.com\/(intent\/(tweet|post)|share)|twitter:\/\/intent\/(tweet|post)/i;
         return intentRegex.test(url);
     };
 
@@ -34,12 +35,23 @@ unsafeWindow.TwitterCommon = (function () {
         return {
             text: urlParams.get('text') || '',
             url: urlParams.get('url') || '',
-            hashtags: urlParams.get('hashtags')?.split(',').map(tag => `#${tag}`).join('\n') || ''
+            hashtags:
+                urlParams
+                    .get('hashtags')
+                    ?.split(',')
+                    .map((tag) => `#${tag}`)
+                    .join('\n') || ''
         };
     };
 
     // トースト通知表示
-    const showToast = (headerText, message, url = null, backgroundColor = '#333', headerBackgroundColor = '#444') => {
+    const showToast = (
+        headerText,
+        message,
+        url = null,
+        backgroundColor = '#333',
+        headerBackgroundColor = '#444'
+    ) => {
         const toast = document.createElement('div');
         toast.style.position = 'fixed';
         toast.style.top = '20px';
@@ -107,15 +119,20 @@ unsafeWindow.TwitterCommon = (function () {
 
     // 現在のユーザー名を取得
     const getCurrentUser = () => {
-        return Array.from(document.querySelectorAll('div[aria-label="ホームタイムライン"] span'))
-            .find(el => el.textContent.trim().startsWith('@'))?.textContent.trim();
+        return Array.from(
+            document.querySelectorAll(
+                'div[aria-label="ホームタイムライン"] span'
+            )
+        )
+            .find((el) => el.textContent.trim().startsWith('@'))
+            ?.textContent.trim();
     };
 
     // ボタン作成
     const createButton = (text, styles = {}) => {
         const button = document.createElement('button');
         button.innerText = text;
-        
+
         const defaultStyles = {
             position: 'fixed',
             top: '10px',

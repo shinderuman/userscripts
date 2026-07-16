@@ -14,11 +14,18 @@
         const { text, url: intentUrl, hashtags } = extractIntentParams(url);
 
         if (!intentUrl && !/https?:\/\/[^\s]+/.test(text)) {
-            showToast('Error', 'Error: The URL parameter is missing or empty, and no URL is found in the text.', null, '#e74c3c', '#c0392b');
+            showToast(
+                'Error',
+                'Error: The URL parameter is missing or empty, and no URL is found in the text.',
+                null,
+                '#e74c3c',
+                '#c0392b'
+            );
             return;
         }
 
-        const fullText = `
+        const fullText =
+            `
 ${text}
 ${intentUrl}
 ${hashtags}
@@ -32,7 +39,9 @@ ${hashtags}
 
     // 1. 基本のintent URLリンク検出（最優先）
     const handleDirectIntentLink = (event) => {
-        const selector = INTENT_PATTERNS.map(pattern => `a[href*="${pattern}"]`).join(', ');
+        const selector = INTENT_PATTERNS.map(
+            (pattern) => `a[href*="${pattern}"]`
+        ).join(', ');
         const target = event.target.closest(selector);
         if (target) {
             event.preventDefault();
@@ -45,9 +54,13 @@ ${hashtags}
 
     const initializeIntentCopier = () => {
         // クリックイベントリスナー
-        document.addEventListener('click', (event) => {
-            handleDirectIntentLink(event);
-        }, true);
+        document.addEventListener(
+            'click',
+            (event) => {
+                handleDirectIntentLink(event);
+            },
+            true
+        );
 
         // window.openのオーバーライド
         const originalOpen = window.open;

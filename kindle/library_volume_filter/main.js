@@ -117,15 +117,27 @@
 
     // シリーズをフィルタリング
     const filterSeries = () => {
-        const filterValue = document.getElementById(CONFIG.FILTER_INPUT_ID).value;
+        const filterValue = document.getElementById(
+            CONFIG.FILTER_INPUT_ID
+        ).value;
         const targetVolumes = filterValue ? parseInt(filterValue) : 0;
 
-        const seriesItems = document.querySelectorAll(CONFIG.SELECTORS.SERIES_ITEM);
+        const seriesItems = document.querySelectorAll(
+            CONFIG.SELECTORS.SERIES_ITEM
+        );
 
-        seriesItems.forEach(item => {
-            const volumeCounter = item.querySelector(CONFIG.SELECTORS.VOLUME_COUNTER);
+        seriesItems.forEach((item) => {
+            const volumeCounter = item.querySelector(
+                CONFIG.SELECTORS.VOLUME_COUNTER
+            );
             if (volumeCounter) {
-                item.style.display = shouldShowItem(parseInt(volumeCounter.textContent.trim()), targetVolumes, isMinMode) ? '' : 'none';
+                item.style.display = shouldShowItem(
+                    parseInt(volumeCounter.textContent.trim()),
+                    targetVolumes,
+                    isMinMode
+                )
+                    ? ''
+                    : 'none';
             }
         });
     };
@@ -145,7 +157,9 @@
     // フィルターUIを初期化
     const initializeFilter = () => {
         // 既存のフィルターコンテナを削除
-        const existingContainer = document.getElementById(CONFIG.FILTER_CONTAINER_ID);
+        const existingContainer = document.getElementById(
+            CONFIG.FILTER_CONTAINER_ID
+        );
         if (existingContainer) {
             existingContainer.remove();
         }
@@ -169,7 +183,9 @@
         }
 
         console.log('📖 Kindle Library Volume Filter が初期化されました');
-        console.log('💡 トップバーの巻数フィールドに最小巻数を入力してフィルタリングできます');
+        console.log(
+            '💡 トップバーの巻数フィールドに最小巻数を入力してフィルタリングできます'
+        );
     };
 
     // シリーズリストの変更を監視

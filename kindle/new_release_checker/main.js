@@ -32,7 +32,7 @@
         if (!asin) return false;
 
         const length = asin.length;
-        return (length >= 10 && length <= 13) && /^\d+$/.test(asin);
+        return length >= 10 && length <= 13 && /^\d+$/.test(asin);
     };
 
     // メイン関数
@@ -41,7 +41,9 @@
             console.log('🧹 古い通知記録をクリーンアップ中...');
             cleanupOldNotifications();
 
-            console.log(`📖 ISBN処理モード: ${getISBNModeDescription(isbnMode)}`);
+            console.log(
+                `📖 ISBN処理モード: ${getISBNModeDescription(isbnMode)}`
+            );
 
             console.log('📖 作者データを取得中...');
             const authors = await fetchAuthors();
@@ -61,17 +63,25 @@
 
     const getISBNModeDescription = (mode) => {
         switch (mode) {
-        case 0: return '0 (ISBNをスキップ)';
-        case 1: return '1 (ISBNのみ表示)';
-        case 2: return '2 (どちらも表示)';
-        default: return `${mode} (不明なモード、ISBNをスキップとして処理)`;
+            case 0:
+                return '0 (ISBNをスキップ)';
+            case 1:
+                return '1 (ISBNのみ表示)';
+            case 2:
+                return '2 (どちらも表示)';
+            default:
+                return `${mode} (不明なモード、ISBNをスキップとして処理)`;
         }
     };
 
     const cleanupOldNotifications = () => {
         const cutoffDate = new Date();
         cutoffDate.setDate(cutoffDate.getDate() - CONFIG.NEW_RELEASE_DAYS);
-        cleanupOldStorageItems(CONFIG.LOCAL_STORAGE_KEYS.NOTIFICATIONS, cutoffDate, 'releaseDate');
+        cleanupOldStorageItems(
+            CONFIG.LOCAL_STORAGE_KEYS.NOTIFICATIONS,
+            cutoffDate,
+            'releaseDate'
+        );
     };
 
     const fetchAuthors = () => {
@@ -79,7 +89,10 @@
     };
 
     const fetchExcludedKeywords = () => {
-        return fetchJsonFromS3(CONFIG.EXCLUDED_KEYWORDS_URL, 'excluded keywords');
+        return fetchJsonFromS3(
+            CONFIG.EXCLUDED_KEYWORDS_URL,
+            'excluded keywords'
+        );
     };
 
     const checkPagesInBatches = async (authors, excludedKeywords, isbnMode) => {
@@ -101,14 +114,20 @@
                     const hasNewReleases = checkNewReleaseConditions(pageInfo);
 
                     processedCount++;
-                    console.log(`進捗: ${processedCount}/${authors.length} - ${pageInfo.Name}`);
+                    console.log(
+                        `進捗: ${processedCount}/${authors.length} - ${pageInfo.Name}`
+                    );
                     console.log(`  新刊: ${pageInfo.newReleases.length}冊`);
 
                     if (hasNewReleases) {
                         newReleaseCount += pageInfo.newReleases.length;
-                        console.log(`📚 新刊発見: ${pageInfo.Name} - ${pageInfo.newReleases.length}冊`);
-                        pageInfo.newReleases.forEach(book => {
-                            console.log(`  - ${book.title} (${book.releaseDate})`);
+                        console.log(
+                            `📚 新刊発見: ${pageInfo.Name} - ${pageInfo.newReleases.length}冊`
+                        );
+                        pageInfo.newReleases.forEach((book) => {
+                            console.log(
+                                `  - ${book.title} (${book.releaseDate})`
+                            );
                             newReleaseBooks.push(book);
                         });
                     }
@@ -124,25 +143,36 @@
 
             // 次のバッチまで待機（レート制限対策）
             if (i + CONFIG.CONCURRENT_REQUESTS < authors.length) {
-                await new Promise(resolve => setTimeout(resolve, CONFIG.REQUEST_DELAY));
+                await new Promise((resolve) =>
+                    setTimeout(resolve, CONFIG.REQUEST_DELAY)
+                );
             }
         }
 
         const now = new Date().toLocaleString('ja-JP');
-        console.log(`✅ チェック完了: ${newReleaseCount}冊の新刊を発見しました (${now})`);
+        console.log(
+            `✅ チェック完了: ${newReleaseCount}冊の新刊を発見しました (${now})`
+        );
 
         // 見つかった新刊をすべて新しいタブで開く
         if (newReleaseBooks.length > 0) {
-            newReleaseBooks.forEach(book => {
+            newReleaseBooks.forEach((book) => {
                 GM_openInTab(book.url, { active: false });
             });
 
             // 通知済みアイテムをまとめて保存
-            saveStorageItems(CONFIG.LOCAL_STORAGE_KEYS.NOTIFICATIONS, newReleaseBooks);
+            saveStorageItems(
+                CONFIG.LOCAL_STORAGE_KEYS.NOTIFICATIONS,
+                newReleaseBooks
+            );
         }
 
         // 完了通知
-        sendCompletionNotification('新刊チェック', authors.length, newReleaseCount);
+        sendCompletionNotification(
+            '新刊チェック',
+            authors.length,
+            newReleaseCount
+        );
     };
 
     const fetchAuthorSearchInfo = async (authorInfo) => {
@@ -159,16 +189,32 @@
                 onload: async (response) => {
                     if (response.status === 200) {
                         const parser = new DOMParser();
-                        const doc = parser.parseFromString(response.responseText, 'text/html');
+                        const doc = parser.parseFromString(
+                            response.responseText,
+                            'text/html'
+                        );
 
                         console.log(`📄 検索結果ページタイトル: ${doc.title}`);
 
-                        const info = await extractSearchPageInfo(doc, authorInfo, authorInfo.excludedKeywords);
+                        const info = await extractSearchPageInfo(
+                            doc,
+                            authorInfo,
+                            authorInfo.excludedKeywords
+                        );
                         resolve(info);
                     } else {
-                        console.log(`❌ 検索ページ取得失敗: ${response.status}`);
-                        sendPageFetchErrorNotification(searchUrl, authorInfo.Name);
-                        reject(new Error(`Failed to fetch search page: ${response.status}`));
+                        console.log(
+                            `❌ 検索ページ取得失敗: ${response.status}`
+                        );
+                        sendPageFetchErrorNotification(
+                            searchUrl,
+                            authorInfo.Name
+                        );
+                        reject(
+                            new Error(
+                                `Failed to fetch search page: ${response.status}`
+                            )
+                        );
                     }
                 },
                 onerror: (error) => {
@@ -180,10 +226,15 @@
     };
 
     const extractSearchPageInfo = async (doc, authorInfo, excludedKeywords) => {
-        const searchResults = doc.querySelectorAll('[data-component-type="s-search-result"]');
+        const searchResults = doc.querySelectorAll(
+            '[data-component-type="s-search-result"]'
+        );
         const newReleases = [];
         const currentDate = new Date();
-        const cutoffDate = new Date(currentDate.getTime() - (CONFIG.NEW_RELEASE_DAYS * 24 * 60 * 60 * 1000));
+        const cutoffDate = new Date(
+            currentDate.getTime() -
+                CONFIG.NEW_RELEASE_DAYS * 24 * 60 * 60 * 1000
+        );
         const isbnMode = authorInfo.isbnMode || 0;
 
         console.log(`🔍 検索結果: ${searchResults.length}件`);
@@ -195,17 +246,23 @@
 
         for (let i = 0; i < booksToCheck.length; i++) {
             const item = booksToCheck[i];
-            console.log(`\n📖 書籍 ${i + 1}/${booksToCheck.length} をチェック中...`);
+            console.log(
+                `\n📖 書籍 ${i + 1}/${booksToCheck.length} をチェック中...`
+            );
 
             // 基本情報チェック
             const basicInfo = checkBookBasicInfo(item);
             if (!basicInfo.isValid) {
                 console.log('⏭️ スキップ: タイトルまたはURLが見つかりません');
                 // デバッグ用：利用可能な要素を表示
-                const allH2 = item.querySelectorAll('h2, h2 span, h2 a, h2 a span');
+                const allH2 = item.querySelectorAll(
+                    'h2, h2 span, h2 a, h2 a span'
+                );
                 console.log(`🔍 利用可能なh2要素: ${allH2.length}個`);
                 allH2.forEach((el, idx) => {
-                    console.log(`  ${idx}: "${el.innerText?.trim() || ''}" (${el.tagName})`);
+                    console.log(
+                        `  ${idx}: "${el.innerText?.trim() || ''}" (${el.tagName})`
+                    );
                 });
                 continue;
             }
@@ -263,7 +320,9 @@
             }
         }
 
-        console.log(`\n📊 ${authorInfo.Name}の結果: ${newReleases.length}冊の新刊を発見`);
+        console.log(
+            `\n📊 ${authorInfo.Name}の結果: ${newReleases.length}冊の新刊を発見`
+        );
         return {
             ...authorInfo,
             newReleases
@@ -271,9 +330,13 @@
     };
 
     const checkBookBasicInfo = (item) => {
-        const titleElement = item.querySelector('.s-title-instructions-style a h2 span');
+        const titleElement = item.querySelector(
+            '.s-title-instructions-style a h2 span'
+        );
         const title = titleElement?.innerText?.trim() || '';
-        const linkElement = titleElement?.closest('a') || item.querySelector('h2 a, .a-link-normal[href*="/dp/"]');
+        const linkElement =
+            titleElement?.closest('a') ||
+            item.querySelector('h2 a, .a-link-normal[href*="/dp/"]');
         const bookUrl = linkElement?.href || '';
 
         if (title && bookUrl) {
@@ -289,37 +352,51 @@
     const checkISBNFiltering = (asin, isbnMode) => {
         const isBookISBN = isISBN(asin);
 
-        console.log(`ASIN: ${asin}, ISBN判定: ${isBookISBN}, モード: ${isbnMode}`);
+        console.log(
+            `ASIN: ${asin}, ISBN判定: ${isBookISBN}, モード: ${isbnMode}`
+        );
 
         switch (isbnMode) {
-        case 0: // ISBNをスキップ
-            if (isBookISBN) {
-                console.log(`⏭️ スキップ: ISBN（紙書籍）のためスキップします (ASIN: ${asin})`);
-                return true;
-            }
-            break;
-        case 1: // ISBNのみ表示
-            if (!isBookISBN) {
-                console.log(`⏭️ スキップ: ISBNではないためスキップします (ASIN: ${asin})`);
-                return true;
-            }
-            break;
-        case 2: // どちらも表示
-            // フィルタリングしない
-            break;
-        default: // 不明なモードの場合はISBNをスキップ
-            if (isBookISBN) {
-                console.log(`⏭️ スキップ: 不明なモード、ISBN（紙書籍）のためスキップします (ASIN: ${asin})`);
-                return true;
-            }
-            break;
+            case 0: // ISBNをスキップ
+                if (isBookISBN) {
+                    console.log(
+                        `⏭️ スキップ: ISBN（紙書籍）のためスキップします (ASIN: ${asin})`
+                    );
+                    return true;
+                }
+                break;
+            case 1: // ISBNのみ表示
+                if (!isBookISBN) {
+                    console.log(
+                        `⏭️ スキップ: ISBNではないためスキップします (ASIN: ${asin})`
+                    );
+                    return true;
+                }
+                break;
+            case 2: // どちらも表示
+                // フィルタリングしない
+                break;
+            default: // 不明なモードの場合はISBNをスキップ
+                if (isBookISBN) {
+                    console.log(
+                        `⏭️ スキップ: 不明なモード、ISBN（紙書籍）のためスキップします (ASIN: ${asin})`
+                    );
+                    return true;
+                }
+                break;
         }
 
         return false;
     };
 
     const checkAlreadyNotified = (asin) => {
-        if (asin && isAlreadyStored(CONFIG.LOCAL_STORAGE_KEYS.NOTIFICATIONS, item => item.asin === asin)) {
+        if (
+            asin &&
+            isAlreadyStored(
+                CONFIG.LOCAL_STORAGE_KEYS.NOTIFICATIONS,
+                (item) => item.asin === asin
+            )
+        ) {
             console.log(`⏭️ スキップ: 既に通知済みです (ASIN: ${asin})`);
             return true;
         }
@@ -327,10 +404,16 @@
     };
 
     const checkExcludedKeywords = (title, excludedKeywords) => {
-        const hasExcludedKeyword = excludedKeywords.some(keyword => title.includes(keyword));
+        const hasExcludedKeyword = excludedKeywords.some((keyword) =>
+            title.includes(keyword)
+        );
         if (hasExcludedKeyword) {
-            const matchedKeyword = excludedKeywords.find(keyword => title.includes(keyword));
-            console.log(`⏭️ スキップ: 除外キーワード "${matchedKeyword}" が含まれています`);
+            const matchedKeyword = excludedKeywords.find((keyword) =>
+                title.includes(keyword)
+            );
+            console.log(
+                `⏭️ スキップ: 除外キーワード "${matchedKeyword}" が含まれています`
+            );
             return true;
         }
         return false;
@@ -348,7 +431,9 @@
                 console.log(`💰 価格: ${price}円`);
 
                 if (price <= CONFIG.MIN_PRICE) {
-                    console.log(`⏭️ スキップ: 価格が${CONFIG.MIN_PRICE}円以下です (${price}円)`);
+                    console.log(
+                        `⏭️ スキップ: 価格が${CONFIG.MIN_PRICE}円以下です (${price}円)`
+                    );
                     return { price, shouldSkip: true };
                 }
             } else {
@@ -377,7 +462,9 @@
     };
 
     const checkReleaseDate = (item, cutoffDate) => {
-        const dateElement = item.querySelector('.puis-desktop-list-row .puisg-col-4-of-24 div:nth-child(2) div:nth-child(2) span span');
+        const dateElement = item.querySelector(
+            '.puis-desktop-list-row .puisg-col-4-of-24 div:nth-child(2) div:nth-child(2) span span'
+        );
         const releaseDateText = dateElement?.innerText?.trim() || '';
 
         console.log(`📅 発売日テキスト: "${releaseDateText}"`);
@@ -404,15 +491,25 @@
         console.log(`📅 日付解析中: "${dateText}"`);
 
         // "発売予定日は2025年10月27日です。" 形式から日付を抽出
-        const dateMatch = dateText.match(/(\d{4})年(\d{1,2})月(\d{1,2})日|(\d{4})\/(\d{1,2})\/(\d{1,2})/);
+        const dateMatch = dateText.match(
+            /(\d{4})年(\d{1,2})月(\d{1,2})日|(\d{4})\/(\d{1,2})\/(\d{1,2})/
+        );
         if (dateMatch) {
             let releaseDate;
             if (dateMatch[1]) {
                 // YYYY年MM月DD日形式
-                releaseDate = new Date(dateMatch[1], dateMatch[2] - 1, dateMatch[3]);
+                releaseDate = new Date(
+                    dateMatch[1],
+                    dateMatch[2] - 1,
+                    dateMatch[3]
+                );
             } else if (dateMatch[4]) {
                 // YYYY/MM/DD形式
-                releaseDate = new Date(dateMatch[4], dateMatch[5] - 1, dateMatch[6]);
+                releaseDate = new Date(
+                    dateMatch[4],
+                    dateMatch[5] - 1,
+                    dateMatch[6]
+                );
             }
             console.log(`📅 解析結果: ${releaseDate?.toISOString()}`);
             return releaseDate;
@@ -425,11 +522,14 @@
         return info.newReleases && info.newReleases.length > 0;
     };
 
-
     // グローバル関数として公開（デベロッパーツールから呼び出し可能）
     unsafeWindow.checkNewReleases = checkNewReleases;
 
     console.log('🚀 New Release Checker が読み込まれました');
-    console.log('💡 デベロッパーツールで checkNewReleases(isbnMode) を実行してください');
-    console.log('💡 isbnMode: 0=ISBNスキップ(デフォルト), 1=ISBNのみ, 2=どちらも表示');
+    console.log(
+        '💡 デベロッパーツールで checkNewReleases(isbnMode) を実行してください'
+    );
+    console.log(
+        '💡 isbnMode: 0=ISBNスキップ(デフォルト), 1=ISBNのみ, 2=どちらも表示'
+    );
 })();

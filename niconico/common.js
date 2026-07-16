@@ -16,7 +16,7 @@ unsafeWindow.NiconicoCommon = (function () {
     };
 
     // 待機関数
-    const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
     // 要素へのスクロール
     const scrollToElement = async (element) => {
@@ -25,13 +25,22 @@ unsafeWindow.NiconicoCommon = (function () {
     };
 
     // SVGボタン作成
-    const createSVGButton = (pathData, className = 'original-control-button') => {
-        const svgElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    const createSVGButton = (
+        pathData,
+        className = 'original-control-button'
+    ) => {
+        const svgElement = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'svg'
+        );
         svgElement.setAttribute('width', '24');
         svgElement.setAttribute('height', '24');
         svgElement.setAttribute('viewBox', '0 0 24 24');
 
-        const pathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const pathElement = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'path'
+        );
         pathElement.setAttribute('d', pathData);
         pathElement.setAttribute('fill', 'white');
 
@@ -59,7 +68,10 @@ unsafeWindow.NiconicoCommon = (function () {
     };
 
     // DOM監視
-    const observeDOM = (callback, options = { childList: true, subtree: true }) => {
+    const observeDOM = (
+        callback,
+        options = { childList: true, subtree: true }
+    ) => {
         const observer = new MutationObserver(callback);
         observer.observe(document.body, options);
         return observer;

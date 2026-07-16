@@ -3,7 +3,10 @@ unsafeWindow.DMMCommon = (function () {
     'use strict';
 
     // DOM監視
-    const observeDOM = (callback, options = { childList: true, subtree: true }) => {
+    const observeDOM = (
+        callback,
+        options = { childList: true, subtree: true }
+    ) => {
         const observer = new MutationObserver(callback);
         observer.observe(document.body, options);
         return observer;

@@ -2,10 +2,7 @@
     'use strict';
 
     // 共通ライブラリから関数を取得
-    const {
-        showNotification,
-        observeDOM
-    } = unsafeWindow.NiconicoCommon;
+    const { showNotification, observeDOM } = unsafeWindow.NiconicoCommon;
 
     const CONFIG = {
         CAMPAIGN_KEYWORDS: [
@@ -24,8 +21,7 @@
             '推しﾀｸﾞ動画が',
             '１日１回無料'
         ],
-        ADDITIONAL_URLS: [
-        ],
+        ADDITIONAL_URLS: [],
         LINK_OPEN_DELAY_MS: 1000
     };
 
@@ -44,15 +40,23 @@
 
     const findCampaignLinks = () => {
         return Array.from(document.querySelectorAll('img'))
-            .filter(img => CONFIG.CAMPAIGN_KEYWORDS.some(keyword => img.alt.includes(keyword)))
-            .map(img => img.closest('a'))
-            .filter(link => link && !openedLinks.has(link.href));
+            .filter((img) =>
+                CONFIG.CAMPAIGN_KEYWORDS.some((keyword) =>
+                    img.alt.includes(keyword)
+                )
+            )
+            .map((img) => img.closest('a'))
+            .filter((link) => link && !openedLinks.has(link.href));
     };
 
     const handleCampaignLinks = (links) => {
-        CONFIG.ADDITIONAL_URLS.forEach(url => {
+        CONFIG.ADDITIONAL_URLS.forEach((url) => {
             if (!openedLinks.has(url)) {
-                window.open(url, '_blank', 'width=580,height=1200,noopener,noreferrer');
+                window.open(
+                    url,
+                    '_blank',
+                    'width=580,height=1200,noopener,noreferrer'
+                );
             }
         });
 
@@ -64,9 +68,13 @@
                 }
             }, CONFIG.LINK_OPEN_DELAY_MS);
         } else {
-            links.forEach(link => {
+            links.forEach((link) => {
                 openedLinks.add(link.href);
-                window.open(link.href, '_blank', 'width=580,height=1200,noopener,noreferrer');
+                window.open(
+                    link.href,
+                    '_blank',
+                    'width=580,height=1200,noopener,noreferrer'
+                );
             });
         }
     };

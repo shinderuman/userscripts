@@ -43,7 +43,11 @@
             observer.disconnect();
             console.log('⏹ 監視をタイムアウトしました');
         }, CONFIG.TIMEOUT_MS);
-        observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true
+        });
         console.log('🚀 ニコニコ自動広告スキッパーが初期化されました');
     }, CONFIG.INITIAL_WAIT_MS);
 })();

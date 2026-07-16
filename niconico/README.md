@@ -5,9 +5,11 @@
 ## 📋 スクリプト一覧
 
 ### 📖 Vertical to Horizontal Reader (`vertical_to_horizontal_reader/`)
+
 ニコニコ漫画の縦読みを右から左の横読み形式に変換するスクリプト。
 
 **機能:**
+
 - 縦読み漫画を横読み形式に変換
 - 見開きページの自動検出・処理
 - キーボードナビゲーション（矢印キー）
@@ -15,14 +17,17 @@
 - ESCキーによる処理中断
 
 **対象サイト:**
+
 - `https://manga.nicovideo.jp/watch/*`
 
 **操作方法:**
+
 - **→/↑/X**: 前のページ（右から左へ）
 - **←/↓/Z**: 次のページ
 - **ESC**: 処理中断
 
 **設定項目:**
+
 ```javascript
 const CONFIG = {
     SELECTORS: {
@@ -46,9 +51,11 @@ const CONFIG = {
 ```
 
 ### 🎬 Video Series Navigation (`video_series_navigation/`)
+
 シリーズ動画間のナビゲーションボタンとキーボードショートカットを追加するスクリプト。
 
 **機能:**
+
 - シリーズ動画の前後移動ボタン
 - 最初のエピソードへのジャンプ
 - 時間制御ボタン（±60秒）
@@ -56,14 +63,17 @@ const CONFIG = {
 - 自動的なボタン配置最適化
 
 **対象サイト:**
+
 - `https://www.nicovideo.jp/watch/*`
 
 **キーボードショートカット:**
+
 - **Zキー**: 10秒戻る
 - **Xキー**: 一時停止/再生
 - **Cキー**: 10秒送る
 
 **ボタン配置:**
+
 - **First**: シリーズ最初の動画
 - **Previous**: 前の動画
 - **Rewind(-60)**: 60秒戻る
@@ -73,13 +83,14 @@ const CONFIG = {
 - **Next**: 次の動画
 
 **設定項目:**
+
 ```javascript
 const CONFIG = {
-    TIME_OFFSETS: [-60, 60],  // 時間制御のオフセット（秒）
+    TIME_OFFSETS: [-60, 60], // 時間制御のオフセット（秒）
     KEY_BINDINGS: {
-        'KeyZ': '#tooltip\\:«ra»\\:trigger',  // 10秒戻る
-        'KeyX': '#tooltip\\:«r6»\\:trigger',  // 一時停止
-        'KeyC': '#tooltip\\:«r9»\\:trigger'   // 10秒送る
+        KeyZ: '#tooltip\\:«ra»\\:trigger', // 10秒戻る
+        KeyX: '#tooltip\\:«r6»\\:trigger', // 一時停止
+        KeyC: '#tooltip\\:«r9»\\:trigger' // 10秒送る
     },
     SELECTORS: {
         PLAYER_CONTAINER: 'div.pos_relative.asp_auto.w_100\\%.ov_hidden.bdr_m',
@@ -89,9 +100,11 @@ const CONFIG = {
 ```
 
 ### 🎯 Auto Campaign Navigator (`auto_campaign_navigator/`)
+
 ニコニコキャンペーンリンクを自動処理するスクリプト（遅延実行・クリックキャンセル機能付き）。
 
 **機能:**
+
 - キャンペーン画像の自動検出
 - 単一リンクの遅延自動実行（1秒後）
 - 複数リンクの新しいタブ一括オープン
@@ -99,71 +112,84 @@ const CONFIG = {
 - デバウンス処理による最適化
 
 **対象サイト:**
+
 - `https://koken.nicovideo.jp/campaign`
 
 **動作:**
+
 1. キャンペーン画像を自動検出
 2. 1つの場合: 1秒後に自動遷移（クリックでキャンセル可能）
 3. 複数の場合: 新しいタブで一括オープン
 
 **設定項目:**
+
 ```javascript
 const CONFIG = {
     CAMPAIGN_KEYWORDS: [
         '1日1回無料',
         '毎日無料',
-        '無料の福引で',
+        '無料の福引で'
         // ... その他のキーワード
     ],
-    LINK_OPEN_DELAY_MS: 1000  // 遅延時間（ミリ秒）
+    LINK_OPEN_DELAY_MS: 1000 // 遅延時間（ミリ秒）
 };
 ```
 
 ### ⏩ Auto Ad Skipper (`auto_ad_skipper/`)
+
 ニコニコ動画の動画広告のスキップボタンを自動クリックするスクリプト。
 
 **機能:**
+
 - ページ読み込み後4秒待機してから監視開始
 - MutationObserverでスキップボタンの出現を検知
 - 20秒経過してもスキップできなかった場合は自動で中断
 
 **対象サイト:**
+
 - `https://www.nicovideo.jp/watch/*`
 
 **動作:**
+
 1. ページ読み込み後4秒待機
 2. 広告コンテナ内のスキップボタンを監視
 3. スキップ可能状態を検知したら自動クリック
 4. 20秒以内にスキップできなければ中断
 
 **設定項目:**
+
 ```javascript
 const CONFIG = {
-    INITIAL_WAIT_MS: 4000,   // 監視開始までの待機時間（ミリ秒）
-    TIMEOUT_MS: 20000,       // 監視タイムアウト（ミリ秒）
+    INITIAL_WAIT_MS: 4000, // 監視開始までの待機時間（ミリ秒）
+    TIMEOUT_MS: 20000, // 監視タイムアウト（ミリ秒）
     AD_CONTAINER_ID: 'nv_watch_VideoAdContainer'
 };
 ```
 
 ### 🎬 Yuzuki Movie Series Enhancer (`yuzuki_movie_series_enhancer/`)
+
 「結月さん映画を鑑賞する」シリーズに映画配信サイト検索機能を追加するスクリプト。
 
 **機能:**
+
 - 映画タイトルの自動抽出（「」『』で囲まれた部分）
 - 🎬アイコンによる配信サイト検索リンク
 - 動的コンテンツの自動監視・対応
 - シンプルで軽量な実装
 
 **対象サイト:**
+
 - `https://www.nicovideo.jp/user/91534/series/351508*`
 
 **動作:**
+
 1. 動画タイトルから映画タイトルを自動抽出
 2. 各タイトルに🎬アイコンを追加
 3. クリックでGoogle検索（映画名 + 配信）を実行
 4. 新しいタブで検索結果を表示
 
 **対応タイトル例:**
+
 - `映画「BEAST/ビースト」を結月さん鑑賞する` → `BEAST/ビースト`
 - `結月さんの映画紹介「レイキャヴィク・ホエール・ウォッチング・マサカー」` → `レイキャヴィク・ホエール・ウォッチング・マサカー`
 - `映画『ＮＯＰＥ／ノープ』を結月さん鑑賞する` → `ＮＯＰＥ／ノープ`
@@ -175,24 +201,29 @@ const CONFIG = {
 ### 主要機能
 
 #### UI要素作成
+
 - `createSVGButton(pathData)`: SVGボタンの作成
 - `createCanvas(width, height)`: Canvas要素の作成
 - `applyStyles(element, styles)`: スタイルの一括適用
 
 #### DOM操作・監視
+
 - `observeElement(element, callback)`: 要素の変更監視
 - `scrollToElement(element)`: 要素へのスムーズスクロール
 - `wait(ms)`: 指定時間の待機
 
 #### 通知・UI
+
 - `showNotification(title, message, duration)`: 通知表示
 - `debounce(func, delay)`: デバウンス処理
 
 #### 動画・URL処理
+
 - `extractVideoId(element)`: 動画IDの抽出
 
 ```javascript
-const { createSVGButton, showNotification, extractVideoId } = unsafeWindow.NiconicoCommon;
+const { createSVGButton, showNotification, extractVideoId } =
+    unsafeWindow.NiconicoCommon;
 
 // SVGボタンを作成
 const { button, svg } = createSVGButton('M12 4l-8 8 8 8V4');
@@ -207,10 +238,12 @@ const videoId = extractVideoId(linkElement);
 ## 🚀 インストール方法
 
 ### 1. Tampermonkeyの準備
+
 1. ブラウザにTampermonkey拡張機能をインストール
 2. Tampermonkey Dashboardを開く
 
 ### 2. スクリプトのインストール
+
 各スクリプトの`wrapper.js`ファイルをTampermonkeyにインポート:
 
 1. **Vertical to Horizontal Reader**: `vertical_to_horizontal_reader/wrapper.js`
@@ -220,6 +253,7 @@ const videoId = extractVideoId(linkElement);
 5. **Auto Ad Skipper**: `auto_ad_skipper/wrapper.js`
 
 ### 3. パスの設定
+
 `wrapper.js`ファイル内の`@require`パスを環境に合わせて調整:
 
 ```javascript
@@ -230,24 +264,29 @@ const videoId = extractVideoId(linkElement);
 ## ⚙️ 設定
 
 ### 対象サイト
+
 - **ニコニコ動画**: `https://www.nicovideo.jp/watch/*`
 - **ニコニコ漫画**: `https://manga.nicovideo.jp/watch/*`
 - **ニコニコキャンペーン**: `https://koken.nicovideo.jp/campaign`
 - **結月さんシリーズ**: `https://www.nicovideo.jp/user/91534/series/351508*`
 
 ### 権限設定
+
 一部スクリプトで以下の権限が必要:
+
 - `GM_notification`: 通知表示
 
 ## 🔍 使用方法
 
 ### Vertical to Horizontal Reader
+
 1. ニコニコ漫画のエピソードページを開く
 2. 自動的に横読み形式に変換される
 3. 矢印キー（→/↑/←/↓）またはX/Zキーでページ移動
 4. ESCキーで処理中断
 
 ### Video Series Navigation
+
 1. ニコニコ動画のシリーズ動画を開く
 2. プレイヤーに追加ボタンが表示される
 3. ボタンクリックで前後の動画に移動
@@ -255,10 +294,12 @@ const videoId = extractVideoId(linkElement);
 5. Z/X/Cキーで動画操作（10秒戻る/一時停止/10秒送る）
 
 ### Auto Ad Skipper
+
 1. ニコニコ動画のページを開く
 2. 広告が表示された場合、自動的にスキップ
 
 ### Auto Campaign Navigator
+
 1. ニコニコキャンペーンページを開く
 2. キャンペーンリンクが自動検出される
 3. 1つの場合: 1秒後に自動遷移
@@ -266,31 +307,34 @@ const videoId = extractVideoId(linkElement);
 5. クリックでキャンセル可能
 
 ### Yuzuki Movie Series Enhancer
+
 1. 結月さんの映画シリーズページを開く
 2. 各動画タイトルに🎬アイコンが自動追加される
 3. アイコンクリックで映画の配信サイト検索
 4. 新しいタブでGoogle検索結果を表示
 
 ### 手動実行（デバッグ用）
+
 デベロッパーツールのコンソールで以下の関数を実行可能:
 
 ```javascript
 // Vertical to Horizontal Reader
-initializeMangaReader()
+initializeMangaReader();
 
 // Video Series Navigation
-initializeSeriesVideoNavigator()
+initializeSeriesVideoNavigator();
 
 // Auto Campaign Navigator
-initializeCampaignLinkHelper()
+initializeCampaignLinkHelper();
 
 // Yuzuki Movie Series Enhancer
-initializeYuzukiMovieSeriesEnhancer()
+initializeYuzukiMovieSeriesEnhancer();
 ```
 
 ## 📊 ログ出力
 
 各スクリプトは詳細なログを出力します:
+
 - 🚀 スクリプト読み込み状況
 - 💡 初期化完了通知
 - 📖 漫画変換処理状況
@@ -302,28 +346,33 @@ initializeYuzukiMovieSeriesEnhancer()
 ## 🛠️ 開発・カスタマイズ
 
 ### アーキテクチャ
+
 - **サービス特化**: ニコニコサービス専用の最適化
 - **共通ライブラリ**: 再利用可能な機能を`common.js`に集約
 - **レスポンシブ対応**: 動的なDOM変更に対応
 
 ### 新しいキャンペーンキーワードの追加
+
 Auto Campaign Navigatorでは、新しいキャンペーンキーワードを追加可能:
 
 ```javascript
 const CONFIG = {
     CAMPAIGN_KEYWORDS: [
         '1日1回無料',
-        '新しいキャンペーン',  // 追加
+        '新しいキャンペーン' // 追加
         // ... その他
     ]
 };
 ```
 
 ### カスタムSVGボタンの作成
+
 Video Series Navigationでは、カスタムボタンを追加可能:
 
 ```javascript
-const customButton = createSVGButton('M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z');
+const customButton = createSVGButton(
+    'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z'
+);
 ```
 
 ## 🚨 注意事項

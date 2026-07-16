@@ -16,15 +16,15 @@
 
     const processLinks = () => {
         const links = document.querySelectorAll(CONFIG.LINK_SELECTOR);
-        
-        links.forEach(link => {
+
+        links.forEach((link) => {
             if (isProcessed(link)) return;
-            
+
             markAsProcessed(link);
 
             const onclick = link.getAttribute('onclick');
             const url = extractUrlFromOnclick(onclick);
-            
+
             if (url) {
                 modifyLink(link, url);
             }

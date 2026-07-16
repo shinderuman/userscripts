@@ -11,8 +11,7 @@
     } = unsafeWindow.GitHubCommon;
 
     // スキップするキーワードリスト
-    const skipList = [
-    ];
+    const skipList = [];
 
     const STORAGE_KEY = 'sale_wishlist_priority:' + location.pathname;
 
@@ -73,9 +72,13 @@
                 id: 'priority-panel',
                 title: '🌟 優先リスト',
                 titleStyle: STYLES.priorityTitle,
-                filterFn: (links) => links
-                    .filter(link => link.isPriority)
-                    .sort((a, b) => (b.priorityLevel || 0) - (a.priorityLevel || 0))
+                filterFn: (links) =>
+                    links
+                        .filter((link) => link.isPriority)
+                        .sort(
+                            (a, b) =>
+                                (b.priorityLevel || 0) - (a.priorityLevel || 0)
+                        )
             }
         },
         monster: {
@@ -85,7 +88,8 @@
                 id: 'monster-panel',
                 title: '👹 モンスターコミックス',
                 titleStyle: STYLES.monsterTitle,
-                filterFn: (links) => links.filter(link => link.textContent.includes('👹'))
+                filterFn: (links) =>
+                    links.filter((link) => link.textContent.includes('👹'))
             }
         }
     };
@@ -105,7 +109,8 @@
     const applyPriorityStyle = (link, level) => {
         link.isPriority = true;
         link.priorityLevel = level;
-        link.textContent = '🌟'.repeat(level) + ' ' + link.textContent.replace(/^🌟+ /u, '');
+        link.textContent =
+            '🌟'.repeat(level) + ' ' + link.textContent.replace(/^🌟+ /u, '');
     };
 
     const removePriorityStyle = (link) => {
@@ -115,7 +120,7 @@
     };
 
     const shouldSkipLink = (linkText) => {
-        return skipList.some(keyword => linkText.includes(keyword));
+        return skipList.some((keyword) => linkText.includes(keyword));
     };
 
     const initializeSaleWishlistOpener = () => {
@@ -128,38 +133,58 @@
         const container = createContainer();
 
         // 優先のみ表示トグルボタン
-        const priorityButton = createButton('優先パネル表示', function () {
-            togglePanel(this, PANEL_CONFIGS.priority);
-        }, STYLES.priorityButton);
+        const priorityButton = createButton(
+            '優先パネル表示',
+            function () {
+                togglePanel(this, PANEL_CONFIGS.priority);
+            },
+            STYLES.priorityButton
+        );
         priorityButton.isFiltering = false;
         container.appendChild(priorityButton);
 
         // モンスターコミックス👹表示トグルボタン
-        const monsterButton = createButton('モンスターコミックス👹表示', function () {
-            togglePanel(this, PANEL_CONFIGS.monster);
-        }, STYLES.monsterButton);
+        const monsterButton = createButton(
+            'モンスターコミックス👹表示',
+            function () {
+                togglePanel(this, PANEL_CONFIGS.monster);
+            },
+            STYLES.monsterButton
+        );
         monsterButton.isFiltering = false;
         container.appendChild(monsterButton);
 
         // 現在日時にスクロールするボタン
-        container.appendChild(createButton('現在日時にスクロール', () => {
-            scrollToCurrentDate();
-        }, STYLES.scrollButton));
+        container.appendChild(
+            createButton(
+                '現在日時にスクロール',
+                () => {
+                    scrollToCurrentDate();
+                },
+                STYLES.scrollButton
+            )
+        );
 
         // 過去のリンクを開くボタン
-        container.appendChild(createButton('過去のリンクを開く', () => {
-            filterLinks((linkDate, today) => linkDate < today);
-        }));
+        container.appendChild(
+            createButton('過去のリンクを開く', () => {
+                filterLinks((linkDate, today) => linkDate < today);
+            })
+        );
 
         // 今日以降のリンクを開くボタン
-        container.appendChild(createButton('今日以降のリンクを開く', () => {
-            filterLinks((linkDate, today) => linkDate >= today);
-        }));
+        container.appendChild(
+            createButton('今日以降のリンクを開く', () => {
+                filterLinks((linkDate, today) => linkDate >= today);
+            })
+        );
 
         // すべてのリンクを開くボタン
-        container.appendChild(createButton('すべてのリンクを開く', () => {
-            filterLinks(() => true);
-        }));
+        container.appendChild(
+            createButton('すべてのリンクを開く', () => {
+                filterLinks(() => true);
+            })
+        );
 
         document.body.appendChild(container);
     };
@@ -176,9 +201,11 @@
 
         Array.from(links)
             .reverse()
-            .forEach(link => processLink(link, conditionFn, today, counters));
+            .forEach((link) => processLink(link, conditionFn, today, counters));
 
-        console.log(`処理完了: ${counters.opened}個のリンクを開きました, ${counters.skipped}個をスキップしました`);
+        console.log(
+            `処理完了: ${counters.opened}個のリンクを開きました, ${counters.skipped}個をスキップしました`
+        );
     };
 
     const processLink = (link, conditionFn, today, counters) => {
@@ -209,7 +236,7 @@
         let closestLink = null;
         let minDiff = Infinity;
 
-        Array.from(links).forEach(link => {
+        Array.from(links).forEach((link) => {
             const linkDate = parseDate(link.textContent);
             if (!linkDate) return;
 
@@ -226,7 +253,7 @@
         if (closestLink) {
             // ページの高さを取得して1/8の位置を計算
             const viewportHeight = window.innerHeight;
-            const targetPosition = viewportHeight * (1/16);
+            const targetPosition = viewportHeight * (1 / 16);
 
             // 要素の現在の位置を取得
             const rect = closestLink.getBoundingClientRect();
@@ -264,18 +291,19 @@
         const list = document.createElement('ul');
         Object.assign(list.style, STYLES.priorityList);
 
-        filterFn(Array.from(document.querySelectorAll(SELECTORS.WISHLIST_LINKS)))
-            .forEach(link => {
-                const li = document.createElement('li');
-                Object.assign(li.style, STYLES.priorityItem);
-                const a = document.createElement('a');
-                a.href = link.href;
-                a.textContent = link.textContent;
-                a.target = '_blank';
-                Object.assign(a.style, STYLES.priorityLink);
-                li.appendChild(a);
-                list.appendChild(li);
-            });
+        filterFn(
+            Array.from(document.querySelectorAll(SELECTORS.WISHLIST_LINKS))
+        ).forEach((link) => {
+            const li = document.createElement('li');
+            Object.assign(li.style, STYLES.priorityItem);
+            const a = document.createElement('a');
+            a.href = link.href;
+            a.textContent = link.textContent;
+            a.target = '_blank';
+            Object.assign(a.style, STYLES.priorityLink);
+            li.appendChild(a);
+            list.appendChild(li);
+        });
 
         panel.appendChild(list);
         return panel;
@@ -289,7 +317,10 @@
         if (button.isFiltering) {
             const article = document.querySelector('#file-md-readme > article');
             if (article) {
-                article.insertBefore(buildPanel(panelConfig), article.firstChild);
+                article.insertBefore(
+                    buildPanel(panelConfig),
+                    article.firstChild
+                );
             }
         }
 
@@ -297,7 +328,7 @@
     };
 
     const setupPriorityToggle = () => {
-        document.querySelectorAll(SELECTORS.WISHLIST_LINKS).forEach(link => {
+        document.querySelectorAll(SELECTORS.WISHLIST_LINKS).forEach((link) => {
             if (link.href in priorityCache) {
                 applyPriorityStyle(link, priorityCache[link.href]);
             }

@@ -1,13 +1,12 @@
-/* eslint-disable no-undef */
 (function () {
     'use strict';
 
     // キーバインド設定（変更可能）
     const KEY_BINDINGS = {
-        PREV_PAGE: 'KeyZ',    // 前のページ
-        NEXT_PAGE: 'KeyX',    // 次のページ
-        NEXT_VOLUME: 'KeyA',  // 次の巻
-        FIRST_PAGE: 'Digit0'  // 最初のページ
+        PREV_PAGE: 'KeyZ', // 前のページ
+        NEXT_PAGE: 'KeyX', // 次のページ
+        NEXT_VOLUME: 'KeyA', // 次の巻
+        FIRST_PAGE: 'Digit0' // 最初のページ
     };
 
     const SELECTORS = {
@@ -26,37 +25,62 @@
     // Chevron要素を直接クリックしてページ送りを行う
     const clickChevron = (direction) => {
         try {
-            const container = document.querySelector(SELECTORS.READER_CONTAINER);
-            const activeContainer = container && container.offsetWidth > 0 && container.offsetHeight > 0 ? container : document;
-            const selector = direction === 'next' ? SELECTORS.CHEVRON_NEXT : SELECTORS.CHEVRON_PREV;
+            const container = document.querySelector(
+                SELECTORS.READER_CONTAINER
+            );
+            const activeContainer =
+                container &&
+                container.offsetWidth > 0 &&
+                container.offsetHeight > 0
+                    ? container
+                    : document;
+            const selector =
+                direction === 'next'
+                    ? SELECTORS.CHEVRON_NEXT
+                    : SELECTORS.CHEVRON_PREV;
             const elements = activeContainer.querySelectorAll(selector);
 
             if (elements.length > 0) {
                 // 表示されている要素をフィルタリング
-                const visibleElements = Array.from(elements).filter(element => {
-                    const rect = element.getBoundingClientRect();
-                    const isInViewport = rect.width > 0 && rect.height > 0 && rect.top >= 0 && rect.left >= 0;
-                    const computedStyle = window.getComputedStyle(element);
-                    const isDisplayed = computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden' && computedStyle.opacity !== '0';
-                    return isInViewport && isDisplayed;
-                });
+                const visibleElements = Array.from(elements).filter(
+                    (element) => {
+                        const rect = element.getBoundingClientRect();
+                        const isInViewport =
+                            rect.width > 0 &&
+                            rect.height > 0 &&
+                            rect.top >= 0 &&
+                            rect.left >= 0;
+                        const computedStyle = window.getComputedStyle(element);
+                        const isDisplayed =
+                            computedStyle.display !== 'none' &&
+                            computedStyle.visibility !== 'hidden' &&
+                            computedStyle.opacity !== '0';
+                        return isInViewport && isDisplayed;
+                    }
+                );
 
                 if (visibleElements.length > 0) {
                     // 最後の要素（最新の巻）を選択
-                    const targetElement = visibleElements[visibleElements.length - 1];
+                    const targetElement =
+                        visibleElements[visibleElements.length - 1];
 
                     // 複数の方法でクリックを試す（重要）
                     targetElement.click();
-                    targetElement.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-                    targetElement.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
-                    targetElement.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+                    targetElement.dispatchEvent(
+                        new MouseEvent('click', { bubbles: true })
+                    );
+                    targetElement.dispatchEvent(
+                        new MouseEvent('mousedown', { bubbles: true })
+                    );
+                    targetElement.dispatchEvent(
+                        new MouseEvent('mouseup', { bubbles: true })
+                    );
 
                     return true;
                 }
             }
 
             return false;
-
         } catch (error) {
             console.error(`Error in clickChevron(${direction}):`, error);
             return false;
@@ -103,7 +127,9 @@
 
         // MutationObserverで最初のページボタンの出現を監視
         const observer = new MutationObserver((mutations, obs) => {
-            const firstPageButton = document.querySelector(SELECTORS.FIRST_PAGE_BUTTON);
+            const firstPageButton = document.querySelector(
+                SELECTORS.FIRST_PAGE_BUTTON
+            );
             if (firstPageButton) {
                 firstPageButton.click();
                 obs.disconnect();
@@ -194,7 +220,9 @@
         setupKeyRemapping();
         monitorUrlChanges();
         console.log('🚀 Amazon Kindle Reader が読み込まれました');
-        console.log(`💡 ${KEY_BINDINGS.PREV_PAGE.replace('Key', '')}キー → 前のページ、${KEY_BINDINGS.NEXT_PAGE.replace('Key', '')}キー → 次のページ、${KEY_BINDINGS.NEXT_VOLUME.replace('Key', '')}キー → 次の巻、${KEY_BINDINGS.FIRST_PAGE.replace('Digit', '')}キー → 最初のページ`);
+        console.log(
+            `💡 ${KEY_BINDINGS.PREV_PAGE.replace('Key', '')}キー → 前のページ、${KEY_BINDINGS.NEXT_PAGE.replace('Key', '')}キー → 次のページ、${KEY_BINDINGS.NEXT_VOLUME.replace('Key', '')}キー → 次の巻、${KEY_BINDINGS.FIRST_PAGE.replace('Digit', '')}キー → 最初のページ`
+        );
     };
 
     // 自動初期化
