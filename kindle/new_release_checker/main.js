@@ -122,7 +122,7 @@
                     if (hasNewReleases) {
                         newReleaseCount += pageInfo.newReleases.length;
                         console.log(
-                            `📚 新刊発見: ${pageInfo.Name} - ${pageInfo.newReleases.length}冊`
+                            `✅ 新刊発見: ${pageInfo.Name} - ${pageInfo.newReleases.length}冊`
                         );
                         pageInfo.newReleases.forEach((book) => {
                             console.log(
@@ -151,7 +151,7 @@
 
         const now = new Date().toLocaleString('ja-JP');
         console.log(
-            `✅ チェック完了: ${newReleaseCount}冊の新刊を発見しました (${now})`
+            `🆗 チェック完了: ${newReleaseCount}冊の新刊を発見しました (${now})`
         );
 
         // 見つかった新刊をすべて新しいタブで開く
@@ -314,7 +314,7 @@
                     asin: asin
                 };
                 newReleases.push(bookData);
-                console.log('✅ 新刊として追加しました');
+                console.log('🆗 新刊として追加しました');
             } else if (!dateInfo.releaseDate) {
                 console.log('❌ 発売日を解析できませんでした');
             }
@@ -340,7 +340,7 @@
         const bookUrl = linkElement?.href || '';
 
         if (title && bookUrl) {
-            console.log(`✅ タイトル取得成功: "${title}"`);
+            console.log(`🆗 タイトル取得成功: "${title}"`);
         }
 
         console.log(`タイトル: "${title}"`);
@@ -452,7 +452,7 @@
         const isAuthorMatch = authorText.includes(authorInfo.Name);
 
         console.log(`👤 作者情報: "${authorText}"`);
-        console.log(`✅ 作者マッチ: ${isAuthorMatch}`);
+        console.log(`🆗 作者マッチ: ${isAuthorMatch}`);
 
         if (!isAuthorMatch) {
             console.log('⏭️ スキップ: 作者が一致しません');
