@@ -47,12 +47,46 @@
         priorityButton: {
             backgroundColor: '#f0883e'
         },
+        monsterTitle: {
+            margin: '0 0 12px 0',
+            fontSize: '16px',
+            color: '#8957e5'
+        },
+        monsterButton: {
+            backgroundColor: '#8957e5'
+        },
         scrollButton: {
             backgroundColor: '#28a745'
         },
         highlight: {
             backgroundColor: '#ffffcc',
             transition: 'background-color 0.3s'
+        }
+    };
+
+    // パネル設定
+    const PANEL_CONFIGS = {
+        priority: {
+            id: 'priority-panel',
+            label: '優先パネル表示',
+            panelConfig: {
+                id: 'priority-panel',
+                title: '🌟 優先リスト',
+                titleStyle: STYLES.priorityTitle,
+                filterFn: (links) => links
+                    .filter(link => link.isPriority)
+                    .sort((a, b) => (b.priorityLevel || 0) - (a.priorityLevel || 0))
+            }
+        },
+        monster: {
+            id: 'monster-panel',
+            label: 'モンスターコミックス👹表示',
+            panelConfig: {
+                id: 'monster-panel',
+                title: '👹 モンスターコミックス',
+                titleStyle: STYLES.monsterTitle,
+                filterFn: (links) => links.filter(link => link.textContent.includes('👹'))
+            }
         }
     };
 
@@ -95,10 +129,17 @@
 
         // 優先のみ表示トグルボタン
         const priorityButton = createButton('優先パネル表示', function () {
-            togglePriorityFilter(this);
+            togglePanel(this, PANEL_CONFIGS.priority);
         }, STYLES.priorityButton);
         priorityButton.isFiltering = false;
         container.appendChild(priorityButton);
+
+        // モンスターコミックス👹表示トグルボタン
+        const monsterButton = createButton('モンスターコミックス👹表示', function () {
+            togglePanel(this, PANEL_CONFIGS.monster);
+        }, STYLES.monsterButton);
+        monsterButton.isFiltering = false;
+        container.appendChild(monsterButton);
 
         // 現在日時にスクロールするボタン
         container.appendChild(createButton('現在日時にスクロール', () => {
@@ -210,22 +251,20 @@
         }
     };
 
-    const buildPriorityPanel = () => {
+    const buildPanel = ({ id, title, titleStyle, filterFn }) => {
         const panel = document.createElement('div');
-        panel.id = 'priority-panel';
+        panel.id = id;
         Object.assign(panel.style, STYLES.priorityPanel);
 
-        const title = document.createElement('h2');
-        title.textContent = '🌟 優先リスト';
-        Object.assign(title.style, STYLES.priorityTitle);
-        panel.appendChild(title);
+        const titleEl = document.createElement('h2');
+        titleEl.textContent = title;
+        Object.assign(titleEl.style, titleStyle);
+        panel.appendChild(titleEl);
 
         const list = document.createElement('ul');
         Object.assign(list.style, STYLES.priorityList);
 
-        Array.from(document.querySelectorAll(SELECTORS.WISHLIST_LINKS))
-            .filter(link => link.isPriority)
-            .sort((a, b) => (b.priorityLevel || 0) - (a.priorityLevel || 0))
+        filterFn(Array.from(document.querySelectorAll(SELECTORS.WISHLIST_LINKS)))
             .forEach(link => {
                 const li = document.createElement('li');
                 Object.assign(li.style, STYLES.priorityItem);
@@ -240,6 +279,21 @@
 
         panel.appendChild(list);
         return panel;
+    };
+
+    const togglePanel = (button, { id, label, panelConfig }) => {
+        button.isFiltering = !button.isFiltering;
+
+        document.getElementById(id)?.remove();
+
+        if (button.isFiltering) {
+            const article = document.querySelector('#file-md-readme > article');
+            if (article) {
+                article.insertBefore(buildPanel(panelConfig), article.firstChild);
+            }
+        }
+
+        button.textContent = button.isFiltering ? 'パネルを閉じる' : label;
     };
 
     const setupPriorityToggle = () => {
@@ -266,21 +320,6 @@
                 savePriorityCache();
             });
         });
-    };
-
-    const togglePriorityFilter = (button) => {
-        button.isFiltering = !button.isFiltering;
-
-        document.getElementById('priority-panel')?.remove();
-
-        if (button.isFiltering) {
-            const article = document.querySelector('#file-md-readme > article');
-            if (article) {
-                article.insertBefore(buildPriorityPanel(), article.firstChild);
-            }
-        }
-
-        button.textContent = button.isFiltering ? 'パネルを閉じる' : '優先パネル表示';
     };
 
     // 自動初期化
