@@ -1,17 +1,10 @@
-# Configuration files with sensitive information
-config.json
+# 認証情報（UserScript用の秘匿情報・git管理外）
 config.js
+config.json
 
-# Node modules
-node_modules/
-
-# IDE files
-.vscode/
-.idea/
-
-# OS files
+# OS・ツールメタデータ
 .DS_Store
-Thumbs.db
+.claude/
 
-# Log files
-*.log
+# Node.js依存パッケージ
+node_modules/
