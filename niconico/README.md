@@ -194,6 +194,37 @@ const CONFIG = {
 - `結月さんの映画紹介「レイキャヴィク・ホエール・ウォッチング・マサカー」` → `レイキャヴィク・ホエール・ウォッチング・マサカー`
 - `映画『ＮＯＰＥ／ノープ』を結月さん鑑賞する` → `ＮＯＰＥ／ノープ`
 
+### 📱 SP Manga Link (`sp_manga_link/`)
+
+ニコニコ漫画の作品ページに、スマホ版ページ（sp.manga.nicovideo.jp）へのリンクを追加するスクリプト。
+
+**機能:**
+
+- 作品ページのショートカットブロックにスマホ版ページへのリンクを追加
+- 既存ボタン（第１話から読む 等）と同デザインで横並びに配置
+- ホスト置き換えによる同一パスでのURL生成
+- 動的コンテンツの自動監視・対応
+
+**対象サイト:**
+
+- `https://manga.nicovideo.jp/comic/*`
+
+**動作:**
+
+1. 作品ページのショートカットブロックを検出
+2. ホストを `manga.nicovideo.jp` → `sp.manga.nicovideo.jp` に置き換えたURLを生成
+3. 既存ボタン群の末尾に「スマホ版で開く」リンクを追加
+
+**設定項目:**
+
+```javascript
+const CONFIG = {
+    PC_HOST: 'manga.nicovideo.jp', // PC版ホスト
+    SP_HOST: 'sp.manga.nicovideo.jp', // スマホ版ホスト
+    LINK_LABEL: 'スマホ版で開く' // 追加リンクの表示テキスト
+};
+```
+
 ## 🔧 共通ライブラリ (`common.js`)
 
 ニコニコ関連スクリプトで共有される汎用機能を提供します。
@@ -251,6 +282,7 @@ const videoId = extractVideoId(linkElement);
 3. **Auto Campaign Navigator**: `auto_campaign_navigator/wrapper.js`
 4. **Yuzuki Movie Series Enhancer**: `yuzuki_movie_series_enhancer/wrapper.js`
 5. **Auto Ad Skipper**: `auto_ad_skipper/wrapper.js`
+6. **SP Manga Link**: `sp_manga_link/wrapper.js`
 
 ### 3. パスの設定
 
@@ -267,6 +299,7 @@ const videoId = extractVideoId(linkElement);
 
 - **ニコニコ動画**: `https://www.nicovideo.jp/watch/*`
 - **ニコニコ漫画**: `https://manga.nicovideo.jp/watch/*`
+- **ニコニコ漫画（作品ページ）**: `https://manga.nicovideo.jp/comic/*`
 - **ニコニコキャンペーン**: `https://koken.nicovideo.jp/campaign`
 - **結月さんシリーズ**: `https://www.nicovideo.jp/user/91534/series/351508*`
 
@@ -312,6 +345,12 @@ const videoId = extractVideoId(linkElement);
 2. 各動画タイトルに🎬アイコンが自動追加される
 3. アイコンクリックで映画の配信サイト検索
 4. 新しいタブでGoogle検索結果を表示
+
+### SP Manga Link
+
+1. ニコニコ漫画の作品ページを開く
+2. ショートカットボタン群の末尾に「スマホ版で開く」リンクが追加される
+3. リンククリックでスマホ版ページ（sp.manga.nicovideo.jp）に遷移
 
 ### 手動実行（デバッグ用）
 
