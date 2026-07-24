@@ -31,7 +31,10 @@ export default [
                 GM_getTabs: 'readonly',
                 GM_notification: 'readonly',
                 GM_setClipboard: 'readonly',
-                GM_info: 'readonly'
+                GM_info: 'readonly',
+
+                // Tampermonkey GM4 オブジェクト形式API（GM.getValue 等）
+                GM: 'readonly'
             }
         },
         rules: {
