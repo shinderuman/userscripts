@@ -13,6 +13,14 @@
         {
             topColumnName: '#gochisou_photo',
             bottomColumnName: '#文鳥'
+        },
+        {
+            topColumnName: 'Maidroid',
+            bottomColumnName: 'RSS1'
+        },
+        {
+            topColumnName: 'RSS2',
+            bottomColumnName: 'RSS3'
         }
     ];
 
