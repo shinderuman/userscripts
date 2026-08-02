@@ -15,6 +15,14 @@ unsafeWindow.KindleCommon = (function () {
             '#a-autoid-2-announce > span.slot-price > span',
             '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-extraMessage .kindleExtraMessage .a-color-price'
         ].join(', '),
+        kindlePriceInSwatch:
+            '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span',
+        kindlePurchasePrice: [
+            '#tmm-grid-swatch-KINDLE .slot-extraMessage .kindleExtraMessage',
+            '#tmm-grid-swatch-KINDLE .slot-extraMessage',
+            '#tmm-grid-swatch-OTHER .slot-extraMessage .kindleExtraMessage',
+            '#tmm-grid-swatch-OTHER .slot-extraMessage'
+        ],
         paperPrice:
             "[id^='tmm-grid-swatch']:not([id$='KINDLE']) > span.a-button > span.a-button-inner > a.a-button-text > span.slot-price > span",
         points: '#tmm-grid-swatch-KINDLE > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span, #tmm-grid-swatch-OTHER > span.a-button > span.a-button-inner > a.a-button-text > span.slot-buyingPoints > span'
@@ -23,7 +31,11 @@ unsafeWindow.KindleCommon = (function () {
     // 共通正規表現
     const COMMON_PATTERNS = {
         POINTS: /(\d+)pt/,
-        PRICE: /([\d,]+)/
+        PRICE: /([\d,]+)/,
+        PURCHASE_PRICE: [
+            /(?:または[、,\s]*|購入価格[：:\s]*)[￥¥]\s*([\d,]+)(?:\s*で購入)?/,
+            /[￥¥]\s*([\d,]+)\s*で購入/
+        ]
     };
 
     // 共通設定
@@ -185,6 +197,20 @@ unsafeWindow.KindleCommon = (function () {
         return match ? match[1] : null;
     };
 
+    const getElementText = (element) => {
+        return (element?.innerText || element?.textContent || '')
+            .replace(/\s+/g, ' ')
+            .trim();
+    };
+    const parsePositiveInteger = (value) => {
+        const parsedValue = Number.parseInt(
+            String(value).replace(/,/g, ''),
+            10
+        );
+        return Number.isFinite(parsedValue) && parsedValue > 0
+            ? parsedValue
+            : 0;
+    };
     // 共通のDOM要素値取得関数
     const getElementValue = (doc, selector, regex) => {
         // 複数のセレクターがカンマ区切りで渡された場合、順番に試す
@@ -193,10 +219,8 @@ unsafeWindow.KindleCommon = (function () {
         for (const sel of selectors) {
             const element = doc.querySelector(sel);
             if (element) {
-                const match = element.innerText.match(regex);
-                const value = match
-                    ? parseInt(match[1].replace(/,/g, ''), 10)
-                    : 0;
+                const match = getElementText(element).match(regex);
+                const value = match ? parsePositiveInteger(match[1]) : 0;
                 if (value > 0) {
                     return value;
                 }
@@ -204,6 +228,50 @@ unsafeWindow.KindleCommon = (function () {
         }
 
         return 0;
+    };
+    const extractKindlePurchasePrice = (text) => {
+        for (const pattern of COMMON_PATTERNS.PURCHASE_PRICE) {
+            const match = text.match(pattern);
+            if (!match) {
+                continue;
+            }
+
+            const price = parsePositiveInteger(match[1]);
+            if (price > 0) {
+                return price;
+            }
+        }
+
+        return 0;
+    };
+    const getKindlePrice = (doc) => {
+        // KINDLEスウォッチ単体の価格を取得（KU対象だと￥0になる）
+        const kindleSwatchPrice = getElementValue(
+            doc,
+            COMMON_SELECTORS.kindlePriceInSwatch,
+            COMMON_PATTERNS.PRICE
+        );
+        if (kindleSwatchPrice > 0) {
+            return kindleSwatchPrice;
+        }
+
+        // KINDLEスウォッチが0円（KU等）なら購入価格フォールバック
+        for (const selector of COMMON_SELECTORS.kindlePurchasePrice) {
+            const element = doc.querySelector(selector);
+            const purchasePrice = extractKindlePurchasePrice(
+                getElementText(element)
+            );
+            if (purchasePrice > 0) {
+                return purchasePrice;
+            }
+        }
+
+        // 購入価格も取れない場合は従来の全セレクタで再取得
+        return getElementValue(
+            doc,
+            COMMON_SELECTORS.kindlePrice,
+            COMMON_PATTERNS.PRICE
+        );
     };
 
     // localStorage管理機能
@@ -264,11 +332,7 @@ unsafeWindow.KindleCommon = (function () {
             COMMON_SELECTORS.points,
             COMMON_PATTERNS.POINTS
         );
-        const kindlePrice = getElementValue(
-            doc,
-            COMMON_SELECTORS.kindlePrice,
-            COMMON_PATTERNS.PRICE
-        );
+        const kindlePrice = getKindlePrice(doc);
         const paperPrice = getElementValue(
             doc,
             COMMON_SELECTORS.paperPrice,
