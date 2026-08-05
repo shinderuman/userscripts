@@ -38,22 +38,17 @@
     // メイン関数
     const checkNewReleases = async (isbnMode = 0) => {
         try {
-            console.log('🧹 古い通知記録をクリーンアップ中...');
             cleanupOldNotifications();
 
             console.log(
                 `📖 ISBN処理モード: ${getISBNModeDescription(isbnMode)}`
             );
 
-            console.log('📖 作者データを取得中...');
             const authors = await fetchAuthors();
             console.log(`${authors.length}人をチェックします`);
 
-            console.log('📖 除外キーワードを取得中...');
             const excludedKeywords = await fetchExcludedKeywords();
-            console.log(`🚫 除外キーワード: ${excludedKeywords.join(', ')}`);
 
-            console.log('📖 作者の新刊をチェック中...');
             await checkPagesInBatches(authors, excludedKeywords, isbnMode);
         } catch (error) {
             console.error('❌ エラーが発生しました:', error);
@@ -96,8 +91,6 @@
     };
 
     const checkPagesInBatches = async (authors, excludedKeywords, isbnMode) => {
-        console.log(`${authors.length}人の作者の新刊をチェック開始...`);
-
         let newReleaseCount = 0;
         let processedCount = 0;
         const newReleaseBooks = [];
@@ -117,7 +110,6 @@
                     console.log(
                         `進捗: ${processedCount}/${authors.length} - ${pageInfo.Name}`
                     );
-                    console.log(`  新刊: ${pageInfo.newReleases.length}冊`);
 
                     if (hasNewReleases) {
                         newReleaseCount += pageInfo.newReleases.length;
@@ -125,9 +117,6 @@
                             `✅ 新刊発見: ${pageInfo.Name} - ${pageInfo.newReleases.length}冊`
                         );
                         pageInfo.newReleases.forEach((book) => {
-                            console.log(
-                                `  - ${book.title} (${book.releaseDate})`
-                            );
                             newReleaseBooks.push(book);
                         });
                     }
@@ -180,7 +169,6 @@
             // 作者名でKindleマンガを検索するURL
             const searchUrl = `https://www.amazon.co.jp/s?k=${encodeURIComponent(authorInfo.Name)}&i=digital-text&rh=n%3A2250738051&s=date-desc-rank`;
 
-            console.log(`🔍 検索中: ${authorInfo.Name}`);
             console.log(`📄 検索URL: ${searchUrl}`);
 
             GM_xmlhttpRequest({
@@ -194,8 +182,6 @@
                             'text/html'
                         );
 
-                        console.log(`📄 検索結果ページタイトル: ${doc.title}`);
-
                         const info = await extractSearchPageInfo(
                             doc,
                             authorInfo,
@@ -203,7 +189,7 @@
                         );
                         resolve(info);
                     } else {
-                        console.log(
+                        console.error(
                             `❌ 検索ページ取得失敗: ${response.status}`
                         );
                         sendPageFetchErrorNotification(
@@ -218,7 +204,7 @@
                     }
                 },
                 onerror: (error) => {
-                    console.log(`❌ 検索リクエストエラー: ${error}`);
+                    console.error(`❌ 検索リクエストエラー: ${error}`);
                     reject(error);
                 }
             });
@@ -237,33 +223,15 @@
         );
         const isbnMode = authorInfo.isbnMode || 0;
 
-        console.log(`🔍 検索結果: ${searchResults.length}件`);
-        console.log(`📅 新刊判定基準日: ${cutoffDate.toISOString()}`);
-
         // 最初の数冊のみチェック（検索結果は日付順でソートされている）
         const booksToCheck = Array.from(searchResults).slice(0, 10);
-        console.log(`チェック対象: ${booksToCheck.length}冊`);
 
         for (let i = 0; i < booksToCheck.length; i++) {
             const item = booksToCheck[i];
-            console.log(
-                `\n📖 書籍 ${i + 1}/${booksToCheck.length} をチェック中...`
-            );
 
             // 基本情報チェック
             const basicInfo = checkBookBasicInfo(item);
             if (!basicInfo.isValid) {
-                console.log('⏭️ スキップ: タイトルまたはURLが見つかりません');
-                // デバッグ用：利用可能な要素を表示
-                const allH2 = item.querySelectorAll(
-                    'h2, h2 span, h2 a, h2 a span'
-                );
-                console.log(`🔍 利用可能なh2要素: ${allH2.length}個`);
-                allH2.forEach((el, idx) => {
-                    console.log(
-                        `  ${idx}: "${el.innerText?.trim() || ''}" (${el.tagName})`
-                    );
-                });
                 continue;
             }
 
@@ -272,7 +240,6 @@
 
             // ASINチェック
             if (!asin) {
-                console.log('⏭️ スキップ: ASINを取得できませんでした');
                 continue;
             }
 
@@ -314,15 +281,9 @@
                     asin: asin
                 };
                 newReleases.push(bookData);
-                console.log('🆗 新刊として追加しました');
-            } else if (!dateInfo.releaseDate) {
-                console.log('❌ 発売日を解析できませんでした');
             }
         }
 
-        console.log(
-            `\n📊 ${authorInfo.Name}の結果: ${newReleases.length}冊の新刊を発見`
-        );
         return {
             ...authorInfo,
             newReleases
@@ -339,37 +300,20 @@
             item.querySelector('h2 a, .a-link-normal[href*="/dp/"]');
         const bookUrl = linkElement?.href || '';
 
-        if (title && bookUrl) {
-            console.log(`🆗 タイトル取得成功: "${title}"`);
-        }
-
-        console.log(`タイトル: "${title}"`);
-        console.log(`🔗 URL: ${bookUrl}`);
-
         return { title, bookUrl, isValid: !!(title && bookUrl) };
     };
 
     const checkISBNFiltering = (asin, isbnMode) => {
         const isBookISBN = isISBN(asin);
 
-        console.log(
-            `ASIN: ${asin}, ISBN判定: ${isBookISBN}, モード: ${isbnMode}`
-        );
-
         switch (isbnMode) {
             case 0: // ISBNをスキップ
                 if (isBookISBN) {
-                    console.log(
-                        `⏭️ スキップ: ISBN（紙書籍）のためスキップします (ASIN: ${asin})`
-                    );
                     return true;
                 }
                 break;
             case 1: // ISBNのみ表示
                 if (!isBookISBN) {
-                    console.log(
-                        `⏭️ スキップ: ISBNではないためスキップします (ASIN: ${asin})`
-                    );
                     return true;
                 }
                 break;
@@ -378,9 +322,6 @@
                 break;
             default: // 不明なモードの場合はISBNをスキップ
                 if (isBookISBN) {
-                    console.log(
-                        `⏭️ スキップ: 不明なモード、ISBN（紙書籍）のためスキップします (ASIN: ${asin})`
-                    );
                     return true;
                 }
                 break;
@@ -397,7 +338,6 @@
                 (item) => item.asin === asin
             )
         ) {
-            console.log(`⏭️ スキップ: 既に通知済みです (ASIN: ${asin})`);
             return true;
         }
         return false;
@@ -408,12 +348,6 @@
             title.includes(keyword)
         );
         if (hasExcludedKeyword) {
-            const matchedKeyword = excludedKeywords.find((keyword) =>
-                title.includes(keyword)
-            );
-            console.log(
-                `⏭️ スキップ: 除外キーワード "${matchedKeyword}" が含まれています`
-            );
             return true;
         }
         return false;
@@ -428,19 +362,11 @@
             const priceMatch = priceText.match(/￥([\d,]+)/);
             if (priceMatch) {
                 price = parseInt(priceMatch[1].replace(/,/g, ''), 10);
-                console.log(`💰 価格: ${price}円`);
 
                 if (price <= CONFIG.MIN_PRICE) {
-                    console.log(
-                        `⏭️ スキップ: 価格が${CONFIG.MIN_PRICE}円以下です (${price}円)`
-                    );
                     return { price, shouldSkip: true };
                 }
-            } else {
-                console.log(`💰 価格: テキスト解析失敗 "${priceText}"`);
             }
-        } else {
-            console.log('💰 価格: 取得できませんでした（継続）');
         }
 
         return { price, shouldSkip: false };
@@ -448,38 +374,26 @@
 
     const checkAuthorMatch = (item, authorInfo) => {
         const authorElement = item.querySelector('.a-size-base');
-        const authorText = authorElement?.innerText?.trim() || '';
-        const isAuthorMatch = authorText.includes(authorInfo.Name);
 
-        console.log(`👤 作者情報: "${authorText}"`);
-        console.log(`🆗 作者マッチ: ${isAuthorMatch}`);
-
-        if (!isAuthorMatch) {
-            console.log('⏭️ スキップ: 作者が一致しません');
-            return false;
-        }
-        return true;
+        return (authorElement?.innerText?.trim() || '').includes(
+            authorInfo.Name
+        );
     };
 
     const checkReleaseDate = (item, cutoffDate) => {
         const dateElement = item.querySelector(
             '.puis-desktop-list-row .puisg-col-4-of-24 div:nth-child(2) div:nth-child(2) span span'
         );
-        const releaseDateText = dateElement?.innerText?.trim() || '';
 
-        console.log(`📅 発売日テキスト: "${releaseDateText}"`);
-
-        const releaseDate = parseDateFromText(releaseDateText);
+        const releaseDate = parseDateFromText(
+            dateElement?.innerText?.trim() || ''
+        );
 
         if (releaseDate) {
             const isNewRelease = releaseDate > cutoffDate;
 
-            console.log(`📅 発売日: ${releaseDate.toISOString()}`);
-            console.log(`🆕 新刊判定: ${isNewRelease}`);
-
             return { releaseDate, isNewRelease };
         } else {
-            console.log('❌ 発売日を解析できませんでした');
             return { releaseDate: null, isNewRelease: false };
         }
     };
@@ -487,8 +401,6 @@
     // Amazon固有の日本語日付解析関数（新刊チェッカー専用）
     const parseDateFromText = (dateText) => {
         if (!dateText) return null;
-
-        console.log(`📅 日付解析中: "${dateText}"`);
 
         // "発売予定日は2025年10月27日です。" 形式から日付を抽出
         const dateMatch = dateText.match(
@@ -511,10 +423,8 @@
                     dateMatch[6]
                 );
             }
-            console.log(`📅 解析結果: ${releaseDate?.toISOString()}`);
             return releaseDate;
         }
-        console.log('❌ 日付パターンが見つかりません');
         return null;
     };
 
