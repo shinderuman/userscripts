@@ -53,6 +53,14 @@
         const title = document.title;
         let url = window.location.href;
 
+        // AmazonでASINが取得できる場合、シンプルな商品URLに変換
+        if (window.location.href.startsWith('https://www.amazon.co.jp/')) {
+            const { asin } = getPageInfo();
+            if (asin) {
+                url = `https://www.amazon.co.jp/dp/${asin}`;
+            }
+        }
+
         // GETパラメータを破棄するサイトの場合
         if (
             CONFIG.GET_PARAM_DISPOSAL_SITES.some((site) =>
