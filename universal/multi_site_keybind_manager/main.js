@@ -7,7 +7,8 @@
         openInTab,
         showNotification,
         preventDefaultKeys,
-        cleanUrl
+        cleanUrl,
+        parseBaseTitle
     } = unsafeWindow.UniversalCommon;
 
     const CONFIG = {
@@ -27,7 +28,6 @@
             ArrowDown: 'https://www.at-x.com/program',
             ArrowRight: 'https://koken.nicovideo.jp/campaign'
         },
-        UNDESIRABLE_CHARS: ['(', ')', '（', '）', '【', '】', '〔', '〕'],
         TAB_OPTIONS: {
             active: true,
             insert: true,
@@ -97,34 +97,11 @@
         return linkUrl.searchParams.get('playlist');
     };
 
-    const filterSearchTitle = (title) => {
-        const unwantedPatterns = [...Array(10).keys()]
-            .map(String)
-            .concat(CONFIG.UNDESIRABLE_CHARS)
-            .concat(getFullWidthDigits());
-
-        let filteredTitle = title;
-
-        // タイトルがunwantedPatternsで始まっていない場合のみフィルタリング
-        if (
-            !unwantedPatterns.some((pattern) =>
-                filteredTitle.startsWith(pattern)
-            )
-        ) {
-            filteredTitle = unwantedPatterns.reduce(
-                (title, pattern) => title.split(pattern)[0].trim(),
-                title
-            );
-        }
-
-        return filteredTitle;
-    };
-
     const handleAmazonSearch = () => {
         const { title } = getPageInfo();
         if (!title) return;
 
-        const filteredTitle = filterSearchTitle(title);
+        const filteredTitle = parseBaseTitle(title);
         openInTab(
             `${CONFIG.SEARCH_ENGINE}${encodeURIComponent(filteredTitle)}`,
             CONFIG.TAB_OPTIONS
@@ -246,14 +223,6 @@
                     .trim()
             ];
         }
-    };
-
-    const getFullWidthDigits = () => {
-        const digits = [];
-        for (let i = 0; i <= 9; i++) {
-            digits.push(String.fromCharCode(i + 0xff10));
-        }
-        return digits;
     };
 
     const handleKeyEvents = (event) => {
