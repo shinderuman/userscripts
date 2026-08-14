@@ -1,7 +1,6 @@
 (function () {
     'use strict';
 
-    // 共通ライブラリから関数を取得
     const {
         COMMON_CONFIG,
         fetchJsonFromS3,
@@ -11,7 +10,6 @@
         evaluateSaleConditions
     } = unsafeWindow.KindleCommon;
 
-    // セール発見通知を送信
     const sendBatchSaleNotification = (saleBooks) => {
         const count = saleBooks.length;
         const title = `🎉 ${count}件のセールを発見`;
@@ -37,7 +35,6 @@
         });
     };
 
-    // 非同期でページをチェック（バッチ処理）
     const checkPagesInBatches = async (books) => {
         console.log(`📚 ${books.length}冊のセール情報をチェック開始...`);
 
@@ -109,7 +106,6 @@
             `✅ チェック完了: ${saleBooks.length}件のセールを発見しました (${now})`
         );
 
-        // セール発見時は統合通知、未発見時は完了通知
         if (saleBooks.length) {
             sendBatchSaleNotification(saleBooks);
         } else {
@@ -117,7 +113,6 @@
         }
     };
 
-    // メイン関数
     const checkWishlistSales = async () => {
         try {
             console.log('📖 書籍データを取得中...');
@@ -140,7 +135,6 @@
         }
     };
 
-    // グローバル関数として公開（デベロッパーツールから呼び出し可能）
     unsafeWindow.checkWishlistSales = checkWishlistSales;
 
     console.log('🚀 Wishlist Sale Checker が読み込まれました');

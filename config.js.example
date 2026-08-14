@@ -1,4 +1,3 @@
-// 共通設定ファイルのテンプレート
 unsafeWindow.GlobalConfig = {
     slack: {
         token: "xoxb-your-slack-bot-token-here",

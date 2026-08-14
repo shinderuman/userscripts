@@ -1,7 +1,6 @@
 (function () {
     'use strict';
 
-    // 共通ライブラリから関数を取得
     const { applyStyles, addBadgeToFavicon } = unsafeWindow.AmazonCommon;
 
     const CONFIG = {
@@ -94,6 +93,5 @@
         console.log('🚀 Amazon Highlight が初期化されました');
     };
 
-    // 自動初期化
     initializeHighlight();
 })();

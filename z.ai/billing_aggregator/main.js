@@ -4,25 +4,21 @@
     const CONFIG = {
         // 集計対象の列インデックス（theadのnth-childをベース）
         TARGET_COLUMNS: {
-            API_KEY: 3, // nth-child(3): API Key
-            BILLING_DATE: 2, // nth-child(2): Billing Date
-            CHARGE_TYPE: 7, // nth-child(7): Charge Type
-            LISTED_PRICE: 8, // nth-child(8): Listed Price
+            API_KEY: 3,
+            BILLING_DATE: 2,
+            CHARGE_TYPE: 7,
+            LISTED_PRICE: 8,
             CODE: 6 // nth-child(6): Model (Code)
         }
     };
 
-    // LocalStorageキー
     const STORAGE_KEY = 'zai_billing_aggregator_data';
     const API_KEY_MAPPING_KEY = 'zai_billing_aggregator_api_key_mapping';
 
-    // 集計データを格納する変数
     let aggregatedData = [];
 
-    // API Keyのマッピングを管理
     let apiKeyMapping = {};
 
-    // LocalStorageからデータを読み込み
     const loadStoredData = () => {
         try {
             const storedData = localStorage.getItem(STORAGE_KEY);
@@ -42,7 +38,6 @@
         return false;
     };
 
-    // LocalStorageにデータを保存
     const saveStoredData = () => {
         try {
             const dataString = JSON.stringify(aggregatedData);
@@ -52,7 +47,6 @@
         }
     };
 
-    // LocalStorageのデータをクリア
     const clearStoredData = () => {
         try {
             localStorage.removeItem(STORAGE_KEY);
@@ -62,7 +56,6 @@
         }
     };
 
-    // API Keyマッピングを読み込み
     const loadApiKeyMapping = () => {
         try {
             const storedMapping = localStorage.getItem(API_KEY_MAPPING_KEY);
@@ -74,7 +67,6 @@
         }
     };
 
-    // API Keyマッピングを保存
     const saveApiKeyMapping = () => {
         try {
             localStorage.setItem(
@@ -86,7 +78,6 @@
         }
     };
 
-    // API Keyから表示用の短縮名を生成
     const getApiKeyDisplayName = (apiKey) => {
         if (!apiKeyMapping[apiKey]) {
             const prefix = apiKey.substring(0, 3);
@@ -95,14 +86,11 @@
         return apiKeyMapping[apiKey];
     };
 
-    // トークン数を数値に変換
     const parseTokenValue = (text) => {
         if (!text || text.trim() === '0$') return 0;
 
-        // "token", "kToken" の単位を処理
         let value = text.replace(/\s*token$/i, '');
 
-        // kTokenを1000倍に変換
         if (value.includes('kToken')) {
             value = value.replace(/kToken/i, '');
             return parseFloat(value) * 1000;
@@ -111,13 +99,11 @@
         return parseFloat(value) || 0;
     };
 
-    // 価格を数値に変換
     const parsePriceValue = (text) => {
         if (!text || text.trim() === '0$' || text.trim() === '') return 0;
         return parseFloat(text.replace(/[^0-9.-]/g, '')) || 0;
     };
 
-    // 現在のページのデータを収集
     const collectCurrentPageData = () => {
         const table = document.querySelector('div.w-full > div > table');
         if (!table) {
@@ -197,7 +183,6 @@
         return pageData;
     };
 
-    // 通知ポップアップを表示
     const showNotification = (message, type = 'info') => {
         const notification = document.createElement('div');
         notification.style.cssText = `
@@ -218,7 +203,6 @@
             animation: slideIn 0.3s ease-out;
         `;
 
-        // アニメーションを定義
         const style = document.createElement('style');
         style.textContent = `
             @keyframes slideIn {
@@ -247,7 +231,6 @@
         notification.textContent = message;
         document.body.appendChild(notification);
 
-        // 3秒後に削除
         setTimeout(() => {
             notification.style.animation = 'slideOut 0.3s ease-in';
             setTimeout(() => {
@@ -258,8 +241,6 @@
         }, 3000);
     };
 
-    // データを集計
-    // rawDataプロパティを除外したクリーンなアイテムを返す
     const removeRawData = (item) => {
         const cleanItem = { ...item };
         delete cleanItem.rawData;
@@ -267,7 +248,6 @@
     };
 
     const aggregateData = () => {
-        // 保存されたデータがあれば読み込む
         if (aggregatedData.length === 0) {
             const loaded = loadStoredData();
             if (loaded && aggregatedData.length > 0) {
@@ -285,7 +265,6 @@
             return;
         }
 
-        // 既存データとマージ
         currentPageData.forEach((item) => {
             const existingIndex = aggregatedData.findIndex(
                 (existing) =>
@@ -296,15 +275,12 @@
             );
 
             if (existingIndex >= 0) {
-                // 既存データを新しいデータで置き換え（rawDataを除外）
                 aggregatedData[existingIndex] = removeRawData(item);
             } else {
-                // 新規データを追加（rawDataプロパティを除外）
                 aggregatedData.push(removeRawData(item));
             }
         });
 
-        // LocalStorageに保存
         saveStoredData();
         saveApiKeyMapping();
 
@@ -314,11 +290,9 @@
         );
     };
 
-    // TOTAL行を追加したデータを生成
     const addTotalRows = (data) => {
         const groupedByApiKeyAndDate = {};
 
-        // API Key、請求日、コードでグループ化
         data.forEach((item) => {
             const key = `${item.apiKey}_${item.billingDate}_${item.code}`;
             if (!groupedByApiKeyAndDate[key]) {
@@ -344,16 +318,13 @@
                 rawData: null
             };
 
-            // 個別の行を追加
             result.push(...items);
-            // TOTAL行を追加
             result.push(totalItem);
         });
 
         return result;
     };
 
-    // 集計結果をソート
     const sortData = (data, sortBy, sortOrder) => {
         return [...data].sort((a, b) => {
             let aValue, bValue;
@@ -404,16 +375,13 @@
         });
     };
 
-    // 現在のソート状態
     let currentSortBy = 'apiKey';
     let currentSortOrder = 'asc';
 
-    // Global scope helper
     const getGlobalContext = () => {
         return typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
     };
 
-    // Chart.jsをロード
     const loadChartJs = () => {
         return new Promise((resolve, reject) => {
             const globalCtx = getGlobalContext();
@@ -438,7 +406,6 @@
         });
     };
 
-    // 文字列から色を生成するハッシュ関数
     const stringToColor = (str) => {
         let hash = 0;
         for (let i = 0; i < str.length; i++) {
@@ -448,7 +415,6 @@
         return '#' + '00000'.substring(0, 6 - c.length) + c;
     };
 
-    // チャート用データを処理
     const processChartData = (data) => {
         const groupedData = {};
         const allDates = new Set();
@@ -457,7 +423,6 @@
             if (item.billingDate) {
                 allDates.add(item.billingDate);
 
-                // グルーピングキー: API Key - Model (Type)
                 const key = `${item.apiKey} - ${item.code} (${item.chargeType})`;
 
                 if (!groupedData[key]) {
@@ -467,17 +432,14 @@
                     groupedData[key][item.billingDate] = 0;
                 }
 
-                // トークン使用量を加算
                 groupedData[key][item.billingDate] += item.usage;
             }
         });
 
-        // 日付でソート
         const sortedDates = Array.from(allDates).sort(
             (a, b) => new Date(a) - new Date(b)
         );
 
-        // データセット生成
         const datasets = Object.keys(groupedData)
             .map((key) => {
                 const dataPoints = sortedDates.map(
@@ -489,14 +451,13 @@
                     label: key,
                     data: dataPoints,
                     borderColor: color,
-                    backgroundColor: color, // 凡例用
+                    backgroundColor: color,
                     borderWidth: 2,
-                    fill: false, // 塗りつぶしなしで線のみ
+                    fill: false,
                     tension: 0.1
                 };
             })
             .filter((dataset) => {
-                // トークン使用量が全て0のデータセットを除外
                 const total = dataset.data.reduce((sum, val) => sum + val, 0);
                 return total > 0;
             });
@@ -575,9 +536,7 @@
         });
     };
 
-    // 集計結果を表示
     const showResults = async () => {
-        // 保存されたデータがあれば読み込む
         if (aggregatedData.length === 0) {
             const loaded = loadStoredData();
             loadApiKeyMapping();
@@ -604,7 +563,6 @@
             );
         }
 
-        // TOTAL行を追加してソート実行
         const dataWithTotal = addTotalRows(aggregatedData);
         const sortedData = sortData(
             dataWithTotal,
@@ -612,7 +570,6 @@
             currentSortOrder
         );
 
-        // オーバーレイ作成
         const overlay = document.createElement('div');
         overlay.style.cssText = `
             position: fixed;
@@ -624,7 +581,6 @@
             z-index: 9999998;
         `;
 
-        // モーダル作成
         const modal = document.createElement('div');
         modal.style.cssText = `
             position: fixed;
@@ -644,7 +600,6 @@
             color: black;
         `;
 
-        // 総計を計算
         const totalUsage = aggregatedData.reduce(
             (sum, item) => sum + item.usage,
             0
@@ -658,7 +613,6 @@
             0
         );
 
-        // ヘッダー部分
         const header = document.createElement('div');
         header.innerHTML = `
             <h2 style="margin: 0 0 20px 0; color: #333;">💰 請求データ集計結果</h2>
@@ -672,12 +626,10 @@
             </div>
         `;
 
-        // テーブル作成
         const table = document.createElement('table');
         table.style.cssText =
             'width: 100%; border-collapse: collapse; margin-bottom: 20px;';
 
-        // テーブルヘッダー
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
         headerRow.style.cssText = 'background-color: #f5f5f5; color: black;';
@@ -713,7 +665,6 @@
         thead.appendChild(headerRow);
         table.appendChild(thead);
 
-        // テーブルボディー
         const tbody = document.createElement('tbody');
         sortedData.forEach((item) => {
             const row = document.createElement('tr');
@@ -732,7 +683,6 @@
 
             row.innerHTML = cells.join('');
 
-            // クリックイベントを追加
             const apiKeyCell = row.querySelector('td:nth-child(1)');
             const billingDateCell = row.querySelector('td:nth-child(2)');
             const chargeTypeCell = row.querySelector('td:nth-child(4)');
@@ -745,13 +695,11 @@
                     currentFilterColumn === 'apiKey';
 
                 if (isCurrentlyFiltered) {
-                    // フィルター解除
                     currentFilter = null;
                     currentFilterColumn = null;
                     filterTableRows(tbody, null, null);
                     showNotification('API Keyフィルターを解除しました', 'info');
                 } else {
-                    // フィルター適用
                     currentFilter = filterValue;
                     currentFilterColumn = 'apiKey';
                     filterTableRows(tbody, filterValue, 'apiKey');
@@ -770,13 +718,11 @@
                     currentFilterColumn === 'billingDate';
 
                 if (isCurrentlyFiltered) {
-                    // フィルター解除
                     currentFilter = null;
                     currentFilterColumn = null;
                     filterTableRows(tbody, null, null);
                     showNotification('請求日フィルターを解除しました', 'info');
                 } else {
-                    // フィルター適用
                     currentFilter = filterValue;
                     currentFilterColumn = 'billingDate';
                     filterTableRows(tbody, filterValue, 'billingDate');
@@ -795,7 +741,6 @@
                     currentFilterColumn === 'chargeType';
 
                 if (isCurrentlyFiltered) {
-                    // フィルター解除
                     currentFilter = null;
                     currentFilterColumn = null;
                     filterTableRows(tbody, null, null);
@@ -804,7 +749,6 @@
                         'info'
                     );
                 } else {
-                    // フィルター適用
                     currentFilter = filterValue;
                     currentFilterColumn = 'chargeType';
                     filterTableRows(tbody, filterValue, 'chargeType');
@@ -819,7 +763,6 @@
         });
         table.appendChild(tbody);
 
-        // 閉じるボタン
         const closeButton = document.createElement('button');
         closeButton.textContent = '閉じる';
         closeButton.style.cssText = `
@@ -834,7 +777,6 @@
         `;
         closeButton.onclick = () => document.body.removeChild(overlay);
 
-        // クリアボタン
         const clearButton = document.createElement('button');
         clearButton.textContent = '集計データをクリア';
         clearButton.style.cssText = `
@@ -856,14 +798,12 @@
             }
         };
 
-        // チャートコンテナ作成
         const chartContainer = document.createElement('div');
         chartContainer.style.cssText =
             'height: 300px; width: 100%; margin-bottom: 20px;';
         const canvas = document.createElement('canvas');
         chartContainer.appendChild(canvas);
 
-        // チャート描画
         const globalCtx = getGlobalContext();
         if (globalCtx.Chart) {
             const chartData = processChartData(aggregatedData);
@@ -872,26 +812,22 @@
             console.warn('Canvas skipping because Chart is not defined');
         }
 
-        // モーダルの組み立て
         modal.appendChild(header);
         modal.appendChild(chartContainer);
         modal.appendChild(table);
         modal.appendChild(clearButton);
         modal.appendChild(closeButton);
 
-        // オーバーレイにクリックイベント
         overlay.onclick = (e) => {
             if (e.target === overlay) {
                 document.body.removeChild(overlay);
             }
         };
 
-        // DOMに追加
         overlay.appendChild(modal);
         document.body.appendChild(overlay);
     };
 
-    // ボタンを作成
     const createButton = (text, onClick, backgroundColor = '#3b82f6') => {
         const button = document.createElement('button');
         button.textContent = text;
@@ -913,11 +849,9 @@
         return button;
     };
 
-    // フィルター状態を管理する変数
     let currentFilter = null;
     let currentFilterColumn = null;
 
-    // テーブルボディーの行をフィルタリング
     const filterTableRows = (tbody, filterValue, columnKey) => {
         const rows = tbody.querySelectorAll('tr');
         rows.forEach((row) => {
@@ -950,16 +884,13 @@
         });
     };
 
-    // 初期化
     const init = () => {
-        // LocalStorageからデータを自動読み込み
         loadStoredData();
         loadApiKeyMapping();
         if (aggregatedData.length > 0) {
             showNotification('読み込みが完了しました', 'info');
         }
 
-        // ボタンコンテナを作成
         const buttonContainer = document.createElement('div');
         buttonContainer.style.cssText = `
             position: fixed;
@@ -975,21 +906,18 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         `;
 
-        // 集計ボタン
         const aggregateButton = createButton(
             '📊 集計',
             aggregateData,
             '#10b981'
         );
 
-        // 結果表示ボタン
         const showResultsButton = createButton(
             '📋 結果表示',
             showResults,
             '#6366f1'
         );
 
-        // リセットボタン
         const resetData = () => {
             if (
                 confirm(
@@ -1003,7 +931,6 @@
         };
         const resetButton = createButton('🔄 リセット', resetData, '#ef4444');
 
-        // イベントリスナーを直接設定（コンテナのクリックイベントを防止）
         aggregateButton.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -1022,17 +949,14 @@
             resetData();
         });
 
-        // createButtonで設定したonclickをクリア
         aggregateButton.onclick = null;
         showResultsButton.onclick = null;
         resetButton.onclick = null;
 
-        // コンテナにボタンを追加
         buttonContainer.appendChild(aggregateButton);
         buttonContainer.appendChild(showResultsButton);
         buttonContainer.appendChild(resetButton);
 
-        // コンテナに属性を設定してDOMに追加
         buttonContainer.setAttribute('data-billing-container', 'true');
         document.body.appendChild(buttonContainer);
     };

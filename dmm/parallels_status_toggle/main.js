@@ -1,11 +1,8 @@
 (function () {
     'use strict';
 
-    // 共通ライブラリから関数を取得
     const { observeDOM, markAsProcessed, isProcessed } = unsafeWindow.DMMCommon;
 
-    // 4状態の定義（キー・短縮ラベル・ツールチップ全文・色）
-    // 循環順: OK -> NG -> 要Player -> 未確認 -> OK
     const STATUSES = [
         {
             key: 'ok',
@@ -43,7 +40,6 @@
         DEFAULT_KEY: 'unknown'
     };
 
-    // localStorage から全状態を読み込み（商品ID -> statusKey）
     const loadStatuses = () => {
         try {
             const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
@@ -54,7 +50,6 @@
         }
     };
 
-    // localStorage へ全状態を保存
     const saveStatuses = (statuses) => {
         try {
             localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(statuses));
@@ -63,18 +58,15 @@
         }
     };
 
-    // 商品IDから現在の状態を取得（未設定はデフォルト=未確認）
     const getStatus = (contentId) =>
         loadStatuses()[contentId] ?? CONFIG.DEFAULT_KEY;
 
-    // 商品IDの状態を設定
     const setStatus = (contentId, key) => {
         const statuses = loadStatuses();
         statuses[contentId] = key;
         saveStatuses(statuses);
     };
 
-    // カードから商品IDを抽出（reviewButtonのhrefのcontent_idパラメータ）
     const extractContentId = (card) => {
         const reviewButton = card.querySelector(CONFIG.REVIEW_BUTTON_SELECTOR);
         if (!reviewButton) {
@@ -84,7 +76,6 @@
         return url.searchParams.get('content_id');
     };
 
-    // 現在の状態から次の状態を取得（循環）
     const getNextStatus = (currentKey) => {
         const keys = STATUSES.map((status) => status.key);
         const currentIndex = keys.indexOf(currentKey);
@@ -92,7 +83,6 @@
         return STATUSES[nextIndex];
     };
 
-    // 現在の状態に合わせてボタン表示を更新
     const updateButton = (button, currentStatus) => {
         button.textContent = currentStatus.label;
         button.title = currentStatus.title;
@@ -101,7 +91,6 @@
         button.style.borderColor = currentStatus.color;
     };
 
-    // カードに循環トグルボタンを1つ生成
     const createButton = (contentId) => {
         const button = document.createElement('span');
         button.setAttribute(CONFIG.BUTTON_ATTR, '');
@@ -141,7 +130,6 @@
         return button;
     };
 
-    // カード1枚の処理（処理済み判定・ID取得・ボタン挿入）
     const processCard = (card) => {
         if (isProcessed(card, CONFIG.PROCESSED_MARKER)) {
             return;
@@ -158,16 +146,13 @@
         }
         // ボタンを右端に固定するための配置基準を設定
         container.style.position = 'relative';
-        // 既存タグ（ブラウザ対応等）と同じ高さの右端に追加
         container.appendChild(createButton(contentId));
     };
 
-    // 全カードを処理
     const processAllCards = () => {
         document.querySelectorAll(CONFIG.CARD_SELECTOR).forEach(processCard);
     };
 
-    // 初期化（即時処理・DOM監視）
     const init = () => {
         processAllCards();
         observeDOM(processAllCards);

@@ -1,8 +1,6 @@
-// 共通ライブラリ
 unsafeWindow.KindleCommon = (function () {
     'use strict';
 
-    // 共通セレクタ
     const COMMON_SELECTORS = {
         title: '#productTitle',
         kindleBookAvailable: '#tmm-grid-swatch-KINDLE',
@@ -33,7 +31,6 @@ unsafeWindow.KindleCommon = (function () {
         ].join(', ')
     };
 
-    // 共通正規表現
     const COMMON_PATTERNS = {
         POINTS: /([\d,]+)\s*(?:pt|ポイント)/i,
         PRICE: /([\d,]+)/,
@@ -43,9 +40,7 @@ unsafeWindow.KindleCommon = (function () {
         ]
     };
 
-    // 共通設定
     const COMMON_CONFIG = {
-        // S3 URLs
         AUTHORS_URL:
             'https://kindle-asins.s3.ap-northeast-1.amazonaws.com/authors.json',
         EXCLUDED_KEYWORDS_URL:
@@ -55,7 +50,6 @@ unsafeWindow.KindleCommon = (function () {
         UNPROCESSED_BOOKS_URL:
             'https://kindle-asins.s3.ap-northeast-1.amazonaws.com/unprocessed_asins.json',
 
-        // 共通閾値
         POINT_THRESHOLD: 170,
         POINTS_RATE_THRESHOLD: 20,
         AVERAGE_PRICE_THRESHOLD: 350,
@@ -63,23 +57,18 @@ unsafeWindow.KindleCommon = (function () {
         PAPER_BOOK_MAX_REASONABLE_PRICE: 1800,
         YOUNG_JUMP_MAX_REASONABLE_PRICE: 600,
 
-        // 新刊チェック設定
         NEW_RELEASE_DAYS: 7,
 
-        // リクエスト制御
         CONCURRENT_REQUESTS: 20,
         REQUEST_DELAY: 1000,
 
-        // その他
         AFFILIATE_PARAMS: '?tag=shinderuman03-22',
         BADGE_EXPIRATION: 5 * 60 * 1000,
         MARKED_ASINS_EXPIRATION: 30 * 24 * 60 * 60 * 1000
     };
 
-    // S3からJSONデータを取得する共通関数
     const fetchJsonFromS3 = (url, dataType) => {
         return new Promise((resolve, reject) => {
-            // キャッシュバスターを追加してキャッシュを無効化
             const cacheBuster = `?t=${Date.now()}&r=${Math.random()}`;
             const urlWithCacheBuster = url + cacheBuster;
             GM_xmlhttpRequest({
@@ -118,7 +107,6 @@ unsafeWindow.KindleCommon = (function () {
         });
     };
 
-    // 個別ページの情報を取得する共通関数
     const fetchPageInfo = (url, extractorFunction, bookTitle = null) => {
         return new Promise((resolve, reject) => {
             const cleanUrl = url.split('?')[0]; // アフィリエイトパラメータを除去
@@ -135,7 +123,6 @@ unsafeWindow.KindleCommon = (function () {
                         const info = extractorFunction(doc, cleanUrl);
                         resolve(info);
                     } else {
-                        // HTTPエラーの場合に通知を送信
                         const error = new Error(
                             `Failed to fetch page: ${response.status}`
                         );
@@ -149,7 +136,6 @@ unsafeWindow.KindleCommon = (function () {
         });
     };
 
-    // 通知送信の共通関数
     const sendNotification = (title, text, url, timeout = 0) => {
         GM_notification({
             title,
@@ -164,7 +150,6 @@ unsafeWindow.KindleCommon = (function () {
         });
     };
 
-    // 完了通知の共通関数
     const sendCompletionNotification = (
         scriptName,
         totalCount,
@@ -178,7 +163,6 @@ unsafeWindow.KindleCommon = (function () {
         );
     };
 
-    // エラー通知の共通関数
     const sendErrorNotification = (scriptName, errorMessage) => {
         sendNotification(
             '❌ エラー',
@@ -188,13 +172,11 @@ unsafeWindow.KindleCommon = (function () {
         );
     };
 
-    // ページ取得エラー通知関数
     const sendPageFetchErrorNotification = (url, title) => {
         const message = `${title}のページ取得に失敗しました`;
         sendNotification('⚠️ ページ取得エラー', message, url, 0);
     };
 
-    // URLからASINを抽出
     const extractAsinFromUrl = (url) => {
         const match = url.match(/\/dp\/([A-Z0-9]{10})/);
         return match ? match[1] : null;
@@ -216,9 +198,7 @@ unsafeWindow.KindleCommon = (function () {
             : 0;
     };
 
-    // 共通のDOM要素値取得関数
     const getElementValue = (doc, selector, regex) => {
-        // 複数のセレクターがカンマ区切りで渡された場合、順番に試す
         const selectors = selector.split(',').map((item) => item.trim());
         for (const currentSelector of selectors) {
             const element = doc.querySelector(currentSelector);
@@ -263,7 +243,6 @@ unsafeWindow.KindleCommon = (function () {
             return kindleSwatchPrice;
         }
 
-        // KINDLEスウォッチが0円（KU等）なら購入価格フォールバック
         for (const selector of COMMON_SELECTORS.kindlePurchasePrice) {
             const element = doc.querySelector(selector);
             const purchasePrice = extractKindlePurchasePrice(
@@ -274,7 +253,6 @@ unsafeWindow.KindleCommon = (function () {
             }
         }
 
-        // 購入価格も取れない場合は従来の全セレクタで再取得
         return getElementValue(
             doc,
             COMMON_SELECTORS.kindlePrice,
@@ -306,7 +284,6 @@ unsafeWindow.KindleCommon = (function () {
         return 0;
     };
 
-    // localStorage管理機能
     const getStorageItems = (storageKey) => {
         try {
             return JSON.parse(localStorage.getItem(storageKey) || '[]');
@@ -353,7 +330,6 @@ unsafeWindow.KindleCommon = (function () {
         }
     };
 
-    // Amazon商品情報抽出
     const extractAmazonProductInfo = (doc, logContext = '') => {
         const title = getElementText(doc.querySelector(COMMON_SELECTORS.title));
         const points = getKindlePoints(doc);
@@ -367,7 +343,6 @@ unsafeWindow.KindleCommon = (function () {
         const hasCoupon =
             couponBadge?.textContent?.includes('クーポン:') || false;
 
-        // 取得できなかった値についてログを出力
         if (points === 0) {
             console.warn(
                 `⚠️ ポイント情報を取得できませんでした - ${title} ${logContext}`
@@ -399,7 +374,6 @@ unsafeWindow.KindleCommon = (function () {
         };
     };
 
-    // セール条件評価
     const evaluateSaleConditions = (productInfo) => {
         const { points, kindlePrice, paperPrice, hasCoupon, title } =
             productInfo;
@@ -424,7 +398,6 @@ unsafeWindow.KindleCommon = (function () {
         return conditions.length > 0 ? conditions.join(' ') : null;
     };
 
-    // 紙書籍価格差を追加すべきか判定
     const shouldAddPriceDifference = (paperPrice, kindlePrice, title) => {
         if (!paperPrice) {
             return false;
@@ -450,7 +423,6 @@ unsafeWindow.KindleCommon = (function () {
         return true;
     };
 
-    // ヤングジャンプ雑誌の価格を判定
     const isValidYoungJumpPrice = (title, paperPrice) => {
         if (!title.includes('ヤングジャンプ')) {
             return true;
@@ -464,7 +436,6 @@ unsafeWindow.KindleCommon = (function () {
         return false;
     };
 
-    // 公開API
     return {
         COMMON_CONFIG,
         COMMON_SELECTORS,

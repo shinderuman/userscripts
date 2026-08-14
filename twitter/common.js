@@ -1,8 +1,6 @@
-// Twitter/X共通ライブラリ
 unsafeWindow.TwitterCommon = (function () {
     'use strict';
 
-    // 現在のユーザー名を取得
     const getCurrentUser = () => {
         return Array.from(
             document.querySelectorAll(
@@ -13,7 +11,6 @@ unsafeWindow.TwitterCommon = (function () {
             ?.textContent.trim();
     };
 
-    // ボタン作成
     const createButton = (text, styles = {}) => {
         const button = document.createElement('button');
         button.innerText = text;
@@ -35,7 +32,6 @@ unsafeWindow.TwitterCommon = (function () {
         return button;
     };
 
-    // 公開API
     return {
         getCurrentUser,
         createButton

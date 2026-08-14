@@ -1,7 +1,6 @@
 (function () {
     'use strict';
 
-    // 共通ライブラリから関数を取得
     const { createButton, createContainer, parseDate } =
         unsafeWindow.GitHubCommon;
 
@@ -15,7 +14,6 @@
     const setupUI = () => {
         const container = createContainer();
 
-        // 基準日付入力フィールド
         const dateLabel = document.createElement('label');
         dateLabel.textContent = '基準日付:';
         dateLabel.style.fontSize = '12px';
@@ -34,21 +32,18 @@
         container.appendChild(dateLabel);
         container.appendChild(baseDateInput);
 
-        // 過去のリンクを開くボタン
         container.appendChild(
             createButton('過去のリンクを開く', () => {
                 filterLinks((linkDate, baseDate) => linkDate < baseDate);
             })
         );
 
-        // 今日以降のリンクを開くボタン
         container.appendChild(
             createButton('基準日以降のリンクを開く', () => {
                 filterLinks((linkDate, baseDate) => linkDate >= baseDate);
             })
         );
 
-        // すべてのリンクを開くボタン
         container.appendChild(
             createButton('すべてのリンクを開く', () => {
                 filterLinks(() => true);
@@ -105,6 +100,5 @@
         }
     };
 
-    // 自動初期化
     initializeNewReleaseChecker();
 })();

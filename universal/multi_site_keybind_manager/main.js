@@ -1,7 +1,6 @@
 (function () {
     'use strict';
 
-    // 共通ライブラリから関数を取得
     const {
         copyToClipboard,
         openInTab,
@@ -53,7 +52,6 @@
         const title = document.title;
         let url = window.location.href;
 
-        // AmazonでASINが取得できる場合、シンプルな商品URLに変換
         if (window.location.href.startsWith('https://www.amazon.co.jp/')) {
             const { asin } = getPageInfo();
             if (asin) {
@@ -61,7 +59,6 @@
             }
         }
 
-        // GETパラメータを破棄するサイトの場合
         if (
             CONFIG.GET_PARAM_DISPOSAL_SITES.some((site) =>
                 window.location.href.startsWith(site)
@@ -74,7 +71,6 @@
             url = cleanUrl(url);
         }
 
-        // ニコニコ動画の再生ページでシリーズの場合、playlistパラメータを付与
         if (
             window.location.href.startsWith('https://www.nicovideo.jp/watch/')
         ) {
@@ -95,7 +91,6 @@
     };
 
     const getNicoSeriesPlaylistParam = () => {
-        // シリーズ再生ページのリンクからplaylistパラメータを取得
         const seriesLink = document.querySelector(
             'a[data-anchor-area="series"][href*="playlist="]'
         );
@@ -234,12 +229,10 @@
     };
 
     const handleKeyEvents = (event) => {
-        // 入力フィールド例外サイトの判定
         const isExceptionSite = CONFIG.INPUT_FIELD_EXCEPTION_SITES.some(
             (site) => window.location.hostname.includes(site)
         );
 
-        // 入力フィールドにフォーカスがある場合は無効化（例外サイトを除く）
         if (
             !isExceptionSite &&
             (event.target.tagName === 'INPUT' ||
@@ -312,6 +305,5 @@
         console.log('💡 Alt+矢印キーで各種機能を使用できます');
     };
 
-    // 自動初期化
     initializeCustomKeybindHandler();
 })();

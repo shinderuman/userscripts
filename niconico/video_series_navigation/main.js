@@ -1,7 +1,6 @@
 (function () {
     'use strict';
 
-    // 共通ライブラリから関数を取得
     const { createSVGButton, extractVideoId } = unsafeWindow.NiconicoCommon;
 
     const CONFIG = {
@@ -32,7 +31,6 @@
         }
     };
 
-    // キーバインドを設定（CONFIGの初期化後に設定）
     CONFIG.KEY_BINDINGS = {
         KeyZ: CONFIG.SELECTORS.BUTTON_REWIND, // 10秒戻る
         KeyX: CONFIG.SELECTORS.BUTTON_PAUSE, // 一時停止
@@ -42,7 +40,6 @@
     let isProcessing = false;
     let debounceTimeout = null;
 
-    // キーイベントを送信する関数
     const performAction = (keyCode) => {
         const selector = CONFIG.KEY_BINDINGS[keyCode];
         if (selector) {
@@ -239,7 +236,6 @@
         let seriesSectionObserver = null;
 
         const mainObserver = new MutationObserver((mutations) => {
-            // 自分が追加したボタンの変更は無視
             const hasRelevantChanges = mutations.some((mutation) => {
                 return (
                     Array.from(mutation.addedNodes).some(
@@ -264,7 +260,6 @@
                 if (!seriesSectionObserver) {
                     seriesSectionObserver = new MutationObserver(
                         (mutations) => {
-                            // 自分が追加したボタンの変更は無視
                             const hasRelevantChanges = mutations.some(
                                 (mutation) => {
                                     return (
@@ -314,12 +309,10 @@
         });
     };
 
-    // キーボードイベントリスナーを設定
     const setupKeyRemapping = () => {
         document.addEventListener(
             'keydown',
             (e) => {
-                // テキスト入力中は無効化
                 const activeElement = document.activeElement;
                 if (
                     activeElement &&
@@ -331,7 +324,6 @@
                     return;
                 }
 
-                // キーバインド処理
                 if (
                     CONFIG.KEY_BINDINGS[e.code] &&
                     !e.ctrlKey &&
@@ -355,6 +347,5 @@
         console.log('🚀 ニコニコ動画シリーズナビゲーターが初期化されました');
     };
 
-    // 自動初期化
     initializeSeriesVideoNavigator();
 })();

@@ -1,7 +1,6 @@
 (function () {
     'use strict';
 
-    // 共通ライブラリから関数を取得
     const {
         COMMON_CONFIG,
         COMMON_SELECTORS,
@@ -10,12 +9,10 @@
         sendCompletionNotification
     } = unsafeWindow.KindleCommon;
 
-    // 書籍データをS3から取得
     const fetchBooks = () => {
         return fetchJsonFromS3(COMMON_CONFIG.PAPER_BOOKS_URL, 'books');
     };
 
-    // 個別ページの情報を取得
     const fetchBookPageInfo = (bookInfo) => {
         return fetchPageInfo(
             `https://www.amazon.co.jp/dp/${bookInfo.ASIN}`,
@@ -24,7 +21,6 @@
         );
     };
 
-    // ページから利用可能性情報を抽出
     const extractPageInfo = (doc, bookInfo, cleanUrl) => {
         const title =
             doc.querySelector(COMMON_SELECTORS.title)?.innerText.trim() ||
@@ -45,12 +41,10 @@
         };
     };
 
-    // 利用可能性条件をチェック
     const checkAvailabilityConditions = (info) => {
         return info.paperBookAvailable && info.kindleBookAvailable;
     };
 
-    // 非同期でページをチェック（バッチ処理）
     const checkPagesInBatches = async (books) => {
         console.log(`📚 ${books.length}冊の利用可能性をチェック開始...`);
 
@@ -106,14 +100,12 @@
             `✅ チェック完了: ${availableCount}件が両方利用可能でした (${now})`
         );
 
-        // 見つかった書籍をすべて新しいタブで開く
         if (availableBooks.length > 0) {
             availableBooks.forEach((pageInfo) => {
                 GM_openInTab(pageInfo.cleanUrl, { active: false });
             });
         }
 
-        // 完了通知
         sendCompletionNotification(
             '利用可能性チェック',
             books.length,
@@ -121,7 +113,6 @@
         );
     };
 
-    // メイン関数
     const checkPaperToKindle = async () => {
         try {
             console.log('📖 書籍データを取得中...');
@@ -141,7 +132,6 @@
         }
     };
 
-    // グローバル関数として公開（デベロッパーツールから呼び出し可能）
     unsafeWindow.checkPaperToKindle = checkPaperToKindle;
 
     console.log('🚀 Paper to Kindle Checker が読み込まれました');

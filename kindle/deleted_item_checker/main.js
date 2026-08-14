@@ -1,7 +1,6 @@
 (function () {
     'use strict';
 
-    // 共通ライブラリから関数を取得
     const { sendCompletionNotification, sendErrorNotification } =
         unsafeWindow.KindleCommon;
 
@@ -193,7 +192,6 @@
             orderElements.forEach((element) => {
                 const titleElement = element.querySelector('a[title] p');
 
-                // 注文日を含むテキストを要素全体から検索
                 const elementText = element.textContent;
                 const dateMatch = elementText.match(
                     /注文日(\d{4}年\d{1,2}月\d{1,2}日)/
@@ -203,7 +201,6 @@
                     const title = titleElement.textContent.trim();
                     const orderDate = dateMatch[1];
 
-                    // 注文詳細ページのURLを抽出
                     const orderDetailLink = element.querySelector(
                         'a[href*="/your-orders/order-details"]'
                     );
@@ -249,7 +246,6 @@
                     `✅ ページ${page}完了: ${pageItems.length}件の注文を発見`
                 );
 
-                // ページ間で少し待機
                 if (page < endPage) {
                     await new Promise((resolve) => setTimeout(resolve, 300));
                 }
@@ -268,16 +264,14 @@
     const findDeletedItemsOnPage = (doc) => {
         const deletedItems = [];
 
-        // 削除メッセージを含む要素を直接検索
         const deletedMessageElements = doc.querySelectorAll(
             '._cDEzb_no-product-msg_2MQ8w'
         );
 
         if (deletedMessageElements.length === 0) {
-            return deletedItems; // 削除商品がない場合は空配列を返す
+            return deletedItems;
         }
 
-        // メインの商品リストを取得（複数のセレクターを試行）
         let productList = doc.querySelector(
             'ul.a-unordered-list.a-nostyle.a-vertical'
         );
@@ -289,7 +283,6 @@
         }
 
         if (productList) {
-            // 商品アイテムを取得（複数のセレクターを試行）
             let allItems = Array.from(
                 productList.querySelectorAll('li.a-spacing-medium')
             );
@@ -297,7 +290,6 @@
                 allItems = Array.from(productList.querySelectorAll('li'));
             }
 
-            // 削除された商品のインデックスをすべて見つける
             const deletedIndices = [];
             allItems.forEach((item, index) => {
                 const deletedMsg = item.querySelector(
@@ -311,11 +303,9 @@
                 }
             });
 
-            // 各削除商品について前後の商品を特定
             deletedIndices.forEach((deletedIndex, deletedItemNumber) => {
                 const surroundingProducts = [];
 
-                // 前後の商品を取得
                 const prevProduct = findSurroundingProduct(
                     allItems,
                     deletedIndex,
@@ -360,10 +350,8 @@
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             if (html.includes(CONFIG.MESSAGES.DELETED)) {
-                // ページ内の削除商品をすべて検出
                 const deletedItems = findDeletedItemsOnPage(doc);
 
-                // 削除商品が検出できない場合はエラー（フォールバックは行わない）
                 if (deletedItems.length === 0) {
                     console.warn(
                         `ページ${pageNum}: 削除メッセージは検出されたが、商品の詳細抽出に失敗`
@@ -446,7 +434,6 @@
         orderResultContainer = document.createElement('div');
         Object.assign(orderResultContainer.style, CONFIG.STYLES.RESULT);
 
-        // 注文履歴セクションを追加
         if (orderItems.length > 0) {
             const orderHistorySection = document.createElement('div');
             orderHistorySection.innerHTML = `<h2><a href="https://www.amazon.co.jp/your-orders/search?search=ヤングジャンプ&ref_=ppx_hzsearch_sb_dt_b" target="_blank" style="color: inherit; text-decoration: none;">ヤングジャンプの注文履歴（${orderItems.length}件）</a></h2>`;
@@ -474,7 +461,6 @@
                 '<h2>ヤングジャンプの注文履歴が見つかりませんでした</h2>';
         }
 
-        // 注文履歴は常に上に表示
         if (deletedResultContainer && deletedResultContainer.parentNode) {
             document.body.insertBefore(
                 orderResultContainer,
@@ -496,7 +482,6 @@
             CONFIG.STYLES.DELETED_RESULT
         );
 
-        // 削除商品セクション
         if (results.length === 0) {
             const deletedSection = document.createElement('div');
             deletedSection.innerHTML =
@@ -517,7 +502,6 @@
                 const li = document.createElement('li');
                 Object.assign(li.style, CONFIG.STYLES.DELETED_ITEM);
 
-                // 前の削除ページとの差を計算
                 let pageDiffText = '';
                 if (index > 0) {
                     const prevPageNum = results[index - 1].pageNum;
@@ -575,14 +559,12 @@
             deletedSection.appendChild(list);
             deletedResultContainer.appendChild(deletedSection);
 
-            // 説明を追加
             const explanation = document.createElement('div');
             Object.assign(explanation.style, CONFIG.STYLES.EXPLANATION);
             explanation.innerHTML = CONFIG.HTML.EXPLANATION;
             deletedResultContainer.appendChild(explanation);
         }
 
-        // 削除商品は常に下に表示（注文履歴の後）
         if (orderResultContainer && orderResultContainer.parentNode) {
             orderResultContainer.parentNode.insertBefore(
                 deletedResultContainer,
@@ -594,7 +576,6 @@
     };
 
     const createControlPanel = () => {
-        // コントロールパネルを作成
         const controlContainer = document.createElement('div');
         Object.assign(controlContainer.style, CONFIG.STYLES.CONTROL_PANEL);
 
@@ -615,7 +596,6 @@
                 CONFIG.DEFAULTS.DELETED_ITEMS_END_PAGE
             );
 
-        // スタイルを適用
         const inputs = controlContainer.querySelectorAll('input');
         inputs.forEach((input) =>
             Object.assign(input.style, CONFIG.STYLES.INPUT)
@@ -628,7 +608,6 @@
 
         document.body.appendChild(controlContainer);
 
-        // ボタンのイベントリスナーを設定
         setupOrderHistoryButton();
         setupDeletedItemButton();
     };
@@ -645,14 +624,12 @@
                 return;
             }
 
-            // 注文履歴のページ範囲を取得
             const orderStartPageInput =
                 document.getElementById('orderStartPage');
             const orderEndPageInput = document.getElementById('orderEndPage');
             const orderStartPage = parseInt(orderStartPageInput.value);
             const orderEndPage = parseInt(orderEndPageInput.value);
 
-            // 入力値の検証
             if (orderStartPage > orderEndPage) {
                 alert('開始ページは終了ページより小さい値を入力してください。');
                 return;
@@ -694,13 +671,11 @@
                 return;
             }
 
-            // 入力値を取得
             const startPageInput = document.getElementById('startPage');
             const endPageInput = document.getElementById('endPage');
             const startPage = parseInt(startPageInput.value);
             const endPage = parseInt(endPageInput.value);
 
-            // 入力値の検証
             if (startPage > endPage) {
                 alert('開始ページは終了ページより小さい値を入力してください。');
                 return;
@@ -727,6 +702,5 @@
         console.log('🗑️ Kindle Deleted Item Checker が初期化されました');
     };
 
-    // 自動初期化
     initializeDeletedItemChecker();
 })();

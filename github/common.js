@@ -1,20 +1,14 @@
-// GitHub共通ライブラリ
-// このファイルはGitHub関連のUserScriptで共有される汎用機能を提供します
-
 (function () {
     'use strict';
 
-    // セレクタ定数
     const SELECTORS = {
         WISHLIST_LINKS: '#file-md-readme > article > ul > li > a'
     };
 
-    // UI関連の共通機能
     const createButton = (label, onClick, styles = {}) => {
         const button = document.createElement('button');
         button.textContent = label;
 
-        // デフォルトスタイル
         const defaultStyles = {
             padding: '10px 20px',
             backgroundColor: '#0366d6',
@@ -27,7 +21,6 @@
             fontWeight: '500'
         };
 
-        // スタイルを適用
         Object.assign(button.style, defaultStyles, styles);
 
         button.addEventListener('click', onClick);
@@ -37,7 +30,6 @@
     const createContainer = (styles = {}) => {
         const container = document.createElement('div');
 
-        // デフォルトスタイル
         const defaultStyles = {
             position: 'fixed',
             top: '50%',
@@ -54,13 +46,11 @@
             border: '1px solid #e1e4e8'
         };
 
-        // スタイルを適用
         Object.assign(container.style, defaultStyles, styles);
 
         return container;
     };
 
-    // 日付関連の共通機能
     const parseDate = (text) => {
         const match = text.match(/^\[(\d{4})-(\d{2})-(\d{2})\]/);
         if (!match) return null;
@@ -77,16 +67,10 @@
         return today;
     };
 
-    // GitHubCommonオブジェクトとしてunsafeWindowに公開
     unsafeWindow.GitHubCommon = {
-        // セレクタ
         SELECTORS,
-
-        // UI関連
         createButton,
         createContainer,
-
-        // 日付関連
         parseDate,
         getTodayStart
     };

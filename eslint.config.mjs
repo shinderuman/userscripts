@@ -8,11 +8,10 @@ export default [
             ecmaVersion: 'latest',
             sourceType: 'script',
             globals: {
-                // 環境組み込み（globalsパッケージで一括定義）
                 ...globals.browser,
                 ...globals.node,
 
-                // Tampermonkey/Greasemonkey globals（globalsパッケージに含まれない特殊グローバル）
+                // globalsパッケージに含まれない特殊グローバル
                 unsafeWindow: 'readonly',
                 GM_setValue: 'readonly',
                 GM_getValue: 'readonly',
@@ -32,13 +31,10 @@ export default [
                 GM_notification: 'readonly',
                 GM_setClipboard: 'readonly',
                 GM_info: 'readonly',
-
-                // Tampermonkey GM4 オブジェクト形式API（GM.getValue 等）
                 GM: 'readonly'
             }
         },
         rules: {
-            // ベストプラクティス（構文・バグ検出）
             'no-unused-vars': ['warn'],
             'no-console': ['off'],
             'no-undef': ['error'],
@@ -46,7 +42,6 @@ export default [
             'no-duplicate-case': ['error'],
             'no-unreachable': ['error'],
 
-            // ES6+
             'prefer-const': ['warn'],
             'no-var': ['warn']
         }

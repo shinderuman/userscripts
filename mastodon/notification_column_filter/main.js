@@ -1,7 +1,6 @@
 (function () {
     'use strict';
 
-    // 共通ライブラリから関数を取得
     const { DeferredMutationObserver } = unsafeWindow.MastodonCommon;
 
     const CONFIG = {
@@ -20,7 +19,7 @@
         const filterBar = document
             .querySelector('div[aria-label="通知"]')
             .querySelector('div.notification__filter-bar');
-        if (!filterBar) return true; // フィルターバーがない場合はデフォルトで有効
+        if (!filterBar) return true;
 
         const firstButton = filterBar.querySelector('button');
         return firstButton && firstButton.classList.contains('active');

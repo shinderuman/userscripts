@@ -1,8 +1,6 @@
 (function () {
     'use strict';
 
-    // 共通ライブラリから関数を取得
-    // 共通ライブラリから関数を取得
     const {} = unsafeWindow.MastodonCommon;
 
     const COLUMN_PAIRS = [
@@ -85,6 +83,5 @@
         column.style.width = '100%';
     };
 
-    // 自動初期化
     initializeColumnCombiner();
 })();

@@ -1,8 +1,6 @@
-// Universal共通ライブラリ
 unsafeWindow.UniversalCommon = (function () {
     'use strict';
 
-    // 通知表示ユーティリティ
     const showNotification = (title, text, timeout = 3000, onclick = null) => {
         if (typeof GM_notification !== 'undefined') {
             GM_notification({
@@ -16,7 +14,6 @@ unsafeWindow.UniversalCommon = (function () {
         }
     };
 
-    // トースト通知表示
     const showToast = (
         headerText,
         message,
@@ -78,7 +75,6 @@ unsafeWindow.UniversalCommon = (function () {
         }, 3000);
     };
 
-    // クリップボード操作
     const copyToClipboard = async (text) => {
         try {
             if (typeof GM_setClipboard !== 'undefined') {
@@ -86,7 +82,6 @@ unsafeWindow.UniversalCommon = (function () {
             } else if (navigator.clipboard) {
                 await navigator.clipboard.writeText(text);
             } else {
-                // フォールバック
                 const textArea = document.createElement('textarea');
                 textArea.value = text;
                 document.body.appendChild(textArea);
@@ -101,7 +96,6 @@ unsafeWindow.UniversalCommon = (function () {
         }
     };
 
-    // 新しいタブで開く
     const openInTab = (url, options = {}) => {
         if (typeof GM_openInTab !== 'undefined') {
             GM_openInTab(url, options);
@@ -110,14 +104,12 @@ unsafeWindow.UniversalCommon = (function () {
         }
     };
 
-    // キーイベントのデフォルト動作を防ぐ
     const preventDefaultKeys = (event, keys) => {
         if (keys.includes(event.key)) {
             event.preventDefault();
         }
     };
 
-    // URL操作ユーティリティ
     const cleanUrl = (url, paramsToRemove = ['fbclid']) => {
         try {
             const urlObj = new URL(url);
@@ -131,7 +123,6 @@ unsafeWindow.UniversalCommon = (function () {
         }
     };
 
-    // DOM要素の待機
     const waitForElement = (selector, timeout = 10000) => {
         return new Promise((resolve, reject) => {
             const element = document.querySelector(selector);
@@ -161,7 +152,6 @@ unsafeWindow.UniversalCommon = (function () {
         });
     };
 
-    // デバウンス関数
     const debounce = (func, wait) => {
         let timeout;
         return function executedFunction(...args) {
@@ -174,7 +164,6 @@ unsafeWindow.UniversalCommon = (function () {
         };
     };
 
-    // 全角数字を半角に正規化
     const normalizeDigits = (s) =>
         s.replace(/[０-９]/g, (d) =>
             String.fromCharCode(d.charCodeAt(0) - 0xfee0)
@@ -184,30 +173,25 @@ unsafeWindow.UniversalCommon = (function () {
     // 方針: サブタイトル（最初の〜/～以降）を切り捨て、末尾の「N巻」「第N巻」「巻数括弧(N)」「雑誌名括弧」「単独数字」を再帰除去。
     // 先頭の数字（「100万」等）は保持。
     const parseBaseTitle = (title) => {
-        // サブタイトル（最初の〜/～以降）を切り捨て
         const main = normalizeDigits(title).split(/[〜～]/)[0];
         const s = main.replace(/\s+$/, '');
 
-        // 末尾の「N巻」「第N巻」を除去して再帰
         const volSuffix = s.match(/[\s　]?第?[0-9]+巻$/);
         if (volSuffix) {
             return parseBaseTitle(s.slice(0, s.length - volSuffix[0].length));
         }
-        // 末尾の雑誌名括弧（数字を含まない）を除去して再帰
         const trailingParen = s.match(/[（(][^（(0-9]*[）)]$/);
         if (trailingParen) {
             return parseBaseTitle(
                 s.slice(0, s.length - trailingParen[0].length)
             );
         }
-        // 末尾の巻数括弧（N）を除去して再帰
         const trailingNumParen = s.match(/[（(][0-9]+[）)]$/);
         if (trailingNumParen) {
             return parseBaseTitle(
                 s.slice(0, s.length - trailingNumParen[0].length)
             );
         }
-        // 末尾の単独数字を除去して再帰（除去後に新たな括弧が末尾になる場合があるため）
         const stripped = s.replace(/[\s　]?[0-9]+$/, '');
         if (stripped !== s) {
             return parseBaseTitle(stripped);
@@ -215,7 +199,6 @@ unsafeWindow.UniversalCommon = (function () {
         return s.replace(/\s+$/, '');
     };
 
-    // 公開API
     return {
         showNotification,
         showToast,

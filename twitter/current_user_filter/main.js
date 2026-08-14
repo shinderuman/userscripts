@@ -1,7 +1,6 @@
 (function () {
     'use strict';
 
-    // 共通ライブラリから関数を取得
     const { getCurrentUser, createButton } = unsafeWindow.TwitterCommon;
 
     let isFiltered = false;
@@ -56,6 +55,5 @@
         console.log('🚀 Twitter Show Yourself が初期化されました');
     };
 
-    // 自動初期化
     initializeShowYourself();
 })();

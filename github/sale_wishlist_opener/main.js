@@ -1,7 +1,6 @@
 (function () {
     'use strict';
 
-    // 共通ライブラリから関数を取得
     const {
         createButton,
         createContainer,
@@ -10,7 +9,6 @@
         SELECTORS
     } = unsafeWindow.GitHubCommon;
 
-    // スキップするキーワードリスト
     const skipList = [];
 
     const STORAGE_KEY = 'sale_wishlist_priority:' + location.pathname;
@@ -63,7 +61,6 @@
         }
     };
 
-    // パネル設定
     const PANEL_CONFIGS = {
         priority: {
             id: 'priority-panel',
@@ -132,7 +129,6 @@
     const setupUI = () => {
         const container = createContainer();
 
-        // 優先のみ表示トグルボタン
         const priorityButton = createButton(
             '優先パネル表示',
             function () {
@@ -143,7 +139,6 @@
         priorityButton.isFiltering = false;
         container.appendChild(priorityButton);
 
-        // モンスターコミックス👹表示トグルボタン
         const monsterButton = createButton(
             'モンスターコミックス👹表示',
             function () {
@@ -154,7 +149,6 @@
         monsterButton.isFiltering = false;
         container.appendChild(monsterButton);
 
-        // 現在日時にスクロールするボタン
         container.appendChild(
             createButton(
                 '現在日時にスクロール',
@@ -165,21 +159,18 @@
             )
         );
 
-        // 過去のリンクを開くボタン
         container.appendChild(
             createButton('過去のリンクを開く', () => {
                 filterLinks((linkDate, today) => linkDate < today);
             })
         );
 
-        // 今日以降のリンクを開くボタン
         container.appendChild(
             createButton('今日以降のリンクを開く', () => {
                 filterLinks((linkDate, today) => linkDate >= today);
             })
         );
 
-        // すべてのリンクを開くボタン
         container.appendChild(
             createButton('すべてのリンクを開く', () => {
                 filterLinks(() => true);
@@ -240,7 +231,6 @@
             const linkDate = parseDate(link.textContent);
             if (!linkDate) return;
 
-            // 未来の日付は対象外
             if (linkDate > today) return;
 
             const diff = today.getTime() - linkDate.getTime();
@@ -251,22 +241,18 @@
         });
 
         if (closestLink) {
-            // ページの高さを取得して1/8の位置を計算
             const viewportHeight = window.innerHeight;
             const targetPosition = viewportHeight * (1 / 16);
 
-            // 要素の現在の位置を取得
             const rect = closestLink.getBoundingClientRect();
             const currentScrollY = window.pageYOffset;
             const targetScrollY = currentScrollY + rect.top - targetPosition;
 
-            // スムーズにスクロール
             window.scrollTo({
                 top: targetScrollY,
                 behavior: 'smooth'
             });
 
-            // 視覚的なハイライトを追加
             const originalBackground = closestLink.style.backgroundColor;
             Object.assign(closestLink.style, STYLES.highlight);
 
@@ -353,6 +339,5 @@
         });
     };
 
-    // 自動初期化
     initializeSaleWishlistOpener();
 })();

@@ -1,7 +1,6 @@
 (function () {
     'use strict';
 
-    // 共通ライブラリから関数を取得
     const {
         observeDOM,
         modifyLink,
@@ -37,6 +36,5 @@
         console.log('💡 DMM動画を新しいタブで開くように変更します');
     };
 
-    // 自動初期化
     initializePlayerOpenTab();
 })();

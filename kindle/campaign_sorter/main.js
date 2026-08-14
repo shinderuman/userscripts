@@ -1,7 +1,6 @@
 (function () {
     'use strict';
 
-    // 共通ライブラリから関数を取得
     const {} = unsafeWindow.KindleCommon;
 
     const CONFIG = {
@@ -168,6 +167,5 @@
         console.log('📘 Kindle Campaign Sorter が初期化されました');
     };
 
-    // 自動初期化
     initializeCampaignSorter();
 })();

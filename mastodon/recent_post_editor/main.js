@@ -1,7 +1,6 @@
 (function () {
     'use strict';
 
-    // 共通ライブラリから関数を取得
     const { COMMON_SELECTORS } = unsafeWindow.MastodonCommon;
 
     const CONFIG = {
@@ -88,6 +87,5 @@
         console.log('  Command+Shift+↑: 最新の投稿にリプライ');
     };
 
-    // 自動初期化
     initializeRecentPostEditor();
 })();

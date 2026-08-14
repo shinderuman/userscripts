@@ -1,7 +1,6 @@
 (function () {
     'use strict';
 
-    // 共通ライブラリから関数を取得
     const {} = unsafeWindow.AmazonCommon;
 
     const CONFIG = {
@@ -64,6 +63,5 @@
         );
     };
 
-    // 自動初期化
     initializeAffiliateTagAdder();
 })();

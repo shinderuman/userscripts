@@ -1,12 +1,6 @@
 (function () {
     'use strict';
 
-    /**
-     * 通知済みのものを表示:
-     * console.table(JSON.parse(localStorage.getItem('newReleaseNotifications')));
-     */
-
-    // 共通ライブラリから関数を取得
     const {
         COMMON_CONFIG,
         fetchJsonFromS3,
@@ -26,16 +20,13 @@
         }
     };
 
-    // ISBN判定関数
     const isISBN = (asin) => {
-        // ISBNは10〜13桁の数値のみで構成される
         if (!asin) return false;
 
         const length = asin.length;
         return length >= 10 && length <= 13 && /^\d+$/.test(asin);
     };
 
-    // メイン関数
     const checkNewReleases = async (isbnMode = 0) => {
         try {
             cleanupOldNotifications();
@@ -100,7 +91,6 @@
 
             const promises = batch.map(async (authorInfo) => {
                 try {
-                    // 除外キーワードとISBNモードを渡す
                     authorInfo.excludedKeywords = excludedKeywords;
                     authorInfo.isbnMode = isbnMode;
                     const pageInfo = await fetchAuthorSearchInfo(authorInfo);
@@ -143,20 +133,17 @@
             `🆗 チェック完了: ${newReleaseCount}冊の新刊を発見しました (${now})`
         );
 
-        // 見つかった新刊をすべて新しいタブで開く
         if (newReleaseBooks.length > 0) {
             newReleaseBooks.forEach((book) => {
                 GM_openInTab(book.url, { active: false });
             });
 
-            // 通知済みアイテムをまとめて保存
             saveStorageItems(
                 CONFIG.LOCAL_STORAGE_KEYS.NOTIFICATIONS,
                 newReleaseBooks
             );
         }
 
-        // 完了通知
         sendCompletionNotification(
             '新刊チェック',
             authors.length,
@@ -166,7 +153,6 @@
 
     const fetchAuthorSearchInfo = async (authorInfo) => {
         return new Promise((resolve, reject) => {
-            // 作者名でKindleマンガを検索するURL
             const searchUrl = `https://www.amazon.co.jp/s?k=${encodeURIComponent(authorInfo.Name)}&i=digital-text&rh=n%3A2250738051&s=date-desc-rank`;
 
             console.log(`📄 検索URL: ${searchUrl}`);
@@ -229,7 +215,6 @@
         for (let i = 0; i < booksToCheck.length; i++) {
             const item = booksToCheck[i];
 
-            // 基本情報チェック
             const basicInfo = checkBookBasicInfo(item);
             if (!basicInfo.isValid) {
                 continue;
@@ -238,38 +223,31 @@
             const { title, bookUrl } = basicInfo;
             const asin = extractAsinFromUrl(bookUrl);
 
-            // ASINチェック
             if (!asin) {
                 continue;
             }
 
-            // ISBNフィルタリングチェック
             if (checkISBNFiltering(asin, isbnMode)) {
                 continue;
             }
 
-            // 通知済みチェック
             if (checkAlreadyNotified(asin)) {
                 continue;
             }
 
-            // 除外キーワードチェック
             if (checkExcludedKeywords(title, excludedKeywords)) {
                 continue;
             }
 
-            // 価格チェック
             const priceInfo = checkBookPrice(item);
             if (priceInfo.shouldSkip) {
                 continue;
             }
 
-            // 作者マッチチェック
             if (!checkAuthorMatch(item, authorInfo)) {
                 continue;
             }
 
-            // 発売日チェック
             const dateInfo = checkReleaseDate(item, cutoffDate);
             if (dateInfo.releaseDate && dateInfo.isNewRelease) {
                 const bookData = {
@@ -307,20 +285,19 @@
         const isBookISBN = isISBN(asin);
 
         switch (isbnMode) {
-            case 0: // ISBNをスキップ
+            case 0:
                 if (isBookISBN) {
                     return true;
                 }
                 break;
-            case 1: // ISBNのみ表示
+            case 1:
                 if (!isBookISBN) {
                     return true;
                 }
                 break;
-            case 2: // どちらも表示
-                // フィルタリングしない
+            case 2:
                 break;
-            default: // 不明なモードの場合はISBNをスキップ
+            default:
                 if (isBookISBN) {
                     return true;
                 }
@@ -398,7 +375,6 @@
         }
     };
 
-    // Amazon固有の日本語日付解析関数（新刊チェッカー専用）
     const parseDateFromText = (dateText) => {
         if (!dateText) return null;
 
@@ -409,14 +385,12 @@
         if (dateMatch) {
             let releaseDate;
             if (dateMatch[1]) {
-                // YYYY年MM月DD日形式
                 releaseDate = new Date(
                     dateMatch[1],
                     dateMatch[2] - 1,
                     dateMatch[3]
                 );
             } else if (dateMatch[4]) {
-                // YYYY/MM/DD形式
                 releaseDate = new Date(
                     dateMatch[4],
                     dateMatch[5] - 1,
@@ -432,7 +406,6 @@
         return info.newReleases && info.newReleases.length > 0;
     };
 
-    // グローバル関数として公開（デベロッパーツールから呼び出し可能）
     unsafeWindow.checkNewReleases = checkNewReleases;
 
     console.log('🚀 New Release Checker が読み込まれました');

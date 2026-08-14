@@ -1,7 +1,6 @@
 (function () {
     'use strict';
 
-    // 共通ライブラリから関数を取得
     const { ImageCache, DeferredMutationObserver } =
         unsafeWindow.MastodonCommon;
 
@@ -264,6 +263,5 @@
         });
     };
 
-    // 自動初期化
     initializeColumnSplitter();
 })();

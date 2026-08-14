@@ -11,6 +11,3 @@
 // @grant        unsafeWindow
 // @noframes
 // ==/UserScript==
-
-// このファイルはTampermonkey用のラッパーです
-// 実際のロジックはmain.jsに実装されています

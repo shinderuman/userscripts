@@ -15,18 +15,15 @@
     };
 
     const setupTitleChangeObserver = () => {
-        // まず即時実行
         if (changePlayerTitle()) {
             return;
         }
 
-        // ターゲット要素を取得
         const titleElement = document.querySelector(CONFIG.TARGET_SELECTOR);
         if (!titleElement) {
             return;
         }
 
-        // pタグだけを監視
         const observer = new MutationObserver(() => {
             if (changePlayerTitle()) {
                 observer.disconnect();

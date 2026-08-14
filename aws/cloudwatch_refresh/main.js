@@ -1,7 +1,6 @@
 (function () {
     'use strict';
 
-    // ダッシュボード画面でのみ動作するようにURL制限
     if (!window.location.hash.includes('#dashboards/dashboard/')) {
         return;
     }

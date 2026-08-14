@@ -12,10 +12,8 @@
         FILTER_MODE_ID: 'volume-filter-mode'
     };
 
-    // フィルターモード（true: 最小, false: 最大）
     let isMinMode = true;
 
-    // フィルター入力フィールドを作成
     const createFilterInput = () => {
         const container = document.createElement('div');
         container.id = CONFIG.FILTER_CONTAINER_ID;
@@ -77,7 +75,6 @@
             line-height: 1;
         `;
 
-        // モード切り替えボタンのイベント
         modeButton.addEventListener('click', () => {
             if (isMinMode) {
                 isMinMode = false;
@@ -92,7 +89,6 @@
             filterSeries();
         });
 
-        // リセットボタンのイベント
         resetButton.addEventListener('click', () => {
             input.value = '';
             filterSeries();
@@ -115,7 +111,6 @@
         return container;
     };
 
-    // シリーズをフィルタリング
     const filterSeries = () => {
         const filterValue = document.getElementById(
             CONFIG.FILTER_INPUT_ID
@@ -154,9 +149,7 @@
         return volumeCount <= targetVolumes;
     };
 
-    // フィルターUIを初期化
     const initializeFilter = () => {
-        // 既存のフィルターコンテナを削除
         const existingContainer = document.getElementById(
             CONFIG.FILTER_CONTAINER_ID
         );
@@ -164,17 +157,14 @@
             existingContainer.remove();
         }
 
-        // topbar-right-componentを探す
         const topbarRight = document.getElementById('topbar-right-component');
         if (!topbarRight) {
             console.error('topbar-right-component が見つかりません');
             return;
         }
 
-        // 新しいフィルターUIを作成
         const filterContainer = createFilterInput();
 
-        // topbar-right-componentの最初の子要素の前に挿入
         const firstChild = topbarRight.firstElementChild;
         if (firstChild) {
             topbarRight.insertBefore(filterContainer, firstChild);
@@ -188,7 +178,6 @@
         );
     };
 
-    // シリーズリストの変更を監視
     const monitorSeriesList = () => {
         const observer = new MutationObserver(() => {
             setTimeout(filterSeries, 100);
@@ -200,7 +189,6 @@
         });
     };
 
-    // 初期化処理
     const initializeLibraryVolumeFilter = () => {
         setTimeout(() => {
             initializeFilter();
@@ -208,6 +196,5 @@
         }, 500);
     };
 
-    // 自動初期化
     initializeLibraryVolumeFilter();
 })();

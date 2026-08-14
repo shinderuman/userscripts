@@ -1,7 +1,6 @@
 (function () {
     'use strict';
 
-    // 共通ライブラリから関数を取得
     const { showNotification, scrollToElement, createCanvas, applyStyles } =
         unsafeWindow.NiconicoCommon;
 
@@ -216,7 +215,6 @@
         console.log('📖 ニコニコ漫画横読み変換が初期化されました');
     };
 
-    // イベントリスナー設定
     document.addEventListener('keydown', handleAbortKey);
     setTimeout(initializeMangaReader, 1000);
 })();

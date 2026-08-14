@@ -1,7 +1,6 @@
 (function () {
     'use strict';
 
-    // 共通ライブラリから関数を取得
     const {
         COMMON_CONFIG,
         COMMON_SELECTORS,
@@ -9,7 +8,6 @@
         evaluateSaleConditions
     } = unsafeWindow.KindleCommon;
 
-    // グローバル設定を取得
     const globalConfig = unsafeWindow.GlobalConfig || {};
 
     const CONFIG = {
@@ -283,7 +281,6 @@ ${productUrl}
         const productInfo = extractAmazonProductInfo(document);
         const conditions = evaluateSaleConditions(productInfo);
 
-        // 共通関数ではクーポン詳細テキストが含まれないので、別途追加
         const couponInfo = getCouponInfo();
         if (couponInfo.hasCoupon && couponInfo.couponText) {
             return conditions.replace(
@@ -295,7 +292,6 @@ ${productUrl}
         return conditions || '';
     };
 
-    // クーポン情報を取得する関数
     const getCouponInfo = () => {
         return {
             hasCoupon:
@@ -413,11 +409,9 @@ ${productUrl}
     };
 
     const getSeriesPoints = (button) => {
-        // buttonのIDからoffer IDを抽出
         const match = button.id.match(PATTERNS.offerButtonId);
         if (!match) return 0;
 
-        // 対応するbuy-boxを探す
         const buyBoxSelector = SELECTORS.offerBuyBox.replace(
             '{OFFER_NUMBER}',
             match[1]
@@ -436,13 +430,11 @@ ${productUrl}
         return 0;
     };
 
-    // シリーズ用のクーポン情報を取得する関数
     const getSeriesCouponInfo = (maxOfferButton) => {
         if (!maxOfferButton) {
             return { hasSeriesCoupon: false, seriesCouponText: '' };
         }
 
-        // maxOfferButtonからoffer IDを抽出
         const match = maxOfferButton.id.match(PATTERNS.offerButtonId);
         if (!match) {
             return { hasSeriesCoupon: false, seriesCouponText: '' };
@@ -450,7 +442,6 @@ ${productUrl}
 
         const offerNumber = match[1];
 
-        // 対応するbuy-box内のクーポン情報を取得
         const buyBoxSelector = SELECTORS.offerBuyBox.replace(
             '{OFFER_NUMBER}',
             offerNumber
@@ -534,6 +525,5 @@ ${productUrl}
         console.log('🚀 Kindle Price and Point Highlighter が初期化されました');
     };
 
-    // 自動初期化
     initializePriceAndPointHighlighter();
 })();

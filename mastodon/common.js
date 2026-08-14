@@ -1,8 +1,6 @@
-// Mastodon共通ライブラリ
 unsafeWindow.MastodonCommon = (function () {
     'use strict';
 
-    // 共通定数
     const COMMON_SELECTORS = {
         TEXTAREA: 'textarea.autosuggest-textarea__textarea',
         HOME_COLUMN: 'div[aria-label="ホーム"]'
@@ -12,7 +10,6 @@ unsafeWindow.MastodonCommon = (function () {
         STATUSES: '/api/v1/statuses'
     };
 
-    // IndexedDBを使用した画像キャッシュクラス
     class ImageCache {
         constructor(
             dbName = 'ImageCacheDB',
@@ -95,7 +92,6 @@ unsafeWindow.MastodonCommon = (function () {
         }
     }
 
-    // 遅延実行対応のMutationObserver
     class DeferredMutationObserver {
         constructor(callback) {
             this.observer = new MutationObserver((mutations) => {
@@ -137,7 +133,6 @@ unsafeWindow.MastodonCommon = (function () {
         }
     }
 
-    // DOM要素の待機と取得
     const waitForElement = (selector, timeout = 10000) => {
         return new Promise((resolve, reject) => {
             const element = document.querySelector(selector);
@@ -167,14 +162,12 @@ unsafeWindow.MastodonCommon = (function () {
         });
     };
 
-    // 複数の要素を待機
     const waitForElements = (selectors, timeout = 10000) => {
         return Promise.all(
             selectors.map((selector) => waitForElement(selector, timeout))
         );
     };
 
-    // APIリクエスト共通関数
     const fetchAPI = async (url, options = {}) => {
         try {
             const response = await fetch(url, {
@@ -196,7 +189,6 @@ unsafeWindow.MastodonCommon = (function () {
         }
     };
 
-    // ユーザー名取得
     const getCurrentUsername = () => {
         const profileLink = document.querySelector('a[href^="/web/@"]');
         if (profileLink) {
@@ -206,7 +198,6 @@ unsafeWindow.MastodonCommon = (function () {
         return null;
     };
 
-    // 公開API
     return {
         ImageCache,
         DeferredMutationObserver,

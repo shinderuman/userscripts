@@ -1,12 +1,11 @@
 (function () {
     'use strict';
 
-    // キーバインド設定（変更可能）
     const KEY_BINDINGS = {
-        PREV_PAGE: 'KeyZ', // 前のページ
-        NEXT_PAGE: 'KeyX', // 次のページ
-        NEXT_VOLUME: 'KeyA', // 次の巻
-        FIRST_PAGE: 'Digit0' // 最初のページ
+        PREV_PAGE: 'KeyZ',
+        NEXT_PAGE: 'KeyX',
+        NEXT_VOLUME: 'KeyA',
+        FIRST_PAGE: 'Digit0'
     };
 
     const SELECTORS = {
@@ -19,10 +18,8 @@
         READER_CONTAINER: '#reader'
     };
 
-    // グローバルなイベントリスナー参照
     let keydownListener = null;
 
-    // Chevron要素を直接クリックしてページ送りを行う
     const clickChevron = (direction) => {
         try {
             const container = document.querySelector(
@@ -41,7 +38,6 @@
             const elements = activeContainer.querySelectorAll(selector);
 
             if (elements.length > 0) {
-                // 表示されている要素をフィルタリング
                 const visibleElements = Array.from(elements).filter(
                     (element) => {
                         const rect = element.getBoundingClientRect();
@@ -87,7 +83,6 @@
         }
     };
 
-    // 次の巻を開く
     const openNextVolume = () => {
         // 「さらに読む」ボタンをクリック
         const moreButton = document.querySelector(SELECTORS.MORE_BUTTON);
@@ -95,7 +90,6 @@
 
         moreButton.click();
 
-        // 100ms間隔で最大50回（5秒間）チェック
         let attempts = 0;
         const maxAttempts = 50;
         const intervalId = setInterval(() => {
@@ -108,7 +102,6 @@
         return true;
     };
 
-    // 定期的に「今すぐ読む」ボタンをチェック
     const checkForReadButton = () => {
         const readButton = document.querySelector(SELECTORS.READ_BUTTON);
         if (readButton) {
@@ -118,14 +111,12 @@
         return false;
     };
 
-    // 最初のページに移動
     const navigateToFirstPage = () => {
         const menuButton = document.querySelector(SELECTORS.MENU_BUTTON);
         if (!menuButton) return false;
 
         menuButton.click();
 
-        // MutationObserverで最初のページボタンの出現を監視
         const observer = new MutationObserver((mutations, obs) => {
             const firstPageButton = document.querySelector(
                 SELECTORS.FIRST_PAGE_BUTTON
@@ -144,19 +135,14 @@
         return true;
     };
 
-    // キーボードイベントリスナーを設定
     const setupKeyRemapping = () => {
-        // 既存のリスナーを削除
         if (keydownListener) {
             document.removeEventListener('keydown', keydownListener, true);
         }
 
-        // 新しいリスナーを作成
         keydownListener = (e) => {
-            // 修飾キーが押されている場合は何もしない
             if (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) return;
 
-            // 前のページキー
             if (e.code === KEY_BINDINGS.PREV_PAGE) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -164,7 +150,6 @@
                 clickChevron('prev');
             }
 
-            // 次のページキー
             if (e.code === KEY_BINDINGS.NEXT_PAGE) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -172,7 +157,6 @@
                 clickChevron('next');
             }
 
-            // 次の巻キー
             if (e.code === KEY_BINDINGS.NEXT_VOLUME) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -180,7 +164,6 @@
                 openNextVolume();
             }
 
-            // 最初のページキー
             if (e.code === KEY_BINDINGS.FIRST_PAGE) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -189,11 +172,9 @@
             }
         };
 
-        // 新しいリスナーを追加
         document.addEventListener('keydown', keydownListener, true);
     };
 
-    // URL変更監視（MutationObserver使用）
     const monitorUrlChanges = () => {
         let lastUrl = window.location.href;
 
@@ -204,18 +185,15 @@
             }
         };
 
-        // MutationObserverでDOM変更を監視
         const observer = new MutationObserver(handleUrlChange);
         observer.observe(document, {
             childList: true,
             subtree: true
         });
 
-        // popstateイベントでも監視
         window.addEventListener('popstate', handleUrlChange);
     };
 
-    // 初期化
     const initializeKindleReader = () => {
         setupKeyRemapping();
         monitorUrlChanges();
@@ -225,6 +203,5 @@
         );
     };
 
-    // 自動初期化
     initializeKindleReader();
 })();

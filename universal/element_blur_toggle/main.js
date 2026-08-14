@@ -3,7 +3,7 @@
 
     const CONFIG = {
         BLUR_FILTER: 'blur(8px)',
-        MODIFIER_KEY: 'altKey' // Option/Alt key
+        MODIFIER_KEY: 'altKey'
     };
 
     const toggleBlur = (element) => {
@@ -26,6 +26,5 @@
         console.log('💡 Option+Clickで要素にモザイクをかけることができます');
     };
 
-    // 自動初期化
     initializeBlurOnClick();
 })();
