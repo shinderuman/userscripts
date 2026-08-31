@@ -33,7 +33,7 @@
             setParent: true
         },
         GET_PARAM_DISPOSAL_SITES: ['https://ja.aliexpress.com'],
-        INPUT_FIELD_EXCEPTION_SITES: ['kenji.asmodeus.jp']
+        INPUT_FIELD_EXCEPTION_SITES: ['kenji.asmodeus.jp', 'chatgpt.com/']
     };
 
     const getPageInfo = () => {
