@@ -158,6 +158,59 @@ Kindle本棚（シリーズビュー）で巻数による絞り込み機能を�
 - **最大モード「5」**: 5巻以下のシリーズのみ表示（短編・完結作品の絞り込み）
 - **空欄**: 全シリーズを表示
 
+### 📚 続巻ASINエクスパンダー (`series_volume_expander/`)
+
+入力したASINの続巻を含むASIN一覧を取得するスクリプト。
+
+**機能:**
+
+- トップバー統合UI（`topbar-right-component`へ挿入、既存のフィルターUIと同デザイン）
+- ASIN入力欄（JSON配列をそのまま貼り付け）
+- 後続巻数入力（空欄または0 = 登録巻以降すべて / 1以上 = 登録巻 + 後続n巻、上限なし）
+- 本棚（漫画）の全件取得とタイトルからのシリーズ・巻数解析
+- 実行で続巻を含むASIN一覧（JSON配列）をConsoleとクリップボードに出力
+- 取得済みの状態での再実行時は確認ダイアログを表示
+- 実行結果を再コピーする「コピー」ボタン常時表示（未実行時はトーストで通知）
+- 処理中の進捗・結果・エラーをトースト表示（Consoleには最終出力とエラーのみ出力）
+- 本棚に存在しないASIN・後続巻が検出できないASINは警告表示のうえ入力値をそのまま出力
+
+**対応サイト:**
+
+- `https://read.amazon.co.jp/kindle-library*` - Kindle本棚
+
+**使用方法:**
+
+1. Kindle本棚を開く
+2. トップバーのASIN欄にJSON配列（例: `["B0XXXXXXXX"]`）を貼り付け
+3. 後続巻数を入力（空欄または0で登録巻以降すべて）
+4. 「続巻取得」ボタンをクリック
+5. 続巻を含むASIN一覧（JSON配列）がConsoleとクリップボードに出力される
+6. 「コピー」ボタンで最後の実行結果を再度クリップボードにコピーできる
+
+### 📚 コレクション追加 (`collection_adder/`)
+
+入力したASIN一覧をKindleのコンテンツ管理ページ（マイコンテンツ）から指定コレクションに一括追加するスクリプト。
+
+**機能:**
+
+- CollectionID入力フィールド（コレクション表示URLでは末尾のIDを自動入力）
+- ASIN一覧入力用テキストエリア（JSON配列をそのまま貼り付け）
+- 10件ずつのバッチ分割リクエスト（バッチ間1200ミリ秒待機）
+- 処理中の進捗・結果・エラーをトースト表示（Consoleにはエラーのみ出力）
+- csrfTokenはページのグローバル変数またはDOMから自動取得
+
+**対応サイト:**
+
+- `https://www.amazon.co.jp/hz/mycd/digital-console/contentlist*` - コンテンツ管理ページ
+
+**使用方法:**
+
+1. コンテンツ管理ページ（マイコンテンツ）を開く
+2. 右下パネルのCollectionIDに追加先コレクションのIDを入力（コレクションを開いているURLでは自動入力）
+3. テキストエリアにJSON配列を貼り付け（続巻ASINエクスパンダーの出力をそのまま使用可能）
+4. 「➕ 追加」ボタンをクリック
+5. バッチごとに追加処理が実行され、進捗と結果がトーストに表示される
+
 ### ⌨️ Amazon Kindle Reader統合スクリプト (`reader_key_remap/`)
 
 Amazon Kindle Readerでの包括的なキーボードショートカット機能を提供する統合スクリプト。
@@ -246,6 +299,7 @@ Kindleマンガリーダーのページタイトルを書き換えるスクリ�
 - `sendNotification(title, text, url, timeout)`: 基本通知
 - `sendCompletionNotification(scriptName, totalCount, resultCount)`: 完了通知
 - `sendErrorNotification(scriptName, errorMessage)`: エラー通知
+- `showToast(message, type, duration)`: ページ内トースト表示（type: `info` / `success` / `error`、duration=0で手動消去、戻り値の`update`/`hide`で内容更新・非表示）
 
 #### バッチ処理
 
@@ -281,6 +335,8 @@ Kindleマンガリーダーのページタイトルを書き換えるスクリ�
 5. **本棚巻数フィルター**: `library_volume_filter/wrapper.js`
 6. **Amazon Kindle Reader統合スクリプト**: `reader_key_remap/wrapper.js`
 7. **Kindle Reader Title Changer**: `reader_title_changer/wrapper.js`
+8. **続巻ASINエクスパンダー**: `series_volume_expander/wrapper.js`
+9. **コレクション追加**: `collection_adder/wrapper.js`
 
 ### 3. パスの設定
 

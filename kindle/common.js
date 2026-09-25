@@ -67,6 +67,12 @@ unsafeWindow.KindleCommon = (function () {
         MARKED_ASINS_EXPIRATION: 30 * 24 * 60 * 60 * 1000
     };
 
+    const TOAST_BACKGROUNDS = {
+        info: '#0F1111',
+        success: '#067D62',
+        error: '#CC0C39'
+    };
+
     const fetchJsonFromS3 = (url, dataType) => {
         return new Promise((resolve, reject) => {
             const cacheBuster = `?t=${Date.now()}&r=${Math.random()}`;
@@ -175,6 +181,66 @@ unsafeWindow.KindleCommon = (function () {
     const sendPageFetchErrorNotification = (url, title) => {
         const message = `${title}のページ取得に失敗しました`;
         sendNotification('⚠️ ページ取得エラー', message, url, 0);
+    };
+
+    const showToast = (message, type = 'info', duration = 3000) => {
+        let container = document.getElementById(
+            'kindle-common-toast-container'
+        );
+
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'kindle-common-toast-container';
+            container.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 99999;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            `;
+            document.body.appendChild(container);
+        }
+
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        toast.style.cssText = `
+            padding: 10px 16px;
+            background: ${TOAST_BACKGROUNDS[type] ?? TOAST_BACKGROUNDS.info};
+            color: #FFFFFF;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: "Amazon Ember", Arial, sans-serif;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
+        `;
+        container.appendChild(toast);
+        requestAnimationFrame(() => {
+            toast.style.opacity = '1';
+        });
+
+        let hideTimer = null;
+
+        const hideToast = () => {
+            clearTimeout(hideTimer);
+            toast.remove();
+            if (!container.hasChildNodes()) {
+                container.remove();
+            }
+        };
+
+        if (duration > 0) {
+            hideTimer = setTimeout(hideToast, duration);
+        }
+
+        return {
+            update: (nextMessage) => {
+                toast.textContent = nextMessage;
+            },
+            hide: hideToast
+        };
     };
 
     const extractAsinFromUrl = (url) => {
@@ -446,6 +512,7 @@ unsafeWindow.KindleCommon = (function () {
         sendCompletionNotification,
         sendErrorNotification,
         sendPageFetchErrorNotification,
+        showToast,
         extractAsinFromUrl,
         getElementValue,
         getStorageItems,

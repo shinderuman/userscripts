@@ -18,7 +18,9 @@ userscripts/
 │   ├── deleted_item_checker/          # 削除商品チェッカー
 │   ├── reader_key_remap/              # Amazon Kindle Reader統合スクリプト
 │   ├── reader_title_changer/          # Kindle Reader タイトル変更
-│   └── library_volume_filter/         # 本棚巻数フィルター
+│   ├── library_volume_filter/         # 本棚巻数フィルター
+│   ├── series_volume_expander/        # 続巻ASINエクスパンダー
+│   └── collection_adder/              # コレクション追加
 ├── amazon/                             # Amazon関連スクリプト
 │   ├── README.md                      # Amazonスクリプトの詳細説明
 │   ├── common.js                      # 共通ライブラリ
@@ -110,6 +112,8 @@ userscripts/
     - **最小/最大モード切り替え**: 指定巻数以上/以下のシリーズを表示
     - **トップバー統合**: 既存UIに自然に統合されたフィルター入力フィールド
     - **動的フィルタリング**: 無限スクロールで読み込まれる新コンテンツにも自動適用
+- **続巻ASINエクスパンダー**: 入力ASINの続巻を含むASIN一覧をConsoleとクリップボードに出力
+- **コレクション追加**: 入力ASIN一覧を指定コレクションにバッチ分割で一括追加
 
 ### Amazon (`amazon/`)
 
