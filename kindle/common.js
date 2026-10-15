@@ -50,7 +50,7 @@ unsafeWindow.KindleCommon = (function () {
         UNPROCESSED_BOOKS_URL:
             'https://kindle-asins.s3.ap-northeast-1.amazonaws.com/unprocessed_asins.json',
 
-        POINT_THRESHOLD: 170,
+        POINT_THRESHOLD: 171,
         POINTS_RATE_THRESHOLD: 20,
         AVERAGE_PRICE_THRESHOLD: 350,
         MIN_PRICE: 221,
