@@ -116,6 +116,21 @@
         link.textContent = link.textContent.replace(/^🌟+ /u, '');
     };
 
+    const togglePriority = (link) => {
+        const currentLevel = link.priorityLevel || 0;
+
+        if (currentLevel >= PRIORITY_MAX) {
+            delete priorityCache[link.href];
+            removePriorityStyle(link);
+        } else {
+            const nextLevel = currentLevel + 1;
+            priorityCache[link.href] = nextLevel;
+            applyPriorityStyle(link, nextLevel);
+        }
+
+        savePriorityCache();
+    };
+
     const shouldSkipLink = (linkText) => {
         return skipList.some((keyword) => linkText.includes(keyword));
     };
@@ -287,12 +302,24 @@
             a.textContent = link.textContent;
             a.target = '_blank';
             Object.assign(a.style, STYLES.priorityLink);
+            a.addEventListener('click', (e) => {
+                handlePriorityClick(e, link, a);
+            });
             li.appendChild(a);
             list.appendChild(li);
         });
 
         panel.appendChild(list);
         return panel;
+    };
+
+    const handlePriorityClick = (e, link, displayLink) => {
+        if (!e.shiftKey) return;
+        e.preventDefault();
+        togglePriority(link);
+        if (displayLink) {
+            displayLink.textContent = link.textContent;
+        }
     };
 
     const togglePanel = (button, { id, label, panelConfig }) => {
@@ -320,21 +347,7 @@
             }
 
             link.addEventListener('click', (e) => {
-                if (!e.shiftKey) return;
-                e.preventDefault();
-
-                const currentLevel = link.priorityLevel || 0;
-
-                if (currentLevel >= PRIORITY_MAX) {
-                    delete priorityCache[link.href];
-                    removePriorityStyle(link);
-                } else {
-                    const nextLevel = currentLevel + 1;
-                    priorityCache[link.href] = nextLevel;
-                    applyPriorityStyle(link, nextLevel);
-                }
-
-                savePriorityCache();
+                handlePriorityClick(e, link);
             });
         });
     };
