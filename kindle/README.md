@@ -13,6 +13,12 @@ Amazon Kindleストアでの書籍チェックを自動化するTampermonkeyス�
 - S3から作者リストを取得
 - Amazon検索結果から新刊を自動検出
 - 発売日ベースの新刊判定（デフォルト7日以内）
+- 著者検索と商品詳細の取得を合計最大20リクエストで並列実行
+- 著者の処理も最大20並列とし、20人全員の完了を待たず空いた枠で次の著者を開始
+- 検索結果で判定し、発売日がない商品だけ詳細ページを取得する（価格不明だけでは追加取得・除外しない）
+- 同一実行中に共著などで重複したASINは、商品取得・タブ表示・通知記録を1回にまとめる
+- 商品ページを確認したASINはIndexedDBに永続保存し、通知対象外だった商品も次回以降の取得から除外
+- チェック済みASINは全件の判定・タブ表示・通知記録の保存後に、1トランザクションで一括保存（処理途中では永続化しない）
 - 除外キーワードによるフィルタリング
 - 新刊発見時に自動でタブを開く
 - 重複処理の防止
@@ -75,6 +81,9 @@ Kindle書籍の価格とポイント条件を満たす場合、視覚的に通�
 **機能:**
 
 - 価格・ポイント条件の自動判定
+- 形式欄のレンダリング完了を待って判定する
+- Kindleページでは画面内の紙価格を使い、商品ページを追加取得しない
+- 紙ページではKindleの価格・ポイントをKindleページから1回取得する
 - ナビゲーションバーのハイライト表示
 - ファビコンへのバッジ追加
 - Slack・Mastodon連携通知
@@ -292,7 +301,19 @@ Kindleマンガリーダーのページタイトルを書き換えるスクリ�
 #### データ取得
 
 - `fetchJsonFromS3(url, dataType)`: S3からJSONデータを取得
-- `fetchPageInfo(url, extractorFunction)`: 個別ページ情報を取得
+- `fetchDocument(url, bookTitle)`: 検索条件を保持してHTMLを取得・解析
+- `fetchPageInfo(url, extractorFunction, bookTitle)`: 商品URLのクエリを除去して取得し、抽出関数を実行
+- `fetchAmazonProductInfo(doc, url, logContext)`: 商品解析結果に、紙書籍ページから取得した価格を追加
+
+#### HTML解析・判定
+
+- `extractAmazonProductInfo(doc, url)`: 商品名・ASIN・価格・ポイント・形式・発売日・クーポンを解析（追加通信なし）
+- `extractBookFormats(doc)` / `getBookAvailability(doc)`: 確認済みの形式欄から紙・Kindleの情報を抽出
+- `extractAmazonSearchBooks(doc)` / `selectNewReleaseCandidates(books, options)`: 検索結果の解析と著者・ISBNモード・除外語・通知済みの絞り込み
+- `extractReleaseDate(doc)` / `isNewRelease(info, cutoffDate, minPrice)`: 発売日解析と新刊判定
+- `extractAmazonSeriesInfo(doc)` / `evaluateSeriesSaleConditions(info)`: シリーズオファーの解析と条件判定
+- `evaluateSaleConditions(info)`: 価格差・ポイント・クーポンによるセール判定
+- `isBadgeExpired(timestamp, expiration, now)`: バッジ期限の判定
 
 #### 通知システム
 
@@ -304,6 +325,7 @@ Kindleマンガリーダーのページタイトルを書き換えるスクリ�
 #### バッチ処理
 
 - `processBatch(items, processorFunction, config)`: 並行処理制御
+- `createRequestLimiter(limit)`: 著者検索・商品取得を通じた同時リクエスト上限の共有
 
 #### ストレージ管理
 
@@ -311,6 +333,7 @@ Kindleマンガリーダーのページタイトルを書き換えるスクリ�
 - `saveStorageItems(storageKey, items)`: localStorage一括保存
 - `isAlreadyStored(storageKey, checkFunction)`: 重複チェック
 - `cleanupOldStorageItems(storageKey, cutoffDate)`: 古いデータ削除
+- `openNewReleaseCheckStore()`: 新刊チェックで商品ページを確認済みのASINだけをIndexedDBに保存・読み込み（キーはASIN、値はnull、期限なし）
 
 #### ユーティリティ
 
@@ -404,6 +427,17 @@ checkWishlistSales();
 - 🧹 クリーンアップ状況
 
 ## 🛠️ 開発・カスタマイズ
+
+### 検証
+
+`node --test kindle/tests/*.test.cjs` でKindleの4つのチェッカーの回帰テストを実行できます。
+`common.test.cjs` は解析・判定をGM APIやページのグローバル状態なしで直接テストします。
+`checkers.test.cjs` は4スクリプトの通知・タブ操作・通信件数・並列実行を検証します。
+`tests/fixtures/` には2026年10月30日の実ページの抜粋と、既存セレクタの契約に基づくテストデータを置き、各ファイルのコメントに出典を記載しています。
+新刊チェックは検索結果で判定し、発売日がない商品だけ詳細ページを取得します。価格不明だけでは追加取得・除外しません。著者名は元の部分一致で照合します。商品ページを取得して確認したASINは、通知の有無にかかわらずIndexedDBの `KindleNewReleaseChecker` / `checkedAsins` に保存します。次回以降は検索結果から除外し、価格・発売日を再取得しません。HTTPエラーなどで取得できなかったASINは記録しません。
+Sale Checkerでは取得HTMLに紙価格がない場合、対応する紙書籍ページから取得します。HighlighterではKindleページ内の形式欄の描画を待って紙価格を読み、紙ページではKindle側の価格・ポイントを取得します。
+`*-response.html` は実際に取得したHTTP応答HTMLの抜粋です。
+紙・Kindleの形式判定は、取得HTMLの `tmmSwatches`、インライン形式欄、`4049723255` で確認したMedia Matrix表示に対応しています。
 
 ### アーキテクチャ
 

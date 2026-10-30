@@ -3,10 +3,12 @@
 
     const {
         COMMON_CONFIG,
-        COMMON_SELECTORS,
+        processBatch,
+        extractAmazonProductInfo,
         fetchJsonFromS3,
         fetchPageInfo,
-        sendCompletionNotification
+        sendCompletionNotification,
+        sendNotification
     } = unsafeWindow.KindleCommon;
 
     const fetchBooks = () => {
@@ -22,21 +24,12 @@
     };
 
     const extractPageInfo = (doc, bookInfo, cleanUrl) => {
-        const title =
-            doc.querySelector(COMMON_SELECTORS.title)?.innerText.trim() ||
-            bookInfo.Title;
-        const paperBookAvailable = doc.querySelector(
-            COMMON_SELECTORS.paperBookAvailable
-        );
-        const kindleBookAvailable = doc.querySelector(
-            COMMON_SELECTORS.kindleBookAvailable
-        );
-
+        const info = extractAmazonProductInfo(doc, cleanUrl);
         return {
             ...bookInfo,
-            title,
-            paperBookAvailable: !!paperBookAvailable,
-            kindleBookAvailable: !!kindleBookAvailable,
+            title: info.title || bookInfo.Title,
+            paperBookAvailable: info.paperBookAvailable,
+            kindleBookAvailable: info.kindleBookAvailable,
             cleanUrl
         };
     };
@@ -52,14 +45,9 @@
         let processedCount = 0;
         const availableBooks = [];
 
-        for (
-            let i = 0;
-            i < books.length;
-            i += COMMON_CONFIG.CONCURRENT_REQUESTS
-        ) {
-            const batch = books.slice(i, i + COMMON_CONFIG.CONCURRENT_REQUESTS);
-
-            const promises = batch.map(async (bookInfo) => {
+        await processBatch(
+            books,
+            async (bookInfo) => {
                 try {
                     const pageInfo = await fetchBookPageInfo(bookInfo);
                     const isAvailable = checkAvailabilityConditions(pageInfo);
@@ -83,17 +71,9 @@
                     console.error(`❌ エラー: ${bookInfo.URL}`, error);
                     return { success: false, error };
                 }
-            });
-
-            await Promise.all(promises);
-
-            // 次のバッチまで待機（レート制限対策）
-            if (i + COMMON_CONFIG.CONCURRENT_REQUESTS < books.length) {
-                await new Promise((resolve) =>
-                    setTimeout(resolve, COMMON_CONFIG.REQUEST_DELAY)
-                );
-            }
-        }
+            },
+            COMMON_CONFIG
+        );
 
         const now = new Date().toLocaleString('ja-JP');
         console.log(
@@ -123,12 +103,12 @@
             await checkPagesInBatches(books);
         } catch (error) {
             console.error('❌ エラーが発生しました:', error);
-            GM_notification({
-                title: '❌ エラー',
-                text: '利用可能性チェック中にエラーが発生しました',
-                image: 'https://www.google.com/s2/favicons?sz=64&domain=amazon.co.jp',
-                timeout: 5000
-            });
+            sendNotification(
+                '❌ エラー',
+                '利用可能性チェック中にエラーが発生しました',
+                null,
+                5000
+            );
         }
     };
 

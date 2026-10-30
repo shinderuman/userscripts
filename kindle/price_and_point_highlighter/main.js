@@ -4,7 +4,14 @@
     const {
         COMMON_CONFIG,
         COMMON_SELECTORS,
-        extractAmazonProductInfo,
+        getElementText,
+        getBookAvailability,
+        isBadgeExpired,
+        fetchKindleInfoForPaper,
+        waitForRenderedProductInfo,
+        extractAsinFromUrl,
+        evaluateSeriesSaleConditions,
+        extractAmazonSeriesInfo,
         evaluateSaleConditions
     } = unsafeWindow.KindleCommon;
 
@@ -26,31 +33,7 @@
         navbar: '#nav-belt',
         postTrigger: '#nav-logo',
         seriesTitle: '#collection-masthead__title',
-        asin: "#ASIN, input[name='idx.asin'], input[name='ASIN.0'], input[name='titleID']",
-        offerButtons: 'button[id^="offer-tab-button_offer_"]',
-        offerButtonTotal: 'div > span',
-        offerButtonPrice: 'div > div > span',
-        offerBuyBox: '[data-offer-id="offer_{OFFER_NUMBER}"] #buy-box',
-        buyBoxPoints:
-            'div.a-row.a-spacing-mini > div.a-column.a-span7.a-text-right.a-span-last > span',
-        accordionRow: '[data-a-accordion-row-name], [data-accordion-id]',
-        accordionHeader: '.a-heading-text, h3'
-    };
-
-    const PATTERNS = {
-        offerButtonId: /offer-tab-button_offer_(\d+)/,
-        totalBooks: [
-            /購入可能な全\s*(\d+)\s*冊/,
-            /残りの全\s*(\d+)\s*冊/,
-            /次の(\d+)冊/,
-            /(\d+)冊すべて/
-        ],
-        seriesPrice: /(\d+(?:,\d+)*)/,
-        seriesPoints: /(\d+(?:,\d+)*)\s*pt/,
-        points: /(\d+)pt/,
-        price: /([\d,]+)/,
-        asinFromUrl:
-            /\/(?:dp|gp\/product|kindle-dbs\/product)\/([A-Z0-9]{10})[/?]?/
+        asin: "#ASIN, input[name='idx.asin'], input[name='ASIN.0'], input[name='titleID']"
     };
 
     let asin = null;
@@ -70,11 +53,6 @@
         );
     };
 
-    const isBadgeExpired = (timestamp) => {
-        if (!timestamp) return false;
-        return Date.now() - Number(timestamp) >= CONFIG.BADGE_EXPIRATION;
-    };
-
     const createMessage = (title, detail) => {
         const url = new URL(window.location.href);
         const productUrl = `${url.protocol}//${url.hostname}/dp/${asin}${CONFIG.AFFILIATE_PARAMS}`;
@@ -88,13 +66,8 @@ ${productUrl}
     const getASIN = () => {
         return (
             document.querySelector(SELECTORS.asin)?.value ||
-            extractASINFromURL()
+            extractAsinFromUrl(window.location.href)
         );
-    };
-
-    const extractASINFromURL = () => {
-        const match = window.location.href.match(PATTERNS.asinFromUrl);
-        return match ? match[1] : null;
     };
 
     const isNotified = () => {
@@ -277,191 +250,33 @@ ${productUrl}
         });
     };
 
-    const evaluateConditions = () => {
-        const productInfo = extractAmazonProductInfo(document);
+    const evaluateConditions = (productInfo) => {
         const conditions = evaluateSaleConditions(productInfo);
 
-        const couponInfo = getCouponInfo();
-        if (couponInfo.hasCoupon && couponInfo.couponText) {
+        if (productInfo.hasCoupon && productInfo.couponText) {
             return conditions.replace(
                 '✅クーポンあり',
-                `✅クーポンあり (${couponInfo.couponText})`
+                `✅クーポンあり (${productInfo.couponText})`
             );
         }
 
         return conditions || '';
     };
 
-    const getCouponInfo = () => {
-        return {
-            hasCoupon:
-                document
-                    .querySelector(SELECTORS.couponBadge)
-                    ?.textContent?.includes('クーポン:') || false,
-            couponText:
-                document
-                    .querySelector('.couponLabelText')
-                    ?.firstChild?.textContent?.trim() || ''
-        };
-    };
-
     const checkSeriesConditions = () => {
-        const maxOfferButton = getMaxOfferButton();
-        if (!maxOfferButton) return null;
-
-        const bookCount = getSeriesTotalFromButton(maxOfferButton);
-        if (bookCount === 0) return null;
-
-        const seriesPrice = getSeriesPriceFromButton(maxOfferButton);
-        const seriesPoints = getSeriesPoints(maxOfferButton);
-        const seriesCouponInfo = getSeriesCouponInfo(maxOfferButton);
-
+        const info = extractAmazonSeriesInfo(document);
+        if (!info) return null;
         console.log(
             '📊 シリーズ情報 - 冊数:',
-            bookCount,
+            info.bookCount,
             '価格:',
-            seriesPrice,
+            info.seriesPrice,
             'ポイント:',
-            seriesPoints,
+            info.seriesPoints,
             'シリーズクーポン:',
-            seriesCouponInfo.hasSeriesCoupon
+            info.hasSeriesCoupon
         );
-
-        const conditions = [];
-        if (seriesCouponInfo.hasSeriesCoupon) {
-            conditions.push(
-                `✅シリーズクーポンあり (${seriesCouponInfo.seriesCouponText})`
-            );
-        }
-        if (seriesPoints >= COMMON_CONFIG.POINT_THRESHOLD) {
-            conditions.push(`✅シリーズのポイントが ${seriesPoints}pt です。`);
-        }
-
-        if (bookCount > 0 && seriesPrice > 0) {
-            const averagePrice = seriesPrice / bookCount;
-            if (averagePrice <= COMMON_CONFIG.AVERAGE_PRICE_THRESHOLD) {
-                conditions.push(
-                    `${bookCount}冊が平均 ${averagePrice.toFixed(2)}円 で購入可能です。`
-                );
-            }
-        }
-
-        return conditions.length > 0 ? conditions.join(' ') : null;
-    };
-
-    const getMaxOfferButton = () => {
-        const offerButtons = document.querySelectorAll(SELECTORS.offerButtons);
-        let maxOfferButton = null;
-        let maxOfferNumber = -1;
-
-        offerButtons.forEach((button) => {
-            const accordionRow = button.closest(SELECTORS.accordionRow);
-            if (accordionRow) {
-                const headerText = accordionRow.querySelector(
-                    SELECTORS.accordionHeader
-                );
-                if (
-                    headerText &&
-                    headerText.textContent.includes('まとめ買い (話)')
-                ) {
-                    return;
-                }
-            }
-
-            const match = button.id.match(PATTERNS.offerButtonId);
-            if (match) {
-                const offerNumber = parseInt(match[1]);
-                if (offerNumber > maxOfferNumber) {
-                    maxOfferNumber = offerNumber;
-                    maxOfferButton = button;
-                }
-            }
-        });
-
-        return maxOfferButton;
-    };
-
-    const getSeriesTotalFromButton = (button) => {
-        const totalSpan = button.querySelector(SELECTORS.offerButtonTotal);
-        if (!totalSpan) return 0;
-
-        const totalText = totalSpan.textContent;
-
-        for (const pattern of PATTERNS.totalBooks) {
-            const match = totalText.match(pattern);
-            if (match) {
-                return parseInt(match[1]);
-            }
-        }
-        return 0;
-    };
-
-    const getSeriesPriceFromButton = (button) => {
-        const priceSpan = button.querySelector(SELECTORS.offerButtonPrice);
-        if (!priceSpan) return 0;
-
-        const priceText = priceSpan.textContent;
-        const priceMatch = priceText.match(PATTERNS.seriesPrice);
-        if (priceMatch) {
-            return parseInt(priceMatch[1].replace(/,/g, ''));
-        }
-        return 0;
-    };
-
-    const getSeriesPoints = (button) => {
-        const match = button.id.match(PATTERNS.offerButtonId);
-        if (!match) return 0;
-
-        const buyBoxSelector = SELECTORS.offerBuyBox.replace(
-            '{OFFER_NUMBER}',
-            match[1]
-        );
-        const buyBox = document.querySelector(buyBoxSelector);
-        if (!buyBox) return 0;
-
-        const pointsElement = buyBox.querySelector(SELECTORS.buyBoxPoints);
-        if (pointsElement) {
-            const pointsText = pointsElement.textContent;
-            const pointsMatch = pointsText.match(PATTERNS.seriesPoints);
-            if (pointsMatch) {
-                return parseInt(pointsMatch[1].replace(/,/g, ''));
-            }
-        }
-        return 0;
-    };
-
-    const getSeriesCouponInfo = (maxOfferButton) => {
-        if (!maxOfferButton) {
-            return { hasSeriesCoupon: false, seriesCouponText: '' };
-        }
-
-        const match = maxOfferButton.id.match(PATTERNS.offerButtonId);
-        if (!match) {
-            return { hasSeriesCoupon: false, seriesCouponText: '' };
-        }
-
-        const offerNumber = match[1];
-
-        const buyBoxSelector = SELECTORS.offerBuyBox.replace(
-            '{OFFER_NUMBER}',
-            offerNumber
-        );
-        const buyBox = document.querySelector(buyBoxSelector);
-
-        if (!buyBox) {
-            return { hasSeriesCoupon: false, seriesCouponText: '' };
-        }
-
-        const couponElement = buyBox.querySelector(
-            '._hulk-buy-card_buyBox_coupon-message__3BUsi'
-        );
-        const hasSeriesCoupon = !!couponElement;
-        const seriesCouponText = couponElement?.textContent?.trim() || '';
-
-        return {
-            hasSeriesCoupon,
-            seriesCouponText
-        };
+        return evaluateSeriesSaleConditions(info);
     };
 
     const addPostClickHandler = (title, detail) => {
@@ -474,13 +289,18 @@ ${productUrl}
         }
     };
 
-    const checkConditions = () => {
-        const productInfo = extractAmazonProductInfo(document);
+    const checkConditions = async () => {
+        const displayedInfo = await waitForRenderedProductInfo(
+            document,
+            window.location.href
+        );
+        const productInfo = await fetchKindleInfoForPaper(displayedInfo);
         const title =
             productInfo.title ||
-            document.querySelector(SELECTORS.seriesTitle)?.innerText.trim() ||
+            getElementText(document.querySelector(SELECTORS.seriesTitle)) ||
             '商品タイトル不明';
-        const detail = evaluateConditions() || checkSeriesConditions();
+        const detail =
+            evaluateConditions(productInfo) || checkSeriesConditions();
 
         if (detail) {
             highlightNavbar();
@@ -496,15 +316,11 @@ ${productUrl}
     };
 
     const checkAndApplyBadgeForKindleAvailability = () => {
-        const paperBookAvailable = document.querySelector(
-            SELECTORS.paperBookAvailable
-        );
-        const kindleBookAvailable = document.querySelector(
-            SELECTORS.kindleBookAvailable
-        );
+        const { paperBookAvailable, kindleBookAvailable } =
+            getBookAvailability(document);
         const markedASINs = getMarkedASINs();
 
-        if (isBadgeExpired(markedASINs[asin])) {
+        if (isBadgeExpired(markedASINs[asin], CONFIG.BADGE_EXPIRATION)) {
             return;
         }
 
@@ -514,16 +330,18 @@ ${productUrl}
         }
     };
 
-    const initializePriceAndPointHighlighter = () => {
+    const initializePriceAndPointHighlighter = async () => {
         asin = getASIN();
         if (!asin) return;
 
         clearNotifiedASINsDaily();
         clearExpiredMarkedASINs();
-        checkConditions() || checkAndApplyBadgeForKindleAvailability();
+        (await checkConditions()) || checkAndApplyBadgeForKindleAvailability();
 
         console.log('🚀 Kindle Price and Point Highlighter が初期化されました');
     };
 
-    initializePriceAndPointHighlighter();
+    initializePriceAndPointHighlighter().catch((error) =>
+        console.error('❌ 価格・ポイントの取得に失敗しました:', error)
+    );
 })();

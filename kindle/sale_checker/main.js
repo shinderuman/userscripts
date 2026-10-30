@@ -3,10 +3,12 @@
 
     const {
         COMMON_CONFIG,
+        processBatch,
         fetchJsonFromS3,
         fetchPageInfo,
         sendCompletionNotification,
-        extractAmazonProductInfo,
+        sendNotification,
+        fetchAmazonProductInfo,
         evaluateSaleConditions
     } = unsafeWindow.KindleCommon;
 
@@ -41,20 +43,16 @@
         let processedCount = 0;
         const saleBooks = [];
 
-        for (
-            let i = 0;
-            i < books.length;
-            i += COMMON_CONFIG.CONCURRENT_REQUESTS
-        ) {
-            const batch = books.slice(i, i + COMMON_CONFIG.CONCURRENT_REQUESTS);
-
-            const promises = batch.map(async (bookInfo) => {
+        await processBatch(
+            books,
+            async (bookInfo) => {
                 try {
                     const pageInfo = await fetchPageInfo(
                         bookInfo.URL,
-                        (doc, cleanUrl) => {
-                            const productInfo = extractAmazonProductInfo(
+                        async (doc, cleanUrl) => {
+                            const productInfo = await fetchAmazonProductInfo(
                                 doc,
+                                cleanUrl,
                                 `(${cleanUrl})`
                             );
 
@@ -89,17 +87,9 @@
                     console.error(`❌ エラー: ${bookInfo.URL}`, error);
                     return { success: false, error };
                 }
-            });
-
-            await Promise.all(promises);
-
-            // 次のバッチまで待機（レート制限対策）
-            if (i + COMMON_CONFIG.CONCURRENT_REQUESTS < books.length) {
-                await new Promise((resolve) =>
-                    setTimeout(resolve, COMMON_CONFIG.REQUEST_DELAY)
-                );
-            }
-        }
+            },
+            COMMON_CONFIG
+        );
 
         const now = new Date().toLocaleString('ja-JP');
         console.log(
@@ -126,12 +116,12 @@
             await checkPagesInBatches(books);
         } catch (error) {
             console.error('❌ エラーが発生しました:', error);
-            GM_notification({
-                title: '❌ エラー',
-                text: 'セールチェック中にエラーが発生しました',
-                image: 'https://www.google.com/s2/favicons?sz=64&domain=amazon.co.jp',
-                timeout: 5000
-            });
+            sendNotification(
+                '❌ エラー',
+                'セールチェック中にエラーが発生しました',
+                null,
+                5000
+            );
         }
     };
 
